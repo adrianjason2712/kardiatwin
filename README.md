@@ -1,4 +1,4 @@
-# Cardio Twin
+# KardiaTwin
 
 Cardio Twin is a real-time heart monitoring application that offers advanced cardiac simulation capabilities.
 
@@ -39,4 +39,5 @@ python server.py
 ## Usage
 - Access the application through your browser after starting both frontend and backend servers.
 - Monitor and simulate cardiac data in real-time.
+
 
