@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle, MessageCircle } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { HeartScene } from './components/HeartScene';
+import PulseChatbot from './components/PulseChatbot';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,6 +34,7 @@ interface UserData {
   fbs: string;
   restecg: string;
   slope: string;
+  protocol: string;  // Add protocol selection
 }
 
 interface SimulationData {
@@ -83,7 +85,8 @@ function App() {
     cp: '',
     fbs: '0',
     restecg: '0',
-    slope: '1'
+    slope: '1',
+    protocol: 'Standard Bruce' // Default to Standard Bruce
   });
 
   const [data, setData] = useState<SimulationData>({
@@ -109,6 +112,24 @@ function App() {
   });
   const [showThresholdSettings, setShowThresholdSettings] = useState(false);
   const [showMiniPlayer, setShowMiniPlayer] = useState(true);
+  const [showChatbot, setShowChatbot] = useState(false);
+
+  // Check if all required parameters are selected
+  const isFormComplete = () => {
+    return userData.age !== '' && userData.sex !== '' && userData.cp !== '';
+  };
+
+  // Auto-select protocol based on age
+  const updateProtocolBasedOnAge = (age: string) => {
+    if (age !== '') {
+      const ageNum = parseInt(age);
+      if (ageNum >= 60) {
+        setUserData(prev => ({ ...prev, protocol: 'Modified Bruce' }));
+      } else {
+        setUserData(prev => ({ ...prev, protocol: 'Standard Bruce' }));
+      }
+    }
+  };
 
   const evaluateRisk = (data: SimulationData): string => {
     // Define risk thresholds
@@ -147,7 +168,20 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/start", userData);
+      // Map protocol names to backend values
+      const protocolMap = {
+        "Standard Bruce": "standard",
+        "Modified Bruce": "modified_bruce"
+      };
+      
+      const submissionData = {
+        ...userData,
+        simulation: {
+          protocol: protocolMap[userData.protocol as keyof typeof protocolMap] || "standard"
+        }
+      };
+      
+      await axios.post("http://localhost:5000/start", submissionData);
       setSimulationStarted(true);
     } catch (error) {
       console.error("Error starting simulation:", error);
@@ -464,6 +498,20 @@ function App() {
               <Heart className="h-6 w-6 text-[#8F87F1]" />
               <span className="text-xl font-bold gradient-text">KardiaTwin</span>
             </div>
+            <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => setShowChatbot(!showChatbot)}
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <MessageCircle className="h-6 w-6" />
+              </button>
+              <button 
+                onClick={() => setShowMiniPlayer(!showMiniPlayer)}
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <Heart className="h-6 w-6" />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -483,8 +531,49 @@ function App() {
         <div className="bg-white rounded-xl shadow-xl p-6 mb-8">
           {!simulationStarted ? (
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-              {/* User Input Section */}
-              <div className="space-y-8">
+                             {/* Form Completion Status */}
+               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                 <div className="flex items-center justify-between">
+                   <h3 className="text-lg font-medium text-gray-700">Required Parameters</h3>
+                   <div className="flex items-center space-x-2">
+                     <span className="text-sm text-gray-600">Completion:</span>
+                     <span className={`text-sm font-medium ${
+                       isFormComplete() ? 'text-green-600' : 'text-orange-600'
+                     }`}>
+                       {isFormComplete() ? 'Complete ✓' : 'Incomplete ⚠'}
+                     </span>
+                   </div>
+                 </div>
+                 <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+                   <div className={`flex items-center space-x-2 text-sm ${
+                     userData.age !== '' ? 'text-green-600' : 'text-gray-500'
+                   }`}>
+                     {userData.age !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                     <span>Age: {userData.age !== '' ? 'Selected' : 'Required'}</span>
+                   </div>
+                   <div className={`flex items-center space-x-2 text-sm ${
+                     userData.sex !== '' ? 'text-green-600' : 'text-gray-500'
+                   }`}>
+                     {userData.sex !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                     <span>Gender: {userData.sex !== '' ? 'Selected' : 'Required'}</span>
+                   </div>
+                   <div className={`flex items-center space-x-2 text-sm ${
+                     userData.cp !== '' ? 'text-green-600' : 'text-gray-500'
+                   }`}>
+                     {userData.cp !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                     <span>Chest Pain: {userData.cp !== '' ? 'Selected' : 'Required'}</span>
+                   </div>
+                   <div className={`flex items-center space-x-2 text-sm ${
+                     userData.protocol !== '' ? 'text-green-600' : 'text-gray-500'
+                   }`}>
+                     {userData.protocol !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                     <span>Protocol: {userData.protocol !== '' ? 'Selected' : 'Required'}</span>
+                   </div>
+                 </div>
+               </div>
+
+               {/* User Input Section */}
+               <div className="space-y-8">
                 {/* Age Input Section */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Age Range</h2>
@@ -493,7 +582,10 @@ function App() {
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                         parseInt(userData.age) >= 18 && parseInt(userData.age) <= 30 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
                       }`}
-                      onClick={() => setUserData({...userData, age: "25"})}
+                      onClick={() => {
+                        setUserData({...userData, age: "25"});
+                        updateProtocolBasedOnAge("25");
+                      }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">18-30</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -515,7 +607,10 @@ function App() {
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                         parseInt(userData.age) >= 31 && parseInt(userData.age) <= 45 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
                       }`}
-                      onClick={() => setUserData({...userData, age: "38"})}
+                      onClick={() => {
+                        setUserData({...userData, age: "38"});
+                        updateProtocolBasedOnAge("38");
+                      }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">31-45</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -537,7 +632,10 @@ function App() {
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                         parseInt(userData.age) >= 46 && parseInt(userData.age) <= 60 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
                       }`}
-                      onClick={() => setUserData({...userData, age: "53"})}
+                      onClick={() => {
+                        setUserData({...userData, age: "53"});
+                        updateProtocolBasedOnAge("53");
+                      }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">46-60</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -559,7 +657,10 @@ function App() {
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
                         parseInt(userData.age) > 60 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
                       }`}
-                      onClick={() => setUserData({...userData, age: "65"})}
+                      onClick={() => {
+                        setUserData({...userData, age: "65"});
+                        updateProtocolBasedOnAge("65");
+                      }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">60+</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -735,14 +836,70 @@ function App() {
                     </div>
                   </div>
                 </div>
+
+                {/* Protocol Selection Section */}
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Exercise Protocol</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div 
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                        userData.protocol === "Standard Bruce" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                      }`}
+                      onClick={() => setUserData({...userData, protocol: "Standard Bruce"})}
+                    >
+                      <div className="font-medium text-gray-700 text-center mb-2">Standard Bruce</div>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-center">
+                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                          Most Common Protocol
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                          Simple to follow
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                          Good for beginners
+                        </li>
+                      </ul>
+                    </div>
+                    <div 
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                        userData.protocol === "Modified Bruce" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                      }`}
+                      onClick={() => setUserData({...userData, protocol: "Modified Bruce"})}
+                    >
+                      <div className="font-medium text-gray-700 text-center mb-2">Modified Bruce</div>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-center">
+                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                          More intense
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                          Suitable for advanced users
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                          Requires more equipment
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
               
-              <button
-                type="submit"
-                className="w-full py-3 px-4 rounded-lg text-white font-medium bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] hover:opacity-90 transition duration-200 shadow-lg"
-              >
-                Start Simulation
-              </button>
+                             <button
+                 type="submit"
+                 disabled={!isFormComplete()}
+                 className={`w-full py-3 px-4 rounded-lg font-medium transition duration-200 shadow-lg ${
+                   isFormComplete()
+                     ? 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:opacity-90'
+                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                 }`}
+               >
+                 {isFormComplete() ? 'Start Simulation' : 'Please Select All Required Parameters'}
+               </button>
             </form>
           ) : (
             <div>
@@ -789,6 +946,12 @@ function App() {
                         <p className="text-sm text-gray-600 mt-1">
                           Real-time vital signs monitoring
                         </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">Protocol</div>
+                        <div className="text-lg font-semibold text-[#8F87F1]">
+                          {userData.protocol}
+                        </div>
                       </div>
                     </div>
 
@@ -1166,10 +1329,32 @@ function App() {
                    "Asymptomatic"}
                 </span>
               </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-600">Exercise Protocol</span>
+                <span className="text-xs font-medium text-gray-800">
+                  {userData.protocol}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+             {/* Chatbot Component */}
+       <PulseChatbot 
+         isOpen={showChatbot} 
+         onClose={() => setShowChatbot(false)} 
+       />
+
+       {/* Floating Chat Button */}
+       {!showChatbot && (
+         <button
+           onClick={() => setShowChatbot(true)}
+           className="fixed bottom-4 right-4 w-14 h-14 bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 z-40 flex items-center justify-center"
+         >
+           <MessageCircle className="w-6 h-6" />
+         </button>
+       )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-100 py-6">

@@ -50,7 +50,10 @@ latest_data = {
     "phase": "rest",  # rest | exercise | recovery
     "workload_level": 0,  # 0..N during exercise
     "prediction": "Waiting...",
-    "future_predictions": []  # Store future predictions
+    "future_predictions": [], # Store future predictions
+    "protocol": "standard",  # standard | modified_bruce
+    "stage": 0,       # Current stage number
+    "stage_time": 0   # Time in current stage
 }
 
 running = False  # Control simulation
@@ -91,16 +94,21 @@ class PhysiologySimulationEngine:
         self.exang = 0
         self.phase = "rest"  # rest | exercise | recovery
         self.workload_level = 0
+        self.protocol = "standard"  # standard | modified_bruce
+        self.stage = 0
+        self.stage_time = 0
 
         # Config
         self.config = {
             "rest_duration_s": 60,
             "exercise_duration_s": 180,
             "recovery_duration_s": 120,
-            "max_workload_level": 3
+            "max_workload_level": 3,
+            "protocol": "standard"
         }
         if config:
             self.config.update(config)
+            self.protocol = config.get("protocol", "standard")
 
         # Internal timers
         self.phase_elapsed_s = 0.0
@@ -109,16 +117,40 @@ class PhysiologySimulationEngine:
         self.recovery_start_hr = self.hr
         self.recovery_flagged = False
 
+        # Protocol-specific configurations
+        self.protocol_configs = {
+            "standard": {
+                "stages": [
+                    {"duration": 180, "workload": 1, "target_hr": 0.85},  # 3 min stages
+                    {"duration": 180, "workload": 2, "target_hr": 0.90},
+                    {"duration": 180, "workload": 3, "target_hr": 0.95}
+                ],
+                "workload_increments": [1, 2, 3]
+            },
+            "modified_bruce": {
+                "stages": [
+                    {"duration": 300, "workload": 0.5, "target_hr": 0.70},  # 5 min stages, gentler
+                    {"duration": 300, "workload": 1.0, "target_hr": 0.80},
+                    {"duration": 300, "workload": 1.5, "target_hr": 0.85},
+                    {"duration": 300, "workload": 2.0, "target_hr": 0.90}
+                ],
+                "workload_increments": [0.5, 1.0, 1.5, 2.0]
+            }
+        }
+
     def _to_next_phase(self, next_phase):
         self.phase = next_phase
         self.phase_elapsed_s = 0.0
+        self.stage = 0
+        self.stage_time = 0
+        
         if next_phase == "rest":
             self.exang = 0
             self.workload_level = 0
             self.recovery_flagged = False
         elif next_phase == "exercise":
             self.exang = 1
-            self.workload_level = 1
+            self.workload_level = self.protocol_configs[self.protocol]["stages"][0]["workload"]
             # Draw fresh parameters for this exercise bout
             self.hr_increase_rate_per_min = random.uniform(10.0, 12.0)
             self.sbp_increase_per_level = random.uniform(10.0, 15.0)
@@ -126,6 +158,31 @@ class PhysiologySimulationEngine:
             self.exang = 0
             self.recovery_start_hr = self.hr
             self.recovery_flagged = False
+
+    def _get_current_stage_config(self):
+        """Get configuration for current exercise stage."""
+        if self.protocol not in self.protocol_configs:
+            return None
+        
+        stages = self.protocol_configs[self.protocol]["stages"]
+        if self.stage < len(stages):
+            return stages[self.stage]
+        return stages[-1]  # Use last stage if exceeded
+
+    def _advance_stage(self):
+        """Advance to next exercise stage if time permits."""
+        current_stage = self._get_current_stage_config()
+        if current_stage and self.stage_time >= current_stage["duration"]:
+            self.stage += 1
+            self.stage_time = 0
+            if self.stage < len(self.protocol_configs[self.protocol]["stages"]):
+                self.workload_level = self.protocol_configs[self.protocol]["stages"][self.stage]["workload"]
+                return True
+            else:
+                # All stages completed, move to recovery
+                self._to_next_phase("recovery")
+                return False
+        return False
 
     def _update_rest(self, dt):
         # Drift towards baseline with small noise
@@ -138,17 +195,26 @@ class PhysiologySimulationEngine:
             self._to_next_phase("exercise")
 
     def _update_exercise(self, dt):
-        # Determine workload progression
-        max_level = max(1, int(self.config["max_workload_level"]))
-        segment = self.config["exercise_duration_s"] / max_level
-        new_level = min(max_level, int(self.phase_elapsed_s // max(1, segment)) + 1)
-        self.workload_level = new_level
+        # Update stage time and check for stage advancement
+        self.stage_time += dt
+        self._advance_stage()
+        
+        # Get current stage configuration
+        current_stage = self._get_current_stage_config()
+        if not current_stage:
+            return
 
-        # HR increases 10–12 bpm per minute during exercise
-        hr_increase_per_sec = self.hr_increase_rate_per_min / 60.0
-        self.hr = min(195.0, self.hr + hr_increase_per_sec * dt + random.uniform(-0.2, 0.4))
+        # Calculate target heart rate for current stage
+        target_hr_percent = current_stage["target_hr"]
+        max_hr = 220 - float(user_static_data.get("age", 50))  # Age-predicted max HR
+        target_hr = max_hr * target_hr_percent
 
-        # SBP rises 10–15 mmHg per workload level; approach target smoothly
+        # HR increases towards target for current stage
+        hr_delta = target_hr - self.hr
+        hr_change_rate = self.hr_increase_rate_per_min / 60.0  # per second
+        self.hr += np.clip(hr_delta * hr_change_rate * dt, -2.0, 2.0) + random.uniform(-0.2, 0.4)
+
+        # SBP rises with workload level
         target_sbp = self.baseline_sbp + self.sbp_increase_per_level * self.workload_level
         sbp_delta = target_sbp - self.sbp
         self.sbp += np.clip(sbp_delta, -3.0, 3.0)  # limit per-second change
@@ -158,11 +224,12 @@ class PhysiologySimulationEngine:
         dbp_delta = target_dbp - self.dbp
         self.dbp += np.clip(dbp_delta, -1.0, 1.0)
 
-        # ST depression mild increase with workload in healthy individuals; noise
+        # ST depression increases with workload
         target_oldpeak = self.baseline_oldpeak + 0.1 * self.workload_level
         self.oldpeak += np.clip(target_oldpeak - self.oldpeak, -0.05, 0.05) + random.uniform(-0.01, 0.01)
 
-        if self.phase_elapsed_s >= self.config["exercise_duration_s"]:
+        # Check if all stages completed
+        if self.stage >= len(self.protocol_configs[self.protocol]["stages"]):
             self._to_next_phase("recovery")
 
     def _update_recovery(self, dt):
@@ -205,7 +272,10 @@ class PhysiologySimulationEngine:
             "exang": 1 if self.exang else 0,
             "oldpeak": round(float(self.oldpeak), 2),
             "phase": self.phase,
-            "workload_level": int(self.workload_level)
+            "workload_level": round(self.workload_level, 1),
+            "protocol": self.protocol,
+            "stage": self.stage + 1,  # 1-indexed for display
+            "stage_time": int(self.stage_time)
         }
 
     def pop_events(self):
@@ -255,14 +325,29 @@ def start_simulation():
         cfg["recovery_duration_s"] = int(sim_cfg["recovery_duration_s"]) or 120
     if "max_workload_level" in sim_cfg:
         cfg["max_workload_level"] = max(1, int(sim_cfg["max_workload_level"]))
+    
+    # Protocol selection
+    protocol = sim_cfg.get("protocol", "standard")
+    if protocol not in ["standard", "modified_bruce"]:
+        protocol = "standard"
+    cfg["protocol"] = protocol
 
     # Reset engine with new configuration
     engine = PhysiologySimulationEngine(config=cfg)
     running = True
     print("[INFO] Simulation started with:", user_static_data)
     print("[INFO] Engine config:", engine.config)
+    print("[INFO] Protocol selected:", protocol)
     print("[INFO] Running flag set to:", running)
-    return jsonify({"message": "Simulation started", "engine_config": engine.config})
+    return jsonify({
+        "message": "Simulation started", 
+        "engine_config": engine.config,
+        "protocol": protocol,
+        "protocol_info": {
+            "standard": "Standard Bruce Protocol - 3 min stages, higher intensity",
+            "modified_bruce": "Modified Bruce Protocol - 5 min stages, gentler progression"
+        }
+    })
 
 def check_alerts():
     """Check for any threshold violations and create alerts."""
@@ -475,6 +560,36 @@ def get_prediction():
     except Exception as e:
         print("JSON Serialization Error:", e)
         return jsonify({"error": "Failed to generate prediction data"}), 500
+
+@app.route('/protocols', methods=['GET'])
+def get_protocols():
+    """Return available exercise protocols and their configurations."""
+    protocols = {
+        "standard": {
+            "name": "Standard Bruce Protocol",
+            "description": "Standard cardiac stress test with 3-minute stages and higher intensity",
+            "stages": [
+                {"stage": 1, "duration": "3 min", "workload": 1, "target_hr": "85% of max HR"},
+                {"stage": 2, "duration": "3 min", "workload": 2, "target_hr": "90% of max HR"},
+                {"stage": 3, "duration": "3 min", "workload": 3, "target_hr": "95% of max HR"}
+            ],
+            "total_duration": "9 minutes",
+            "suitable_for": "Standard cardiac stress testing, healthy individuals"
+        },
+        "modified_bruce": {
+            "name": "Modified Bruce Protocol", 
+            "description": "Gentler progression with 5-minute stages, suitable for elderly or compromised patients",
+            "stages": [
+                {"stage": 1, "duration": "5 min", "workload": 0.5, "target_hr": "70% of max HR"},
+                {"stage": 2, "duration": "5 min", "workload": 1.0, "target_hr": "80% of max HR"},
+                {"stage": 3, "duration": "5 min", "workload": 1.5, "target_hr": "85% of max HR"},
+                {"stage": 4, "duration": "5 min", "workload": 2.0, "target_hr": "90% of max HR"}
+            ],
+            "total_duration": "20 minutes",
+            "suitable_for": "Elderly patients, post-MI recovery, compromised individuals"
+        }
+    }
+    return jsonify(protocols)
 
 @app.route('/alerts', methods=['GET'])
 def get_alerts():
