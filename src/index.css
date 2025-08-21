@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #8F87F1;
+  --secondary: #C68EFD;
+  --accent: #E9A5F1;
+  --light: #FED2E2;
+}
+
+body {
+  background-color: #f8f9fa;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #8F87F1, #C68EFD, #E9A5F1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #8F87F1 0%, #C68EFD 50%, #E9A5F1 100%);
+}
