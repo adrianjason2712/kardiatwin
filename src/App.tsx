@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Heart, Activity, Droplets, Zap, Github, Gauge, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { HeartScene } from './components/HeartScene';
 import {
@@ -460,24 +460,9 @@ function App() {
       <nav className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <a 
-              href="https://mjonathan.uno" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-            >
+            <div className="flex items-center space-x-2">
               <Heart className="h-6 w-6 text-[#8F87F1]" />
-              <span className="text-xl font-bold gradient-text">Cardio Twin</span>
-            </a>
-            <div className="flex items-center space-x-4">
-              <a 
-                href="https://github.com/cyberhunter0304" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-gray-600 hover:text-[#8F87F1] transition-colors"
-              >
-                <Github className="h-5 w-5" />
-              </a>
+              <span className="text-xl font-bold gradient-text">KardiaTwin</span>
             </div>
           </div>
         </div>
@@ -1189,16 +1174,8 @@ function App() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-100 py-6">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-600">
-            Made with 💜 by{' '}
-            <a 
-              href="https://mjonathan.uno" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-[#8F87F1] hover:text-[#C68EFD] transition-colors font-medium"
-            >
-              Jonathan
-            </a>
+          <p className="text-gray-600 italic">
+            "The greatest wealth is health." — Virgil
           </p>
         </div>
       </footer>
