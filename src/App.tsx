@@ -4,6 +4,7 @@ import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCirc
 import { Line } from 'react-chartjs-2';
 import { HeartScene } from './components/HeartScene';
 import PulseChatbot from './components/PulseChatbot';
+import { SimulationProgress } from './components/SimulationProgress';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,6 +45,11 @@ interface SimulationData {
   trestbps: number;   // Blood Pressure
   exang: number;      // Exercise induced angina
   prediction: string; // Risk prediction
+  phase: string;      // rest | exercise | recovery
+  workload_level: number; // Current workload level
+  protocol: string;   // standard | modified_bruce
+  stage: number;      // Current stage number (1-indexed)
+  stage_time: number; // Time in current stage (seconds)
   future_predictions: Array<{
     time: string;
     trestbps: number;
@@ -96,11 +102,23 @@ function App() {
     trestbps: 0,
     exang: 0,
     prediction: 'Waiting...',
+    phase: 'rest',
+    workload_level: 0,
+    protocol: 'standard',
+    stage: 0,
+    stage_time: 0,
     future_predictions: []
   });
 
   const [history, setHistory] = useState<SimulationData[]>([]);
   const [simulationStarted, setSimulationStarted] = useState(false);
+  const [engineConfig, setEngineConfig] = useState({
+    rest_duration_s: 60,
+    exercise_duration_s: 180,
+    recovery_duration_s: 120,
+    max_workload_level: 3,
+    protocol: "standard"
+  });
   const [exerciseIntensity, setExerciseIntensity] = useState(50);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [thresholds, setThresholds] = useState<AlertThresholds>({
@@ -181,7 +199,13 @@ function App() {
         }
       };
       
-      await axios.post("http://localhost:5000/start", submissionData);
+      const response = await axios.post("http://localhost:5000/start", submissionData);
+      
+      // Store the engine configuration
+      if (response.data && response.data.engine_config) {
+        setEngineConfig(response.data.engine_config);
+      }
+      
       setSimulationStarted(true);
     } catch (error) {
       console.error("Error starting simulation:", error);
@@ -903,6 +927,20 @@ function App() {
             </form>
           ) : (
             <div>
+              {/* Simulation Progress Bar */}
+              <div className="mb-8">
+                <SimulationProgress 
+                  phase={data.phase}
+                  stage={data.stage}
+                  stageTime={data.stage_time}
+                  protocol={data.protocol}
+                  restDuration={engineConfig.rest_duration_s}
+                  exerciseDuration={engineConfig.exercise_duration_s}
+                  recoveryDuration={engineConfig.recovery_duration_s}
+                  workloadLevel={data.workload_level}
+                />
+              </div>
+              
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
