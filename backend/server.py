@@ -3,9 +3,12 @@ import time
 import threading
 import pickle
 import numpy as np
+import json
+import uuid
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from threading import Lock
+from models import get_db_session, SimulationSession, SimulationDataPoint, SimulationAlert
 
 app = Flask(__name__)
 CORS(app)
@@ -38,6 +41,11 @@ alert_thresholds = {
 # Store alerts
 alerts = []
 alert_lock = Lock()
+
+# Simulation session tracking
+current_session_id = None
+simulation_start_time = None
+session_lock = Lock()
 
 # Live simulation data
 latest_data = {
@@ -97,6 +105,7 @@ class PhysiologySimulationEngine:
         self.protocol = "standard"  # standard | modified_bruce
         self.stage = 0
         self.stage_time = 0
+        self.protocol_completed = False
 
         # Config
         self.config = {
@@ -154,6 +163,8 @@ class PhysiologySimulationEngine:
             # Draw fresh parameters for this exercise bout
             self.hr_increase_rate_per_min = random.uniform(10.0, 12.0)
             self.sbp_increase_per_level = random.uniform(10.0, 15.0)
+            # Reset protocol completion flag when starting a new exercise phase
+            self.protocol_completed = False
         elif next_phase == "recovery":
             self.exang = 0
             self.recovery_start_hr = self.hr
@@ -185,6 +196,9 @@ class PhysiologySimulationEngine:
         return False
 
     def _update_rest(self, dt):
+        # Update rest timer
+        self.phase_elapsed_s += dt
+        
         # Drift towards baseline with small noise
         self.hr += (self.baseline_hr - self.hr) * min(1.0, dt/15.0) + random.uniform(-0.2, 0.2)
         self.sbp += (self.baseline_sbp - self.sbp) * min(1.0, dt/20.0) + random.uniform(-0.5, 0.5)
@@ -195,6 +209,9 @@ class PhysiologySimulationEngine:
             self._to_next_phase("exercise")
 
     def _update_exercise(self, dt):
+        # Update exercise timer
+        self.phase_elapsed_s += dt
+        
         # Update stage time and check for stage advancement
         self.stage_time += dt
         self._advance_stage()
@@ -233,6 +250,9 @@ class PhysiologySimulationEngine:
             self._to_next_phase("recovery")
 
     def _update_recovery(self, dt):
+        # Update recovery timer
+        self.phase_elapsed_s += dt
+        
         # First minute: HR should drop by ~20 bpm
         if self.phase_elapsed_s <= 60.0:
             expected_drop = 20.0 * (self.phase_elapsed_s / 60.0)
@@ -252,10 +272,11 @@ class PhysiologySimulationEngine:
         self.oldpeak += (self.baseline_oldpeak - self.oldpeak) * min(1.0, dt/20.0) + random.uniform(-0.01, 0.01)
 
         if self.phase_elapsed_s >= self.config["recovery_duration_s"]:
+            # Add protocol completion event before transitioning
+            self.protocol_completed = True
             self._to_next_phase("rest")
 
     def update(self, dt):
-        self.phase_elapsed_s += dt
         if self.phase == "rest":
             self._update_rest(dt)
         elif self.phase == "exercise":
@@ -288,13 +309,31 @@ class PhysiologySimulationEngine:
                 "severity": "medium"
             })
             self.recovery_flagged = False
+            
+        if self.protocol_completed:
+            # Add protocol completion event
+            events.append({
+                "type": "protocol_completed",
+                "message": "The exercise protocol has been completed successfully.",
+                "severity": "info"
+            })
+            self.protocol_completed = False
+            
         return events
 
 @app.route('/start', methods=['POST'])
 def start_simulation():
     """Start the simulation with user inputs and optional simulation plan."""
-    global user_static_data, running, engine
+    global user_static_data, running, engine, current_session_id, simulation_start_time
     data = request.json or {}
+    
+    # Generate a session name if not provided
+    session_name = data.get("session_name", f"Simulation {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    # Reset session tracking
+    with session_lock:
+        current_session_id = None
+        simulation_start_time = time.time()
 
     # Populate user_static_data with default values if fields are missing
     user_static_data = {

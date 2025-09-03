@@ -145,8 +145,11 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
         
         {/* Recovery section */}
         <div 
-          className="absolute h-full bg-purple-500 right-0 top-0"
-          style={{ width: `${(recoveryDuration / totalDuration) * 100}%` }}
+          className="absolute h-full bg-purple-500"
+          style={{ 
+            left: `${((restDuration + exerciseDuration) / totalDuration) * 100}%`,
+            width: `${(recoveryDuration / totalDuration) * 100}%` 
+          }}
         ></div>
         
         {/* Progress indicator */}
@@ -154,6 +157,43 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
           className="absolute h-full bg-white opacity-50 left-0 top-0 transition-all duration-500 ease-out"
           style={{ width: `${totalProgress}%` }}
         ></div>
+      </div>
+      
+      {/* Phase Timers */}
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="text-center p-2 rounded-md bg-blue-50">
+          <div className="text-xs text-blue-700 font-medium">Rest</div>
+          <div className="text-sm font-bold">
+            {phase === 'rest' ? 
+              `${formatTime(currentPhaseElapsed)} / ${formatTime(restDuration)}` : 
+              phase === 'exercise' || phase === 'recovery' ? 
+                `${formatTime(restDuration)} / ${formatTime(restDuration)}` : 
+                `00:00 / ${formatTime(restDuration)}`
+            }
+          </div>
+        </div>
+        <div className="text-center p-2 rounded-md bg-green-50">
+          <div className="text-xs text-green-700 font-medium">Exercise</div>
+          <div className="text-sm font-bold">
+            {phase === 'exercise' ? 
+              `${formatTime(currentPhaseElapsed)} / ${formatTime(exerciseDuration)}` : 
+              phase === 'recovery' ? 
+                `${formatTime(exerciseDuration)} / ${formatTime(exerciseDuration)}` : 
+                phase === 'rest' ? 
+                  `00:00 / ${formatTime(exerciseDuration)}` : 
+                  `00:00 / ${formatTime(exerciseDuration)}`
+            }
+          </div>
+        </div>
+        <div className="text-center p-2 rounded-md bg-purple-50">
+          <div className="text-xs text-purple-700 font-medium">Recovery</div>
+          <div className="text-sm font-bold">
+            {phase === 'recovery' ? 
+              `${formatTime(currentPhaseElapsed)} / ${formatTime(recoveryDuration)}` : 
+              `00:00 / ${formatTime(recoveryDuration)}`
+            }
+          </div>
+        </div>
       </div>
       
       {/* Protocol Information */}
