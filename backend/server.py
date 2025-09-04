@@ -198,6 +198,7 @@ class PhysiologySimulationEngine:
     def _update_rest(self, dt):
         # Update rest timer
         self.phase_elapsed_s += dt
+        self.stage_time += dt  # Update stage_time for frontend timer display
         
         # Drift towards baseline with small noise
         self.hr += (self.baseline_hr - self.hr) * min(1.0, dt/15.0) + random.uniform(-0.2, 0.2)
@@ -252,6 +253,7 @@ class PhysiologySimulationEngine:
     def _update_recovery(self, dt):
         # Update recovery timer
         self.phase_elapsed_s += dt
+        self.stage_time += dt  # Update stage_time for frontend timer display
         
         # First minute: HR should drop by ~20 bpm
         if self.phase_elapsed_s <= 60.0:
