@@ -1,5 +1,5 @@
-import React from 'react';
-import { Activity, Heart, RefreshCcw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Activity, Heart, RefreshCcw, CheckCircle, AlertCircle, Clock, BarChart3 } from 'lucide-react';
 
 interface SimulationProgressProps {
   phase: string;
@@ -22,6 +22,18 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
   recoveryDuration,
   workloadLevel
 }) => {
+  const [showCompletionPrompt, setShowCompletionPrompt] = useState(false);
+  const [restTimer, setRestTimer] = useState(0);
+  const [recoveryTimer, setRecoveryTimer] = useState(0);
+  const [isSimulationComplete, setIsSimulationComplete] = useState(false);
+  const [phaseHistory, setPhaseHistory] = useState<string[]>([]);
+  const [countdownTimer, setCountdownTimer] = useState(0);
+  const [phaseTimings, setPhaseTimings] = useState({
+    rest: 0,
+    exercise: 0,
+    recovery: 0
+  });
+
   // Calculate the total duration of all phases
   const totalDuration = restDuration + exerciseDuration + recoveryDuration;
   
@@ -43,7 +55,65 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
     currentPhaseDuration = recoveryDuration;
     elapsedTime = restDuration + exerciseDuration + stageTime;
   }
-  
+
+  // Track phase history to detect completion
+  useEffect(() => {
+    if (phase && !phaseHistory.includes(phase)) {
+      setPhaseHistory(prev => [...prev, phase]);
+    }
+  }, [phase, phaseHistory]);
+
+  // Debug: Log prop changes
+  useEffect(() => {
+    console.log('Props changed:', { phase, stage, stageTime, protocol, restDuration, exerciseDuration, recoveryDuration, workloadLevel });
+  }, [phase, stage, stageTime, protocol, restDuration, exerciseDuration, recoveryDuration, workloadLevel]);
+
+  // Update timers based on current phase - FIXED LOGIC
+  useEffect(() => {
+    console.log('Timer Update - Phase:', phase, 'StageTime:', stageTime, 'Type:', typeof stageTime);
+    
+    if (phase === 'rest') {
+      // Rest phase: timer counts up from 0 to restDuration
+      setRestTimer(stageTime);
+      setCountdownTimer(Math.max(0, restDuration - stageTime));
+      setPhaseTimings(prev => ({ ...prev, rest: stageTime }));
+      console.log('Rest timer updated:', stageTime);
+    } else if (phase === 'exercise') {
+      // Exercise phase: timer counts up from 0 to exerciseDuration
+      setCountdownTimer(Math.max(0, exerciseDuration - stageTime));
+      setPhaseTimings(prev => ({ ...prev, exercise: stageTime }));
+      console.log('Exercise timer updated:', stageTime);
+    } else if (phase === 'recovery') {
+      // Recovery phase: timer counts up from 0 to recoveryDuration
+      setRecoveryTimer(stageTime);
+      setCountdownTimer(Math.max(0, recoveryDuration - stageTime));
+      setPhaseTimings(prev => ({ ...prev, recovery: stageTime }));
+      console.log('Recovery timer updated:', stageTime);
+    }
+  }, [phase, stageTime, restDuration, exerciseDuration, recoveryDuration]);
+
+  // Check if simulation is complete
+  useEffect(() => {
+    // Check if we've been through all phases and are back to rest
+    const hasCompletedAllPhases = phaseHistory.includes('rest') && 
+                                  phaseHistory.includes('exercise') && 
+                                  phaseHistory.includes('recovery');
+    
+    // Check if we're back to rest phase after completing all phases
+    const isBackToRestAfterCompletion = phase === 'rest' && 
+                                       hasCompletedAllPhases && 
+                                       phaseHistory.length >= 3;
+    
+    // Alternative completion check: if we've spent enough time in recovery
+    const hasSpentEnoughTimeInRecovery = phase === 'recovery' && 
+                                         stageTime >= recoveryDuration - 1; // Within 1 second of completion
+    
+    if ((isBackToRestAfterCompletion || hasSpentEnoughTimeInRecovery) && !isSimulationComplete) {
+      setIsSimulationComplete(true);
+      setShowCompletionPrompt(true);
+    }
+  }, [phase, stageTime, recoveryDuration, phaseHistory, isSimulationComplete]);
+
   // Calculate progress percentages
   const totalProgress = Math.min(100, (elapsedTime / totalDuration) * 100);
   const phaseProgress = Math.min(100, (currentPhaseElapsed / currentPhaseDuration) * 100);
@@ -91,6 +161,31 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Handle simulation completion
+  const handleSimulationComplete = () => {
+    setShowCompletionPrompt(false);
+    // You can add additional logic here like saving results, showing summary, etc.
+  };
+
+  // Get completion status for each phase
+  const getPhaseCompletionStatus = () => {
+    const hasRest = phaseHistory.includes('rest');
+    const hasExercise = phaseHistory.includes('exercise');
+    const hasRecovery = phaseHistory.includes('recovery');
+    
+    return {
+      rest: hasRest,
+      exercise: hasExercise,
+      recovery: hasRecovery,
+      allComplete: hasRest && hasExercise && hasRecovery
+    };
+  };
+
+  const completionStatus = getPhaseCompletionStatus();
+
+  // Calculate total simulation time
+  const totalSimulationTime = phaseTimings.rest + phaseTimings.exercise + phaseTimings.recovery;
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
       <h3 className="text-xl font-semibold mb-4 gradient-text">Simulation Progress</h3>
@@ -107,6 +202,17 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
         <div className="ml-auto">
           <span className="text-sm font-medium">
             {formatTime(currentPhaseElapsed)} / {formatTime(currentPhaseDuration)}
+          </span>
+        </div>
+      </div>
+
+      {/* Current Phase Countdown Timer */}
+      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-center space-x-2">
+          <Clock className="h-5 w-5 text-gray-600" />
+          <span className="text-sm text-gray-600">Time remaining in current phase:</span>
+          <span className="text-lg font-bold text-gray-800">
+            {formatTime(Math.max(0, countdownTimer))}
           </span>
         </div>
       </div>
@@ -161,18 +267,33 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
       
       {/* Phase Timers */}
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="text-center p-2 rounded-md bg-blue-50">
+        <div className={`text-center p-2 rounded-md transition-all duration-200 ${
+          phase === 'rest' ? 'bg-blue-100 border-2 border-blue-300' : 'bg-blue-50'
+        }`}>
           <div className="text-xs text-blue-700 font-medium">Rest</div>
           <div className="text-sm font-bold">
             {phase === 'rest' ? 
-              `${formatTime(currentPhaseElapsed)} / ${formatTime(restDuration)}` : 
+              `${formatTime(restTimer)} / ${formatTime(restDuration)}` : 
               phase === 'exercise' || phase === 'recovery' ? 
                 `${formatTime(restDuration)} / ${formatTime(restDuration)}` : 
                 `00:00 / ${formatTime(restDuration)}`
             }
           </div>
+          {phase === 'rest' && (
+            <div className="text-xs text-blue-600 mt-1 flex items-center justify-center">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-1"></div>
+              ⏱️ Running
+            </div>
+          )}
+          {completionStatus.rest && phase !== 'rest' && (
+            <div className="text-xs text-green-600 mt-1">
+              ✓ Completed
+            </div>
+          )}
         </div>
-        <div className="text-center p-2 rounded-md bg-green-50">
+        <div className={`text-center p-2 rounded-md transition-all duration-200 ${
+          phase === 'exercise' ? 'bg-green-100 border-2 border-green-300' : 'bg-green-50'
+        }`}>
           <div className="text-xs text-green-700 font-medium">Exercise</div>
           <div className="text-sm font-bold">
             {phase === 'exercise' ? 
@@ -184,15 +305,55 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
                   `00:00 / ${formatTime(exerciseDuration)}`
             }
           </div>
+          {phase === 'exercise' && (
+            <div className="text-xs text-green-600 mt-1 flex items-center justify-center">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
+              ⏱️ Running
+            </div>
+          )}
+          {completionStatus.exercise && phase !== 'exercise' && (
+            <div className="text-xs text-green-600 mt-1">
+              ✓ Completed
+            </div>
+          )}
         </div>
-        <div className="text-center p-2 rounded-md bg-purple-50">
+        <div className={`text-center p-2 rounded-md transition-all duration-200 ${
+          phase === 'recovery' ? 'bg-purple-100 border-2 border-purple-300' : 'bg-purple-50'
+        }`}>
           <div className="text-xs text-purple-700 font-medium">Recovery</div>
           <div className="text-sm font-bold">
             {phase === 'recovery' ? 
-              `${formatTime(currentPhaseElapsed)} / ${formatTime(recoveryDuration)}` : 
+              `${formatTime(recoveryTimer)} / ${formatTime(recoveryDuration)}` : 
               `00:00 / ${formatTime(recoveryDuration)}`
             }
           </div>
+          {phase === 'recovery' && (
+            <div className="text-xs text-purple-600 mt-1 flex items-center justify-center">
+              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse mr-1"></div>
+              ⏱️ Running
+            </div>
+          )}
+          {completionStatus.recovery && phase !== 'recovery' && (
+            <div className="text-xs text-green-600 mt-1">
+              ✓ Completed
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Debug Info - Temporary for troubleshooting */}
+      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+        <div className="font-medium text-yellow-800 mb-2">Debug Info (Remove in production):</div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>Phase: <span className="font-medium">{phase}</span></div>
+          <div>Stage: <span className="font-medium">{stage}</span></div>
+          <div>StageTime: <span className="font-medium">{stageTime}s</span></div>
+          <div>RestTimer: <span className="font-medium">{restTimer}s</span></div>
+          <div>RecoveryTimer: <span className="font-medium">{recoveryTimer}s</span></div>
+          <div>Countdown: <span className="font-medium">{countdownTimer}s</span></div>
+        </div>
+        <div className="mt-2">
+          <div>Phase History: <span className="font-medium">{phaseHistory.join(' → ')}</span></div>
         </div>
       </div>
       
@@ -201,6 +362,73 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
         <span className="font-medium">Protocol: </span>
         {protocol === 'standard' ? 'Standard Bruce' : 'Modified Bruce'}
       </div>
+
+      {/* Simulation Completion Prompt */}
+      {showCompletionPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-lg mx-4 text-center shadow-xl">
+            <div className="mb-4">
+              <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              Simulation Complete!
+            </h3>
+            <p className="text-gray-600 mb-6">
+              The cardiac stress test simulation has been completed successfully. 
+              All phases (Rest, Exercise, and Recovery) have been completed.
+            </p>
+            
+            {/* Detailed Completion Summary */}
+            <div className="mb-6 text-left bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-3">Phase Completion Summary:</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Rest Phase:</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-green-600">✓ Completed</span>
+                    <span className="text-xs text-gray-500">({formatTime(phaseTimings.rest)})</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Exercise Phase:</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-green-600">✓ Completed</span>
+                    <span className="text-xs text-gray-500">({formatTime(phaseTimings.exercise)})</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Recovery Phase:</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-green-600">✓ Completed</span>
+                    <span className="text-xs text-gray-500">({formatTime(phaseTimings.recovery)})</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Total Simulation Time:</span>
+                    <span className="text-sm font-bold text-gray-800">{formatTime(totalSimulationTime)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={handleSimulationComplete}
+                className="flex-1 bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 transition-opacity"
+              >
+                View Results
+              </button>
+              <button
+                onClick={handleSimulationComplete}
+                className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
