@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Activity, Heart, RefreshCcw, CheckCircle, AlertCircle, Clock, BarChart3 } from 'lucide-react';
 
 interface SimulationProgressProps {
@@ -28,6 +29,7 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
   const [isSimulationComplete, setIsSimulationComplete] = useState(false);
   const [phaseHistory, setPhaseHistory] = useState<string[]>([]);
   const [countdownTimer, setCountdownTimer] = useState(0);
+  const [paused, setPaused] = useState(false);
   const [phaseTimings, setPhaseTimings] = useState({
     rest: 0,
     exercise: 0,
@@ -63,34 +65,54 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
     }
   }, [phase, phaseHistory]);
 
-  // Debug: Log prop changes
-  useEffect(() => {
-    console.log('Props changed:', { phase, stage, stageTime, protocol, restDuration, exerciseDuration, recoveryDuration, workloadLevel });
-  }, [phase, stage, stageTime, protocol, restDuration, exerciseDuration, recoveryDuration, workloadLevel]);
+  // (debug logs removed)
 
-  // Update timers based on current phase - FIXED LOGIC
+  // Update timers based on current phase
   useEffect(() => {
-    console.log('Timer Update - Phase:', phase, 'StageTime:', stageTime, 'Type:', typeof stageTime);
-    
     if (phase === 'rest') {
       // Rest phase: timer counts up from 0 to restDuration
       setRestTimer(stageTime);
       setCountdownTimer(Math.max(0, restDuration - stageTime));
       setPhaseTimings(prev => ({ ...prev, rest: stageTime }));
-      console.log('Rest timer updated:', stageTime);
     } else if (phase === 'exercise') {
       // Exercise phase: timer counts up from 0 to exerciseDuration
       setCountdownTimer(Math.max(0, exerciseDuration - stageTime));
       setPhaseTimings(prev => ({ ...prev, exercise: stageTime }));
-      console.log('Exercise timer updated:', stageTime);
     } else if (phase === 'recovery') {
       // Recovery phase: timer counts up from 0 to recoveryDuration
       setRecoveryTimer(stageTime);
       setCountdownTimer(Math.max(0, recoveryDuration - stageTime));
       setPhaseTimings(prev => ({ ...prev, recovery: stageTime }));
-      console.log('Recovery timer updated:', stageTime);
     }
   }, [phase, stageTime, restDuration, exerciseDuration, recoveryDuration]);
+
+  // Sync pause status periodically
+  useEffect(() => {
+    const fetchPause = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/pause_status');
+        setPaused(Boolean(res.data.paused));
+      } catch (_) {}
+    };
+    fetchPause();
+    const t = setInterval(fetchPause, 2000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Toggle pause/resume
+  const handleTogglePause = async () => {
+    try {
+      if (paused) {
+        await axios.post('http://localhost:5000/resume_simulation');
+        setPaused(false);
+      } else {
+        await axios.post('http://localhost:5000/pause_simulation');
+        setPaused(true);
+      }
+    } catch (e) {
+      // no-op UI toast could be added
+    }
+  };
 
   // Check if simulation is complete
   useEffect(() => {
@@ -214,6 +236,13 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
           <span className="text-lg font-bold text-gray-800">
             {formatTime(Math.max(0, countdownTimer))}
           </span>
+          <button
+            onClick={handleTogglePause}
+            className={`ml-4 px-3 py-1 rounded-md text-sm font-medium transition-colors ${paused ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-700 text-white hover:bg-gray-800'}`}
+            aria-label={paused ? 'Resume simulation' : 'Pause simulation'}
+          >
+            {paused ? 'Resume' : 'Pause'}
+          </button>
         </div>
       </div>
       
@@ -341,21 +370,7 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
         </div>
       </div>
 
-      {/* Debug Info - Temporary for troubleshooting */}
-      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
-        <div className="font-medium text-yellow-800 mb-2">Debug Info (Remove in production):</div>
-        <div className="grid grid-cols-2 gap-2">
-          <div>Phase: <span className="font-medium">{phase}</span></div>
-          <div>Stage: <span className="font-medium">{stage}</span></div>
-          <div>StageTime: <span className="font-medium">{stageTime}s</span></div>
-          <div>RestTimer: <span className="font-medium">{restTimer}s</span></div>
-          <div>RecoveryTimer: <span className="font-medium">{recoveryTimer}s</span></div>
-          <div>Countdown: <span className="font-medium">{countdownTimer}s</span></div>
-        </div>
-        <div className="mt-2">
-          <div>Phase History: <span className="font-medium">{phaseHistory.join(' → ')}</span></div>
-        </div>
-      </div>
+      {/* Debug info removed for production */}
       
       {/* Protocol Information */}
       <div className="mt-4 text-sm text-gray-600">

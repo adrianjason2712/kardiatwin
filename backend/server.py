@@ -111,35 +111,7 @@ class PhysiologySimulationEngine:
         self.protocol_completed = False
         self.protocol_finished = False  # New flag to indicate protocol is completely done
 
-        # Config
-        self.config = {
-            "rest_duration_s": 60,
-            "exercise_duration_s": 180,
-            "recovery_duration_s": 120,
-            "max_workload_level": 3,
-            "protocol": "standard"
-        }
-        if config:
-            self.config.update(config)
-            self.protocol = config.get("protocol", "standard")
-            print(f"[PROTOCOL_CONFIG] Protocol set to: {self.protocol}")
-            print(f"[PROTOCOL_CONFIG] Available stages: {len(self.protocol_configs[self.protocol]['stages'])}")
-            for i, stage in enumerate(self.protocol_configs[self.protocol]['stages']):
-                print(f"[PROTOCOL_CONFIG] Stage {i+1}: {stage['duration']}s, workload {stage['workload']}, target HR {stage['target_hr']}")
-
-        # Internal timers
-        self.phase_elapsed_s = 0.0
-        self.hr_increase_rate_per_min = 11.0  # bpm/min during exercise
-        self.sbp_increase_per_level = 12.0    # mmHg per workload level
-        self.recovery_start_hr = self.hr
-        self.recovery_flagged = False
-        
-        # Pause functionality
-        self.paused = False
-        self.pause_start_time = None
-        self.pause_elapsed = 0.0
-
-        # Protocol-specific configurations
+        # Protocol-specific configurations (must be defined before using in config handling)
         self.protocol_configs = {
             "standard": {
                 "stages": [
@@ -160,9 +132,34 @@ class PhysiologySimulationEngine:
             }
         }
 
+        # Config
+        self.config = {
+            "rest_duration_s": 60,
+            "exercise_duration_s": 180,
+            "recovery_duration_s": 120,
+            "max_workload_level": 3,
+            "protocol": "standard"
+        }
+        if config:
+            self.config.update(config)
+            self.protocol = config.get("protocol", "standard")
+
+        # Internal timers
+        self.phase_elapsed_s = 0.0
+        self.hr_increase_rate_per_min = 11.0  # bpm/min during exercise
+        self.sbp_increase_per_level = 12.0    # mmHg per workload level
+        self.recovery_start_hr = self.hr
+        self.recovery_flagged = False
+        
+        # Pause functionality
+        self.paused = False
+        self.pause_start_time = None
+        self.pause_elapsed = 0.0
+
+        # Protocol-specific configurations moved above
+
     def _to_next_phase(self, next_phase):
-        print(f"[DEBUG] Transitioning from {self.phase} to {next_phase}")
-        print(f"[DEBUG] Rest elapsed: {self.phase_elapsed_s:.1f}s, Exercise stage: {self.stage}, Recovery elapsed: {self.phase_elapsed_s:.1f}s")
+        
         
         self.phase = next_phase
         self.phase_elapsed_s = 0.0
@@ -186,7 +183,7 @@ class PhysiologySimulationEngine:
             self.recovery_start_hr = self.hr
             self.recovery_flagged = False
             
-        print(f"[DEBUG] Phase transition complete. New phase: {self.phase}, workload: {self.workload_level}")
+        
 
     def _get_current_stage_config(self):
         """Get configuration for current exercise stage."""
@@ -205,15 +202,15 @@ class PhysiologySimulationEngine:
             old_stage = self.stage
             self.stage += 1
             self.stage_time = 0
-            print(f"[STAGE_ADVANCE] Advanced from stage {old_stage + 1} to stage {self.stage + 1}")
+            
             
             if self.stage < len(self.protocol_configs[self.protocol]["stages"]):
                 self.workload_level = self.protocol_configs[self.protocol]["stages"][self.stage]["workload"]
-                print(f"[STAGE_ADVANCE] New workload level: {self.workload_level}")
+                
                 return True
             else:
                 # All stages completed, move to recovery
-                print(f"[STAGE_ADVANCE] All stages completed, moving to recovery")
+                
                 self._to_next_phase("recovery")
                 return False
         return False
@@ -246,8 +243,7 @@ class PhysiologySimulationEngine:
             return
 
         # Log stage info every 30 seconds
-        if int(self.stage_time) % 30 == 0 and self.stage_time > 0:
-            print(f"[EXERCISE_STAGE] Stage {self.stage + 1}: {self.stage_time:.0f}s/{current_stage['duration']}s, Workload: {self.workload_level}, Target HR: {current_stage['target_hr']*100:.0f}%")
+        
 
         # Calculate target heart rate for current stage
         target_hr_percent = current_stage["target_hr"]
@@ -275,7 +271,7 @@ class PhysiologySimulationEngine:
 
         # Check if all stages completed
         if self.stage >= len(self.protocol_configs[self.protocol]["stages"]):
-            print(f"[PROTOCOL_COMPLETE] All {len(self.protocol_configs[self.protocol]['stages'])} stages completed, moving to recovery")
+            
             self._to_next_phase("recovery")
 
     def _update_recovery(self, dt):
@@ -306,7 +302,12 @@ class PhysiologySimulationEngine:
             self.protocol_completed = True
             self.protocol_finished = True  # Mark protocol as completely finished
             # Don't go back to rest - protocol is complete
-            print(f"[PROTOCOL_COMPLETE] Protocol completed. Total time: {self.pause_elapsed + self.phase_elapsed_s:.1f}s")
+            # Explicitly stop the global running flag so clients know the protocol ended
+            try:
+                global running
+                running = False
+            except Exception:
+                pass
             return  # Stop updating
 
     def update(self, dt):
@@ -599,32 +600,35 @@ def generate_future_predictions():
 def simulate_physiology_engine():
     """Run the rule-based physiology simulation engine."""
     global latest_data, previous_values, engine
-    print("[INFO] Simulation thread starting...")
-    print(f"[INFO] Global engine exists: {'engine' in globals()}")
-    print(f"[INFO] Global engine is None: {globals().get('engine') is None}")
+    
     
     # Initialize engine if not already
     if 'engine' not in globals() or engine is None:
-        print("[INFO] Creating new engine in simulation thread...")
         engine = PhysiologySimulationEngine()
-        print("[INFO] Engine initialized in simulation thread")
     else:
-        print(f"[INFO] Using existing engine: phase={engine.phase}")
+        pass
 
     last_tick = time.time()
     iteration = 0
-    print("[INFO] Entering main simulation loop")
+    
     
     while True:
         iteration += 1
-        if iteration <= 5:  # Log first 5 iterations
-            print(f"[INFO] Iteration {iteration}: running={running}, phase={engine.phase if engine else 'None'}")
+        if iteration <= 5:
+            pass
         
+        # If globally stopped, idle
         if not running:
             # Idle but keep loop alive
-            if iteration % 10 == 0:  # Log every 10th iteration
-                print(f"[INFO] Simulation idle, running={running}")
+            if iteration % 10 == 0:
+                pass
             time.sleep(0.5)
+            last_tick = time.time()
+            continue
+
+        # Hard pause: when engine is paused, do not mutate state or predictions
+        if engine and engine.paused:
+            time.sleep(0.2)
             last_tick = time.time()
             continue
 
@@ -633,9 +637,10 @@ def simulate_physiology_engine():
         last_tick = now
 
         try:
-            if iteration <= 5:  # Log first 5 updates
-                print(f"[INFO] Updating engine with dt={dt:.3f}s")
+            if iteration <= 5:
+                pass
             
+            # Advance simulation only when not paused/finished
             engine.update(dt)
 
             with data_lock:
@@ -643,11 +648,10 @@ def simulate_physiology_engine():
                 sim_snapshot = engine.to_latest_data()
                 latest_data.update(sim_snapshot)
                 
-                # Debug logging for timer values
-                if iteration <= 5:  # Log first 5 updates
-                    print(f"[INFO] Update {iteration}: Phase={latest_data['phase']}, Stage={latest_data['stage']}, StageTime={latest_data['stage_time']}, PhaseElapsed={engine.phase_elapsed_s:.1f}s")
-                else:
-                    print(f"[DEBUG] Phase: {latest_data['phase']}, Stage: {latest_data['stage']}, StageTime: {latest_data['stage_time']}, Running: {running}")
+                # If paused, do not produce alerts or predictions; keep state frozen
+                if engine.paused:
+                    time.sleep(0.05)
+                    continue
 
                 # Persist previous values for smoothing compatibility
                 previous_values["trestbps"] = latest_data["trestbps"]
@@ -688,9 +692,6 @@ def simulate_physiology_engine():
                 latest_data["future_predictions"] = generate_future_predictions()
 
         except Exception as e:
-            print("❌ Error in Simulation/Prediction:", e)
-            import traceback
-            traceback.print_exc()
             with data_lock:
                 latest_data["prediction"] = "Error"
 
@@ -698,46 +699,17 @@ def simulate_physiology_engine():
 
 # Start the simulation thread
 try:
-    print("[INFO] Creating PhysiologySimulationEngine...")
     engine = PhysiologySimulationEngine()
-    running = True  # Start with simulation running by default
-    
-    # Test if the engine works
-    print(f"[INFO] Engine created successfully: phase={engine.phase}")
-    print(f"[INFO] Engine config: {engine.config}")
-    
-    # Start simulation thread
-    print("[INFO] Starting simulation thread...")
+    running = True
     sim_thread = threading.Thread(target=simulate_physiology_engine, daemon=True)
     sim_thread.start()
-    
-    # Wait a moment to ensure thread starts
     time.sleep(0.5)
-    
-    print("[INFO] Physiology simulation thread started with running=True")
-    print(f"[INFO] Thread alive: {sim_thread.is_alive()}")
-    print(f"[INFO] Engine phase: {engine.phase}")
-    print(f"[INFO] Running flag: {running}")
-    
-    # Test a single update
     try:
-        print("[INFO] Testing engine update...")
         engine.update(1.0)
-        print(f"[INFO] Test update successful: phase={engine.phase}, elapsed={engine.phase_elapsed_s}")
-        
-        # Test the data output
         test_data = engine.to_latest_data()
-        print(f"[INFO] Test data output: {test_data}")
-        
-    except Exception as e:
-        print(f"[ERROR] Test update failed: {e}")
-        import traceback
-        traceback.print_exc()
-        
-except Exception as e:
-    print(f"[ERROR] Failed to create engine: {e}")
-    import traceback
-    traceback.print_exc()
+    except Exception:
+        pass
+except Exception:
     engine = None
     running = False
 
@@ -860,7 +832,7 @@ def start_simulation_manual():
     running = True
     if not engine:
         engine = PhysiologySimulationEngine()
-    print("[INFO] Simulation manually started")
+    
     return jsonify({"message": "Simulation started", "running": True})
 
 @app.route('/stop_simulation', methods=['POST'])
@@ -868,7 +840,7 @@ def stop_simulation():
     """Stop the simulation."""
     global running
     running = False
-    print("[INFO] Simulation stopped")
+    
     return jsonify({"message": "Simulation stopped", "running": False})
 
 @app.route('/pause_simulation', methods=['POST'])
@@ -937,7 +909,6 @@ def reset_protocol():
     if engine:
         # Create a new engine instance to reset everything
         engine = PhysiologySimulationEngine()
-        print("[RESET] Protocol reset - starting fresh from rest phase")
         return jsonify({
             "message": "Protocol reset successfully",
             "phase": "rest",
@@ -1008,17 +979,10 @@ def force_update():
     global engine, latest_data
     try:
         if engine:
-            print(f"[FORCE_UPDATE] Before update: phase={engine.phase}, elapsed={engine.phase_elapsed_s:.1f}s, stage_time={engine.stage_time:.1f}s")
-            
             # Force one update
-            engine.update(1.0)  # Update with 1 second
-            
-            print(f"[FORCE_UPDATE] After update: phase={engine.phase}, elapsed={engine.phase_elapsed_s:.1f}s, stage_time={engine.stage_time:.1f}s")
-            
+            engine.update(1.0)
             snapshot = engine.to_latest_data()
             latest_data.update(snapshot)
-            
-            print(f"[FORCE_UPDATE] Snapshot: {snapshot}")
             
             return jsonify({
                 "message": "Forced update successful",
@@ -1030,11 +994,7 @@ def force_update():
         else:
             return jsonify({"error": "No engine available"}), 400
     except Exception as e:
-        print(f"[FORCE_UPDATE] Error: {e}")
-        import traceback
-        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    print("[INFO] Starting Flask server...")
-    app.run(debug=True)
+    app.run()

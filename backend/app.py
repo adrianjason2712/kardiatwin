@@ -9,7 +9,7 @@ from flask_cors import CORS
 import threading
 
 # Load the ML model
-model = joblib.load("C:\\Users\\mjona\\CardioTwin\\backend\\heart_model.pkl")
+model = joblib.load("C:\\Users\\adria\\Downloads\\Kardia\\KardiaTwin\\backend\\heart_model.pkl")
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for React Frontend
@@ -54,4 +54,4 @@ def start_websocket():
 # Run Flask & WebSocket Together
 if __name__ == "__main__":
     threading.Thread(target=start_websocket, daemon=True).start()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
