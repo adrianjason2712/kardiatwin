@@ -156,7 +156,201 @@ class PhysiologySimulationEngine:
         self.pause_start_time = None
         self.pause_elapsed = 0.0
 
+        # Age-related parameters
+        self.age = 50  # Default age
+        self.age_modifier = 1.0  # Age-based multiplier for protocol intensity
+
+        # Physiological modifiers based on lifestyle
+        self.smoking_status = "non_smoker"  # non_smoker | smoker | ex_smoker
+        self.diabetes_history = "none"  # none | type_1 | type_2
+        self.alcohol_consumption = "none"  # none | moderate | heavy
+        self.activity_level = "active"  # sedentary | active | athlete
+
+        # Lifestyle-based modifiers (multipliers/adjustments)
+        self.sbp_modifier = 1.0
+        self.hr_modifier = 1.0
+        self.recovery_modifier = 1.0
+        self.max_workload_capacity = 1.0
+        self.ectopic_beat_chance = 0.0
+        self.silent_ischemia_enabled = False
+
+        # Dynamic event tracking
+        self.last_event_triggers = {}  # Prevent event spam by tracking last trigger time
+        self.abnormal_bp_reported = False
+        self.shortness_of_breath_reported = False
+        self.palpitations_reported = False
+        self.dizziness_reported = False
+
         # Protocol-specific configurations moved above
+
+    def apply_lifestyle_modifiers(self):
+        """Calculate physiological modifiers based on lifestyle inputs."""
+        # Reset modifiers
+        self.sbp_modifier = 1.0
+        self.hr_modifier = 1.0
+        self.recovery_modifier = 1.0
+        self.max_workload_capacity = 1.0
+        self.ectopic_beat_chance = 0.0
+        self.silent_ischemia_enabled = False
+
+        # ===== SMOKING STATUS MODIFIERS =====
+        if self.smoking_status == "smoker":
+            # Vasoconstriction: Increase baseline SBP by 10-15%
+            self.sbp_modifier *= 1.12
+            # Reduced oxygen transport: HR increases faster
+            self.hr_modifier *= 1.1
+            # Slower heart rate recovery: Recovery modifier reduces recovery speed
+            self.recovery_modifier *= 0.65  # Only 65% effectiveness of normal recovery
+            # Chronotropic incompetence: Harder to reach max HR
+            self.max_workload_capacity *= 0.85
+        elif self.smoking_status == "ex_smoker":
+            # Slight improvement
+            self.sbp_modifier *= 1.03
+            self.recovery_modifier *= 0.95
+            self.max_workload_capacity *= 0.95
+
+        # ===== DIABETIC HISTORY MODIFIERS =====
+        if self.diabetes_history in ["type_1", "type_2"]:
+            # Autonomic Neuropathy: Blunted HR response to exercise
+            self.hr_modifier *= 0.85
+            # Recovery is slower
+            self.recovery_modifier *= 0.75
+            # If high risk detected, we'll enable silent ischemia
+            self.silent_ischemia_enabled = True
+            if self.diabetes_history == "type_1":
+                self.sbp_modifier *= 1.05
+
+        # ===== ALCOHOL CONSUMPTION MODIFIERS =====
+        if self.alcohol_consumption == "moderate":
+            # Slight hypertension
+            self.sbp_modifier *= 1.05
+            # Small arrhythmia chance
+            self.ectopic_beat_chance = 0.02  # 2% chance per minute during high intensity
+        elif self.alcohol_consumption == "heavy":
+            # Significant hypertension
+            self.sbp_modifier *= 1.15
+            # Higher arrhythmia chance
+            self.ectopic_beat_chance = 0.05  # 5% chance per minute during high intensity
+            # Dehydration effect: Higher HR for same workload (cardiac drift)
+            self.hr_modifier *= 1.12
+            # Recovery is also affected
+            self.recovery_modifier *= 0.8
+
+        # ===== ACTIVITY LEVEL MODIFIERS =====
+        if self.activity_level == "sedentary":
+            # Higher resting HR (already in baseline, but we'll adjust response)
+            self.hr_modifier *= 1.15
+            # Faster fatigue: Lower max workload capacity
+            self.max_workload_capacity *= 0.75
+            # Slower recovery
+            self.recovery_modifier *= 0.7
+            # Baseline HR increase for sedentary
+            self.baseline_hr = min(self.baseline_hr * 1.2, 100)
+        elif self.activity_level == "athlete":
+            # Lower resting HR
+            self.baseline_hr = max(self.baseline_hr * 0.75, 50)
+            # Better recovery: Faster drop in HR during first minute
+            self.recovery_modifier *= 1.4
+            # Higher max workload capacity
+            self.max_workload_capacity *= 1.3
+            # HR response more efficient
+            self.hr_modifier *= 0.85
+
+    def apply_age_modifiers(self):
+        """Apply age-based modifiers to protocol functioning and physiological response.
+
+        Age affects:
+        1. Heart rate response (older = slower response, lower max HR)
+        2. Recovery capacity (older = slower recovery)
+        3. Blood pressure response (older = exaggerated BP changes)
+        4. Perceived exertion (older = feels harder)
+        """
+        # Age-based modifications (applied independently from lifestyle factors)
+
+        # Heart Rate Response based on age
+        if self.age < 30:
+            # Young: Brisk HR response, good capacity
+            age_hr_factor = 0.95  # Slightly faster response than baseline
+            self.hr_modifier *= 1.05
+        elif self.age < 40:
+            # Young adult: Normal HR response
+            age_hr_factor = 1.0
+        elif self.age < 50:
+            # Middle-aged: Slight HR response blunting
+            age_hr_factor = 1.05
+            self.hr_modifier *= 1.0
+        elif self.age < 60:
+            # Transition: Moderate HR blunting
+            age_hr_factor = 1.08
+            self.hr_modifier *= 0.98
+        elif self.age < 70:
+            # Senior: More pronounced HR blunting
+            age_hr_factor = 1.15
+            self.hr_modifier *= 0.93
+        else:
+            # Older senior: Significant HR blunting, reduced max capacity
+            age_hr_factor = 1.25
+            self.hr_modifier *= 0.85
+
+        # Recovery capacity based on age (independent of lifestyle)
+        if self.age < 30:
+            # Young: Excellent recovery
+            self.recovery_modifier *= 1.2
+        elif self.age < 40:
+            # Young adult: Good recovery
+            self.recovery_modifier *= 1.1
+        elif self.age < 50:
+            # Middle-aged: Normal recovery
+            self.recovery_modifier *= 1.0
+        elif self.age < 60:
+            # Transition: Slight recovery delay
+            self.recovery_modifier *= 0.95
+        elif self.age < 70:
+            # Senior: Slower recovery
+            self.recovery_modifier *= 0.85
+        else:
+            # Older senior: Significantly slower recovery
+            self.recovery_modifier *= 0.75
+
+        # Blood pressure response based on age
+        if self.age < 40:
+            # Young: Normal BP response
+            self.sbp_modifier *= 1.0
+        elif self.age < 50:
+            # Middle-aged: Slight BP sensitivity
+            self.sbp_modifier *= 1.02
+        elif self.age < 60:
+            # Transition: Moderate BP increase
+            self.sbp_modifier *= 1.04
+        elif self.age < 70:
+            # Senior: Higher BP response
+            self.sbp_modifier *= 1.07
+        else:
+            # Older senior: Exaggerated BP response
+            self.sbp_modifier *= 1.10
+
+        # Workload capacity based on age
+        if self.age < 30:
+            # Young: Full capacity, can exceed
+            self.max_workload_capacity *= 1.1
+        elif self.age < 40:
+            # Young adult: Normal capacity
+            self.max_workload_capacity *= 1.0
+        elif self.age < 50:
+            # Middle-aged: Slight capacity reduction
+            self.max_workload_capacity *= 0.97
+        elif self.age < 60:
+            # Transition: Moderate capacity reduction
+            self.max_workload_capacity *= 0.90
+        elif self.age < 70:
+            # Senior: Reduced capacity
+            self.max_workload_capacity *= 0.80
+        else:
+            # Older senior: Significantly reduced capacity
+            self.max_workload_capacity *= 0.65
+
+        # Store age modifier factor for protocol-level adjustments
+        self.age_modifier = age_hr_factor
 
     def _to_next_phase(self, next_phase):
         
@@ -255,8 +449,8 @@ class PhysiologySimulationEngine:
         hr_change_rate = self.hr_increase_rate_per_min / 60.0  # per second
         self.hr += np.clip(hr_delta * hr_change_rate * dt, -2.0, 2.0) + random.uniform(-0.2, 0.4)
 
-        # SBP rises with workload level
-        target_sbp = self.baseline_sbp + self.sbp_increase_per_level * self.workload_level
+        # SBP rises with workload level, apply modifier for lifestyle factors
+        target_sbp = (self.baseline_sbp + self.sbp_increase_per_level * self.workload_level) * self.sbp_modifier
         sbp_delta = target_sbp - self.sbp
         self.sbp += np.clip(sbp_delta, -3.0, 3.0)  # limit per-second change
 
@@ -269,6 +463,16 @@ class PhysiologySimulationEngine:
         target_oldpeak = self.baseline_oldpeak + 0.1 * self.workload_level
         self.oldpeak += np.clip(target_oldpeak - self.oldpeak, -0.05, 0.05) + random.uniform(-0.01, 0.01)
 
+        # Handle ectopic beats (arrhythmia from alcohol/dehydration)
+        # Check every second if we should trigger an ectopic beat during high intensity
+        if self.ectopic_beat_chance > 0 and self.workload_level >= 2:
+            if random.random() < self.ectopic_beat_chance / 60.0:  # Convert to per-second probability
+                # Sudden spike/drop in HR to simulate ectopic beat
+                ectopic_magnitude = random.choice([-15, 20])  # -15 or +20 bpm sudden change
+                self.hr += ectopic_magnitude
+                # Mark as exercise-induced angina for this beat
+                self.exang = 1
+
         # Check if all stages completed
         if self.stage >= len(self.protocol_configs[self.protocol]["stages"]):
             
@@ -278,23 +482,28 @@ class PhysiologySimulationEngine:
         # Update recovery timer
         self.phase_elapsed_s += dt
         self.stage_time += dt  # Update stage_time for frontend timer display
-        
-        # First minute: HR should drop by ~20 bpm
+
+        # First minute: HR should drop by ~20 bpm, modified by recovery_modifier
         if self.phase_elapsed_s <= 60.0:
-            expected_drop = 20.0 * (self.phase_elapsed_s / 60.0)
+            # Apply recovery modifier: smokers drop slower, athletes drop faster
+            expected_drop = 20.0 * (self.phase_elapsed_s / 60.0) * self.recovery_modifier
             target_hr = max(self.baseline_hr, self.recovery_start_hr - expected_drop)
             self.hr += (target_hr - self.hr) * min(1.0, dt/5.0) + random.uniform(-0.3, 0.3)
             if self.phase_elapsed_s >= 60.0 and not self.recovery_flagged:
                 actual_drop = self.recovery_start_hr - self.hr
-                if actual_drop < 18.0:  # flag abnormal if < ~20 bpm
+                # Flag abnormal recovery if HR doesn't drop sufficiently (adjusted for recovery modifier)
+                threshold = 18.0 * self.recovery_modifier
+                if actual_drop < threshold:
                     self.recovery_flagged = True
         else:
-            # Then ease towards baseline
-            self.hr += (self.baseline_hr - self.hr) * min(1.0, dt/20.0) + random.uniform(-0.2, 0.2)
+            # Then ease towards baseline (also affected by recovery modifier)
+            recovery_speed = min(1.0, dt/20.0) * self.recovery_modifier
+            self.hr += (self.baseline_hr - self.hr) * recovery_speed + random.uniform(-0.2, 0.2)
 
-        # SBP and DBP return towards baseline
-        self.sbp += (self.baseline_sbp - self.sbp) * min(1.0, dt/15.0)
-        self.dbp += (self.baseline_dbp - self.dbp) * min(1.0, dt/15.0)
+        # SBP and DBP return towards baseline (affected by recovery modifier)
+        recovery_speed_sbp = min(1.0, dt/15.0) * self.recovery_modifier
+        self.sbp += (self.baseline_sbp - self.sbp) * recovery_speed_sbp
+        self.dbp += (self.baseline_dbp - self.dbp) * recovery_speed_sbp
         self.oldpeak += (self.baseline_oldpeak - self.oldpeak) * min(1.0, dt/20.0) + random.uniform(-0.01, 0.01)
 
         if self.phase_elapsed_s >= self.config["recovery_duration_s"]:
@@ -349,15 +558,78 @@ class PhysiologySimulationEngine:
 
     def pop_events(self):
         events = []
+
+        # ===== RECOVERY ABNORMALITY =====
         if self.phase == "recovery" and self.phase_elapsed_s >= 60.0 and self.recovery_flagged:
             # Emit once per recovery minute window then reset flag so we don't spam
             events.append({
                 "type": "recovery_abnormal",
-                "message": "HR failed to drop ~20 bpm within first minute of recovery",
-                "severity": "medium"
+                "message": "HR failed to drop ~20 bpm within first minute of recovery - Poor heart rate recovery detected",
+                "severity": "high"
             })
             self.recovery_flagged = False
-            
+
+        # ===== DYNAMIC PATIENT REPORTS DURING EXERCISE =====
+        if self.phase == "exercise":
+            current_time = time.time()
+
+            # Shortness of Breath: Smokers + High Intensity
+            if self.smoking_status == "smoker" and self.workload_level >= 2 and not self.shortness_of_breath_reported:
+                last_sob = self.last_event_triggers.get("shortness_of_breath", 0)
+                if current_time - last_sob > 15:  # Only trigger once per 15 seconds
+                    events.append({
+                        "type": "patient_report",
+                        "message": "⚠ Patient reports: 'I'm feeling shortness of breath'",
+                        "severity": "medium"
+                    })
+                    self.last_event_triggers["shortness_of_breath"] = current_time
+                    self.shortness_of_breath_reported = True
+
+            # Abnormal Blood Pressure: High SBP
+            if self.sbp > 160 and not self.abnormal_bp_reported:
+                last_bp = self.last_event_triggers.get("high_bp", 0)
+                if current_time - last_bp > 20:
+                    events.append({
+                        "type": "patient_report",
+                        "message": "⚠ Patient reports: 'I feel dizzy and my chest feels tight'",
+                        "severity": "high"
+                    })
+                    self.last_event_triggers["high_bp"] = current_time
+                    self.abnormal_bp_reported = True
+
+            # Palpitations: Alcohol use + High Intensity + Ectopic chance
+            if self.alcohol_consumption in ["moderate", "heavy"] and self.workload_level >= 2 and not self.palpitations_reported:
+                last_palp = self.last_event_triggers.get("palpitations", 0)
+                if current_time - last_palp > 15:
+                    events.append({
+                        "type": "patient_report",
+                        "message": "⚠ Patient reports: 'I feel palpitations and an irregular heartbeat'",
+                        "severity": "high"
+                    })
+                    self.last_event_triggers["palpitations"] = current_time
+                    self.palpitations_reported = True
+
+            # Extreme Blood Pressure (very high or very low)
+            if (self.sbp > 180 or self.sbp < 90) and not self.dizziness_reported:
+                last_dizz = self.last_event_triggers.get("extreme_bp", 0)
+                if current_time - last_dizz > 20:
+                    event_msg = "Patient feels extremely dizzy - Blood Pressure Spike!" if self.sbp > 180 else "Patient feels faint - Blood Pressure Drop!"
+                    events.append({
+                        "type": "alert",
+                        "message": f"🚨 CRITICAL: {event_msg}",
+                        "severity": "critical"
+                    })
+                    self.last_event_triggers["extreme_bp"] = current_time
+                    self.dizziness_reported = True
+
+        # Reset report flags when exercise ends
+        if self.phase != "exercise":
+            self.shortness_of_breath_reported = False
+            self.abnormal_bp_reported = False
+            self.palpitations_reported = False
+            self.dizziness_reported = False
+
+        # ===== PROTOCOL COMPLETION =====
         if self.protocol_completed:
             # Add protocol completion event
             events.append({
@@ -366,7 +638,7 @@ class PhysiologySimulationEngine:
                 "severity": "info"
             })
             self.protocol_completed = False
-            
+
         return events
     
     def pause(self):
@@ -460,18 +732,55 @@ def start_simulation():
 
     # Reset engine with new configuration
     engine = PhysiologySimulationEngine(config=cfg)
+
+    # Set age from user data
+    engine.age = int(data.get("age", 50))
+
+    # Apply age-based modifiers first
+    engine.apply_age_modifiers()
+
+    # Apply lifestyle modifiers (combined with age modifiers)
+    engine.smoking_status = data.get("smoking_status", "non_smoker")
+    engine.diabetes_history = data.get("diabetes_history", "none")
+    engine.alcohol_consumption = data.get("alcohol_consumption", "none")
+    engine.activity_level = data.get("activity_level", "active")
+    engine.apply_lifestyle_modifiers()
+
     running = True
     print("[INFO] Simulation started with:", user_static_data)
     print("[INFO] Engine config:", engine.config)
     print("[INFO] Protocol selected:", protocol)
+    print(f"[INFO] Age: {engine.age} years, Age Modifier: {engine.age_modifier:.2f}x")
+    print(f"[INFO] Lifestyle Modifiers - Smoking: {engine.smoking_status}, Diabetes: {engine.diabetes_history}, Alcohol: {engine.alcohol_consumption}, Activity: {engine.activity_level}")
+    print(f"[INFO] Applied Modifiers - SBP: {engine.sbp_modifier:.2f}x, HR: {engine.hr_modifier:.2f}x, Recovery: {engine.recovery_modifier:.2f}x, Max Workload: {engine.max_workload_capacity:.2f}x")
     print("[INFO] Running flag set to:", running)
     print(f"[INFO] Protocol stages: {len(engine.protocol_configs[protocol]['stages'])} stages")
     for i, stage in enumerate(engine.protocol_configs[protocol]['stages']):
         print(f"[INFO] Stage {i+1}: {stage['duration']}s, workload {stage['workload']}, target HR {stage['target_hr']*100:.0f}%")
+    # Calculate total exercise duration from protocol stages
+    protocol_stages = engine.protocol_configs[protocol]["stages"]
+    total_exercise_duration = sum(stage["duration"] for stage in protocol_stages)
+
+    # Prepare exercise stages info for frontend
+    exercise_stages = [
+        {
+            "stage_num": i + 1,
+            "duration": stage["duration"],
+            "workload": stage["workload"],
+            "target_hr": stage["target_hr"]
+        }
+        for i, stage in enumerate(protocol_stages)
+    ]
+
     return jsonify({
-        "message": "Simulation started", 
-        "engine_config": engine.config,
+        "message": "Simulation started",
+        "engine_config": {
+            **engine.config,
+            "exercise_duration_s": total_exercise_duration  # Override with actual total
+        },
         "protocol": protocol,
+        "exercise_stages": exercise_stages,
+        "total_exercise_duration": total_exercise_duration,
         "protocol_info": {
             "standard": "Standard Bruce Protocol - 3 min stages, higher intensity",
             "modified_bruce": "Modified Bruce Protocol - 5 min stages, gentler progression"
@@ -983,7 +1292,7 @@ def force_update():
             engine.update(1.0)
             snapshot = engine.to_latest_data()
             latest_data.update(snapshot)
-            
+
             return jsonify({
                 "message": "Forced update successful",
                 "new_phase": engine.phase,
@@ -994,6 +1303,196 @@ def force_update():
         else:
             return jsonify({"error": "No engine available"}), 400
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/what_if_analysis', methods=['POST'])
+def what_if_analysis():
+    """
+    Comparative analysis endpoint - show predicted outcomes if user changes lifestyle.
+    Accepts hypothetical lifestyle changes and returns comparative results.
+    """
+    global engine, latest_data, user_static_data
+    try:
+        data = request.json or {}
+
+        # Get current simulation snapshot
+        current_snapshot = latest_data.copy()
+
+        # Create hypothetical engine with modified lifestyle
+        hypothetical_engine = PhysiologySimulationEngine(config=engine.config)
+
+        # Apply original lifestyle modifiers
+        hypothetical_engine.smoking_status = engine.smoking_status
+        hypothetical_engine.diabetes_history = engine.diabetes_history
+        hypothetical_engine.alcohol_consumption = engine.alcohol_consumption
+        hypothetical_engine.activity_level = engine.activity_level
+
+        # Override with hypothetical changes
+        if "smoking_status" in data:
+            hypothetical_engine.smoking_status = data["smoking_status"]
+        if "diabetes_history" in data:
+            hypothetical_engine.diabetes_history = data["diabetes_history"]
+        if "alcohol_consumption" in data:
+            hypothetical_engine.alcohol_consumption = data["alcohol_consumption"]
+        if "activity_level" in data:
+            hypothetical_engine.activity_level = data["activity_level"]
+
+        hypothetical_engine.apply_lifestyle_modifiers()
+
+        # Calculate differences
+        comparison = {
+            "current": {
+                "smoking_status": engine.smoking_status,
+                "diabetes_history": engine.diabetes_history,
+                "alcohol_consumption": engine.alcohol_consumption,
+                "activity_level": engine.activity_level,
+                "sbp_modifier": round(engine.sbp_modifier, 2),
+                "hr_modifier": round(engine.hr_modifier, 2),
+                "recovery_modifier": round(engine.recovery_modifier, 2),
+                "baseline_hr": round(engine.baseline_hr, 1),
+            },
+            "hypothetical": {
+                "smoking_status": hypothetical_engine.smoking_status,
+                "diabetes_history": hypothetical_engine.diabetes_history,
+                "alcohol_consumption": hypothetical_engine.alcohol_consumption,
+                "activity_level": hypothetical_engine.activity_level,
+                "sbp_modifier": round(hypothetical_engine.sbp_modifier, 2),
+                "hr_modifier": round(hypothetical_engine.hr_modifier, 2),
+                "recovery_modifier": round(hypothetical_engine.recovery_modifier, 2),
+                "baseline_hr": round(hypothetical_engine.baseline_hr, 1),
+            },
+            "predicted_improvements": {
+                "sbp_reduction": round((engine.sbp_modifier - hypothetical_engine.sbp_modifier) * 100, 1),  # percentage points
+                "hr_improvement": round((engine.hr_modifier - hypothetical_engine.hr_modifier) * 100, 1),
+                "recovery_improvement": round((hypothetical_engine.recovery_modifier - engine.recovery_modifier) * 100, 1),
+                "baseline_hr_reduction": round(engine.baseline_hr - hypothetical_engine.baseline_hr, 1),
+            },
+            "message": generate_what_if_message(engine, hypothetical_engine)
+        }
+
+        return jsonify(comparison)
+
+    except Exception as e:
+        print(f"Error in what_if_analysis: {e}")
+        return jsonify({"error": str(e)}), 500
+
+def generate_what_if_message(current_engine, hypothetical_engine):
+    """Generate a meaningful message about lifestyle changes."""
+    messages = []
+
+    if current_engine.smoking_status != hypothetical_engine.smoking_status:
+        if hypothetical_engine.smoking_status == "non_smoker":
+            messages.append("Quitting smoking would significantly improve your heart's recovery capability.")
+        elif hypothetical_engine.smoking_status == "ex_smoker":
+            messages.append("Becoming an ex-smoker would reduce blood pressure strain on your heart.")
+
+    if current_engine.diabetes_history != hypothetical_engine.diabetes_history:
+        if hypothetical_engine.diabetes_history == "none":
+            messages.append("Managing or eliminating diabetes would improve your heart rate response to exercise.")
+
+    if current_engine.alcohol_consumption != hypothetical_engine.alcohol_consumption:
+        if hypothetical_engine.alcohol_consumption == "none":
+            messages.append("Reducing alcohol consumption would decrease arrhythmia risk and improve recovery.")
+
+    if current_engine.activity_level != hypothetical_engine.activity_level:
+        if hypothetical_engine.activity_level == "athlete":
+            messages.append("Increasing your activity level to athletic levels would dramatically improve your recovery and cardiovascular fitness.")
+        elif hypothetical_engine.activity_level == "active":
+            messages.append("Becoming more active would improve your baseline heart rate and recovery performance.")
+
+    if not messages:
+        messages.append("Your current lifestyle factors are being optimized for your simulation.")
+
+    return " ".join(messages)
+
+def calculate_heart_age(age, systolic_bp, heart_rate, st_depression, smoking_status, diabetes_history):
+    """
+    Calculate biological heart age based on cardiovascular risk factors.
+    Uses simplified scoring similar to Framingham Heart Age calculation.
+    """
+    heart_age = age
+
+    # Blood Pressure impact
+    if systolic_bp > 140:
+        heart_age += (systolic_bp - 140) * 0.05
+    elif systolic_bp < 110:
+        heart_age -= (110 - systolic_bp) * 0.03
+
+    # Resting Heart Rate impact (for overall fitness)
+    if heart_rate > 80:
+        heart_age += (heart_rate - 80) * 0.02
+    elif heart_rate < 60:
+        heart_age -= (60 - heart_rate) * 0.01
+
+    # ST Depression (cardiac stress indicator)
+    if st_depression > 1.0:
+        heart_age += (st_depression - 1.0) * 5
+
+    # Smoking adds years to heart age
+    if smoking_status == "smoker":
+        heart_age += 5
+    elif smoking_status == "ex_smoker":
+        heart_age += 2
+
+    # Diabetes adds years
+    if diabetes_history in ["type_1", "type_2"]:
+        heart_age += 3
+
+    return max(18, round(heart_age, 1))  # Heart age shouldn't be less than 18
+
+@app.route('/biological_age', methods=['GET'])
+def get_biological_age():
+    """
+    Calculate and return the user's biological heart age vs actual age.
+    """
+    try:
+        if not engine or not latest_data:
+            return jsonify({"error": "Simulation not running"}), 400
+
+        actual_age = float(user_static_data.get("age", 50))
+        heart_age = calculate_heart_age(
+            actual_age,
+            latest_data.get("trestbps", 120),
+            latest_data.get("thalach", 72),
+            latest_data.get("oldpeak", 1.0),
+            engine.smoking_status,
+            engine.diabetes_history
+        )
+
+        age_difference = heart_age - actual_age
+
+        # Generate interpretation
+        if age_difference < 0:
+            interpretation = f"Your heart is {abs(age_difference):.1f} years younger than your age! Excellent cardiovascular health."
+            status = "excellent"
+        elif age_difference < 3:
+            interpretation = "Your heart age is close to your actual age. Good cardiovascular health."
+            status = "good"
+        elif age_difference < 10:
+            interpretation = f"Your heart is {age_difference:.1f} years older than your actual age. Consider lifestyle changes."
+            status = "fair"
+        else:
+            interpretation = f"Your heart is {age_difference:.1f} years older than your actual age. Significant lifestyle changes recommended."
+            status = "poor"
+
+        return jsonify({
+            "actual_age": actual_age,
+            "heart_age": heart_age,
+            "age_difference": age_difference,
+            "interpretation": interpretation,
+            "status": status,
+            "recommendations": [
+                "Quit smoking" if engine.smoking_status == "smoker" else None,
+                "Increase physical activity" if engine.activity_level == "sedentary" else None,
+                "Reduce alcohol consumption" if engine.alcohol_consumption in ["moderate", "heavy"] else None,
+                "Manage blood sugar levels" if engine.diabetes_history != "none" else None,
+                "Monitor blood pressure regularly",
+                "Regular cardiovascular exercise"
+            ] if status != "excellent" else ["Maintain your current healthy lifestyle!"]
+        })
+
+    except Exception as e:
+        print(f"Error calculating biological age: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":

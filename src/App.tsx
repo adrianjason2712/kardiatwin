@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle, MessageCircle } from 'lucide-react';
+import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle, MessageCircle, Menu, X, TrendingDown, BarChart3 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { HeartScene } from './components/HeartScene';
 import PulseChatbot from './components/PulseChatbot';
 import { SimulationProgress } from './components/SimulationProgress';
+import { SimulationPage } from './pages/SimulationPage';
+import { HeartAgeCalculatorPage } from './pages/HeartAgeCalculatorPage';
+import { WhatIfCalculatorPage } from './pages/WhatIfCalculatorPage';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -36,6 +39,11 @@ interface UserData {
   restecg: string;
   slope: string;
   protocol: string;  // Add protocol selection
+  // Lifestyle & History parameters
+  smoking_status?: string;  // "non_smoker" | "smoker" | "ex_smoker"
+  diabetes_history?: string;  // "none" | "type_1" | "type_2"
+  alcohol_consumption?: string;  // "none" | "moderate" | "heavy"
+  activity_level?: string;  // "sedentary" | "active" | "athlete"
 }
 
 interface SimulationData {
@@ -68,22 +76,6 @@ interface ExerciseRecommendation {
   status: 'recommended' | 'caution' | 'avoid';
 }
 
-interface Alert {
-  timestamp: string;
-  type: string;
-  message: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  acknowledged: boolean;
-}
-
-interface AlertThresholds {
-  heart_rate_high: number;
-  heart_rate_low: number;
-  blood_pressure_high: number;
-  blood_pressure_low: number;
-  st_depression_high: number;
-}
-
 function App() {
   const [userData, setUserData] = useState<UserData>({
     age: '',
@@ -92,7 +84,11 @@ function App() {
     fbs: '0',
     restecg: '0',
     slope: '1',
-    protocol: 'Standard Bruce' // Default to Standard Bruce
+    protocol: 'Standard Bruce', // Default to Standard Bruce
+    smoking_status: 'non_smoker',
+    diabetes_history: 'none',
+    alcohol_consumption: 'none',
+    activity_level: 'active'
   });
 
   const [data, setData] = useState<SimulationData>({
@@ -119,35 +115,65 @@ function App() {
     max_workload_level: 3,
     protocol: "standard"
   });
+  const [exerciseStages, setExerciseStages] = useState<any[]>([]);
   const [exerciseIntensity, setExerciseIntensity] = useState(50);
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [thresholds, setThresholds] = useState<AlertThresholds>({
-    heart_rate_high: 170,
-    heart_rate_low: 50,
-    blood_pressure_high: 140,
-    blood_pressure_low: 90,
-    st_depression_high: 2.0
-  });
-  const [showThresholdSettings, setShowThresholdSettings] = useState(false);
   const [showMiniPlayer, setShowMiniPlayer] = useState(true);
   const [showChatbot, setShowChatbot] = useState(false);
+  const [showWhatIfMode, setShowWhatIfMode] = useState(false);
+  const [whatIfResults, setWhatIfResults] = useState<any>(null);
+  const [heartAge, setHeartAge] = useState<any>(null);
+  const [whatIfChanges, setWhatIfChanges] = useState({
+    smoking_status: userData.smoking_status,
+    diabetes_history: userData.diabetes_history,
+    alcohol_consumption: userData.alcohol_consumption,
+    activity_level: userData.activity_level
+  });
+  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if'>('simulation');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Check if all required parameters are selected
-  const isFormComplete = () => {
-    return userData.age !== '' && userData.sex !== '' && userData.cp !== '';
-  };
-
-  // Auto-select protocol based on age
-  const updateProtocolBasedOnAge = (age: string) => {
+  // Update default protocol based on age (following medical standards)
+  const updateDefaultProtocolByAge = (age: string) => {
     if (age !== '') {
       const ageNum = parseInt(age);
       if (ageNum >= 60) {
+        // Older patients (60+) should default to Modified Bruce per medical standards
         setUserData(prev => ({ ...prev, protocol: 'Modified Bruce' }));
       } else {
+        // Younger patients default to Standard Bruce
         setUserData(prev => ({ ...prev, protocol: 'Standard Bruce' }));
       }
     }
   };
+
+  // Check if all required parameters are selected
+  const isFormComplete = () => {
+    return userData.age !== '' && userData.sex !== '' && userData.cp !== '' && userData.protocol !== '';
+  };
+
+  const fetchWhatIfAnalysis = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/what_if_analysis", whatIfChanges);
+      setWhatIfResults(response.data);
+    } catch (error) {
+      console.error("Error fetching What If analysis:", error);
+      alert("Failed to fetch What If analysis");
+    }
+  };
+
+  const fetchHeartAge = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/biological_age");
+      setHeartAge(response.data);
+    } catch (error) {
+      console.error("Error fetching heart age:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (simulationStarted) {
+      fetchHeartAge();
+    }
+  }, [simulationStarted]);
 
   const evaluateRisk = (data: SimulationData): string => {
     // Define risk thresholds
@@ -200,12 +226,15 @@ function App() {
       };
       
       const response = await axios.post("http://localhost:5000/start", submissionData);
-      
-      // Store the engine configuration
+
+      // Store the engine configuration and exercise stages
       if (response.data && response.data.engine_config) {
         setEngineConfig(response.data.engine_config);
       }
-      
+      if (response.data && response.data.exercise_stages) {
+        setExerciseStages(response.data.exercise_stages);
+      }
+
       setSimulationStarted(true);
     } catch (error) {
       console.error("Error starting simulation:", error);
@@ -229,57 +258,6 @@ function App() {
     const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
   }, [simulationStarted, exerciseIntensity]);
-
-  useEffect(() => {
-    if (!simulationStarted) return;
-
-    const fetchAlerts = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/alerts");
-        setAlerts(response.data);
-      } catch (error) {
-        console.error("Error fetching alerts:", error);
-      }
-    };
-
-    const alertInterval = setInterval(fetchAlerts, 2000);
-    return () => clearInterval(alertInterval);
-  }, [simulationStarted]);
-
-  const handleAcknowledgeAlert = async (index: number) => {
-    try {
-      await axios.post(`http://localhost:5000/alerts/${index}/acknowledge`);
-      setAlerts(prev => prev.filter((_, i) => i !== index));
-    } catch (error) {
-      console.error("Error acknowledging alert:", error);
-    }
-  };
-
-  const handleThresholdChange = async (key: keyof AlertThresholds, value: number) => {
-    if (value < 0) {
-      alert("Negative values are not allowed");
-      return;
-    }
-
-    try {
-      const newThresholds = { ...thresholds, [key]: value };
-      const response = await axios.post("http://localhost:5000/thresholds", newThresholds);
-      
-      if (response.data.error) {
-        alert(response.data.error);
-        return;
-      }
-      
-      setThresholds(newThresholds);
-    } catch (error) {
-      console.error("Error updating thresholds:", error);
-      if (axios.isAxiosError(error) && error.response?.data?.error) {
-        alert(error.response.data.error);
-      } else {
-        alert("Failed to update thresholds. Please try again.");
-      }
-    }
-  };
 
   const chartData = {
     labels: history.map((_, index) => `${index + 1}s`),
@@ -513,45 +491,153 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Left Sidebar Navigation */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col shadow-sm`}>
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          {sidebarOpen && (
             <div className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-[#8F87F1]" />
-              <span className="text-xl font-bold gradient-text">KardiaTwin</span>
+              <Heart className="h-5 w-5 text-[#8F87F1]" />
+              <span className="font-bold gradient-text text-sm">KardiaTwin</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => setShowChatbot(!showChatbot)}
-                className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
-              >
-                <MessageCircle className="h-6 w-6" />
-              </button>
-              <button 
-                onClick={() => setShowMiniPlayer(!showMiniPlayer)}
-                className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
-              >
-                <Heart className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-        <div className="hero-gradient py-20 text-white">
-          <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Real-time Heart Simulation</h1>
-            <p className="text-lg md:text-xl mb-8 opacity-90">
-            Experience advanced cardiac simulation with our cutting-edge simulation system
-            </p>
-          </div>
+          )}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
 
-      {/* Main Content */}
-      <div className="flex-grow container mx-auto px-4 py-8">
+        {/* Navigation Items */}
+        <nav className="flex-1 p-4 space-y-2">
+          <button
+            onClick={() => setCurrentPage('simulation')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              currentPage === 'simulation'
+                ? 'bg-[#8F87F1] bg-opacity-10 text-[#8F87F1] border border-[#8F87F1]'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <Activity className="h-5 w-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm font-medium">Simulation</span>}
+          </button>
+
+          <button
+            onClick={() => setCurrentPage('heart-age')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              currentPage === 'heart-age'
+                ? 'bg-red-50 text-red-600 border border-red-300'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <Heart className="h-5 w-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm font-medium">Heart Age</span>}
+          </button>
+
+          <button
+            onClick={() => setCurrentPage('what-if')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              currentPage === 'what-if'
+                ? 'bg-purple-50 text-purple-600 border border-purple-300'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <TrendingDown className="h-5 w-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm font-medium">What If</span>}
+          </button>
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-gray-200 space-y-2">
+          <button
+            onClick={() => setShowChatbot(!showChatbot)}
+            className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors ${
+              showChatbot ? 'bg-gray-100' : ''
+            }`}
+            title="Chat Assistant"
+          >
+            <MessageCircle className="h-5 w-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm font-medium">Chat</span>}
+          </button>
+
+          <button
+            onClick={() => setShowMiniPlayer(!showMiniPlayer)}
+            className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors ${
+              showMiniPlayer ? 'bg-gray-100' : ''
+            }`}
+            title="Vital Signs Widget"
+          >
+            <Heart className="h-5 w-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm font-medium">Vitals</span>}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Navbar */}
+        <nav className="bg-white shadow-sm border-b border-gray-200">
+          <div className="px-8 py-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold gradient-text">
+                {currentPage === 'simulation' && 'Cardiac Stress Test Simulation'}
+                {currentPage === 'heart-age' && 'Biological Heart Age Calculator'}
+                {currentPage === 'what-if' && 'What If Analysis'}
+              </h1>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                {simulationStarted && (
+                  <span className="flex items-center space-x-1">
+                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                    <span>Simulation Active</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Page Content */}
+        <div className="flex-1 overflow-auto">
+          <div className="px-8 py-8">
+            {currentPage === 'simulation' && (
+              <SimulationPage
+                userData={userData}
+                data={data}
+                history={history}
+                simulationStarted={simulationStarted}
+                isFormComplete={isFormComplete}
+                handleSubmit={handleSubmit}
+                setUserData={setUserData}
+                updateDefaultProtocolByAge={updateDefaultProtocolByAge}
+                getExerciseRecommendations={getExerciseRecommendations}
+                chartData={chartData}
+                engineConfig={engineConfig}
+                exerciseStages={exerciseStages}
+              />
+            )}
+
+            {currentPage === 'heart-age' && (
+              <HeartAgeCalculatorPage
+                userData={userData}
+                data={data}
+              />
+            )}
+
+            {currentPage === 'what-if' && (
+              <WhatIfCalculatorPage
+                userData={userData}
+                data={data}
+                originalWhatIfChanges={whatIfChanges}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Original inline simulation form - kept for reference but now in SimulationPage */}
+      {false && (
         <div className="bg-white rounded-xl shadow-xl p-6 mb-8">
           {!simulationStarted ? (
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
@@ -912,7 +998,115 @@ function App() {
                   </div>
                 </div>
               </div>
-              
+
+              {/* Lifestyle & History Section */}
+              <div className="space-y-8 mt-8 pt-8 border-t-2 border-gray-200">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Lifestyle & Medical History</h2>
+                  <p className="text-gray-600 text-sm mb-6">These factors help personalize your simulation experience</p>
+
+                  {/* Smoking Status */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Smoking Status</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { value: 'non_smoker', label: 'Non-Smoker', description: 'Never smoked' },
+                        { value: 'ex_smoker', label: 'Ex-Smoker', description: 'Quit smoking' },
+                        { value: 'smoker', label: 'Smoker', description: 'Currently smoking' }
+                      ].map(option => (
+                        <div
+                          key={option.value}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                            userData.smoking_status === option.value
+                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                          }`}
+                          onClick={() => setUserData({...userData, smoking_status: option.value})}
+                        >
+                          <div className="font-medium text-gray-700 text-center">{option.label}</div>
+                          <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Diabetes History */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Diabetes History</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { value: 'none', label: 'No Diabetes', description: 'No history' },
+                        { value: 'type_2', label: 'Type 2', description: 'Type 2 Diabetes' },
+                        { value: 'type_1', label: 'Type 1', description: 'Type 1 Diabetes' }
+                      ].map(option => (
+                        <div
+                          key={option.value}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                            userData.diabetes_history === option.value
+                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                          }`}
+                          onClick={() => setUserData({...userData, diabetes_history: option.value})}
+                        >
+                          <div className="font-medium text-gray-700 text-center">{option.label}</div>
+                          <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Alcohol Consumption */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Alcohol Consumption</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { value: 'none', label: 'No Alcohol', description: 'Rarely or never' },
+                        { value: 'moderate', label: 'Moderate', description: '1-2 drinks/day' },
+                        { value: 'heavy', label: 'Heavy', description: '3+ drinks/day' }
+                      ].map(option => (
+                        <div
+                          key={option.value}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                            userData.alcohol_consumption === option.value
+                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                          }`}
+                          onClick={() => setUserData({...userData, alcohol_consumption: option.value})}
+                        >
+                          <div className="font-medium text-gray-700 text-center">{option.label}</div>
+                          <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Activity Level */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Typical Activity Level</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { value: 'sedentary', label: 'Sedentary', description: 'Mostly sitting' },
+                        { value: 'active', label: 'Active', description: '3-5 days/week exercise' },
+                        { value: 'athlete', label: 'Athlete', description: 'Regular intense activity' }
+                      ].map(option => (
+                        <div
+                          key={option.value}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                            userData.activity_level === option.value
+                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                          }`}
+                          onClick={() => setUserData({...userData, activity_level: option.value})}
+                        >
+                          <div className="font-medium text-gray-700 text-center">{option.label}</div>
+                          <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
                              <button
                  type="submit"
                  disabled={!isFormComplete()}
@@ -927,367 +1121,15 @@ function App() {
             </form>
           ) : (
             <div>
-              {/* Simulation Progress Bar */}
-              <div className="mb-8">
-                <SimulationProgress 
-                  phase={data.phase}
-                  stage={data.stage}
-                  stageTime={data.stage_time}
-                  protocol={data.protocol}
-                  restDuration={engineConfig.rest_duration_s}
-                  exerciseDuration={engineConfig.exercise_duration_s}
-                  recoveryDuration={engineConfig.recovery_duration_s}
-                  workloadLevel={data.workload_level}
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gradient-to-br from-[#8F87F1] to-[#C68EFD] p-6 rounded-lg text-white shadow-lg">
-                      <div className="flex items-center mb-2">
-                        <Heart className="mr-2" />
-                        <h3 className="text-lg font-semibold">Heart Rate</h3>
-                      </div>
-                      <p className="text-3xl font-bold">{data.thalach} BPM</p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-[#C68EFD] to-[#E9A5F1] p-6 rounded-lg text-white shadow-lg">
-                      <div className="flex items-center mb-2">
-                        <Droplets className="mr-2" />
-                        <h3 className="text-lg font-semibold">Cholesterol</h3>
-                      </div>
-                      <p className="text-3xl font-bold">{data.chol} mg/dL</p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-[#E9A5F1] to-[#FED2E2] p-6 rounded-lg text-white shadow-lg">
-                      <div className="flex items-center mb-2">
-                        <Zap className="mr-2" />
-                        <h3 className="text-lg font-semibold">ST Depression</h3>
-                      </div>
-                      <p className="text-3xl font-bold">{data.oldpeak}</p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-[#FED2E2] to-[#8F87F1] p-6 rounded-lg text-white shadow-lg">
-                      <div className="flex items-center mb-2">
-                        <Activity className="mr-2" />
-                        <h3 className="text-lg font-semibold">Blood Pressure</h3>
-                      </div>
-                      <p className="text-3xl font-bold">{data.trestbps} mmHg</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h3 className="text-xl font-semibold gradient-text">Current Risk Factors</h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Real-time vital signs monitoring
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-600">Protocol</div>
-                        <div className="text-lg font-semibold text-[#8F87F1]">
-                          {userData.protocol}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Heart Rate</span>
-                            <span className="text-sm font-medium">{data.thalach} BPM</span>
-                        </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Blood Pressure</span>
-                            <span className="text-sm font-medium">{data.trestbps} mmHg</span>
-                      </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">ST Depression</span>
-                            <span className="text-sm font-medium">{data.oldpeak}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-semibold mb-4 gradient-text">3D Heart Visualization</h3>
-                  <HeartScene heartRate={data.thalach} />
-                </div>
-              </div>
-              
-              {/* Exercise Recommendations Section */}
-              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 mt-8">
-                <h3 className="text-xl font-semibold mb-4 gradient-text">Exercise Recommendations</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {getExerciseRecommendations(data).map((exercise, index) => (
-                    <div 
-                      key={index}
-                      className={`p-6 rounded-lg border ${
-                        exercise.status === 'recommended' 
-                          ? 'border-green-200 bg-green-50' 
-                          : exercise.status === 'caution'
-                          ? 'border-yellow-200 bg-yellow-50'
-                          : 'border-red-200 bg-red-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-2">
-                          {exercise.type.includes('HIIT') ? (
-                            <Zap className="h-5 w-5 text-[#8F87F1]" />
-                          ) : exercise.type.includes('Walking') ? (
-                            <Activity className="h-5 w-5 text-[#8F87F1]" />
-                          ) : exercise.type.includes('Yoga') ? (
-                            <Heart className="h-5 w-5 text-[#8F87F1]" />
-                          ) : (
-                            <Gauge className="h-5 w-5 text-[#8F87F1]" />
-                          )}
-                        <h4 className="text-lg font-semibold">{exercise.type}</h4>
-                        </div>
-                        {exercise.status === 'recommended' ? (
-                          <CheckCircle2 className="h-6 w-6 text-green-500" />
-                        ) : exercise.status === 'caution' ? (
-                          <AlertCircle className="h-6 w-6 text-yellow-500" />
-                        ) : (
-                          <XCircle className="h-6 w-6 text-red-500" />
-                        )}
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center">
-                          <Activity className="h-4 w-4 mr-2 text-gray-500" />
-                          <span className="text-sm">Intensity: {exercise.intensity}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Gauge className="h-4 w-4 mr-2 text-gray-500" />
-                          <span className="text-sm">Duration: {exercise.duration}</span>
-                        </div>
-                        
-                        {exercise.benefits.length > 0 && (
-                          <div className="mt-4">
-                            <h5 className="text-sm font-medium text-gray-700 mb-2">Benefits:</h5>
-                            <ul className="space-y-1">
-                              {exercise.benefits.map((benefit, i) => (
-                                <li key={i} className="text-sm text-gray-600 flex items-center">
-                                  <CheckCircle2 className="h-3 w-3 mr-2 text-green-500" />
-                                  {benefit}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        {exercise.warnings.length > 0 && (
-                          <div className="mt-4">
-                            <h5 className="text-sm font-medium text-gray-700 mb-2">Warnings:</h5>
-                            <ul className="space-y-1">
-                              {exercise.warnings.map((warning, i) => (
-                                <li key={i} className="text-sm text-gray-600 flex items-center">
-                                  <AlertCircle className="h-3 w-3 mr-2 text-yellow-500" />
-                                  {warning}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Future Predictions Panel */}
-              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 mt-8">
-                <h3 className="text-xl font-semibold mb-4 gradient-text">Future Predictions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {data.future_predictions?.map((prediction, index) => (
-                    <div
-                      key={index}
-                      className={`p-6 rounded-lg border ${
-                        prediction.prediction === 'High Risk'
-                          ? 'border-red-200 bg-red-50'
-                          : 'border-green-200 bg-green-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-semibold">{prediction.time}</h4>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          prediction.prediction === 'High Risk'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}>
-                          {prediction.prediction}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Heart Rate</span>
-                          <span className="font-medium">{prediction.thalach} BPM</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Blood Pressure</span>
-                          <span className="font-medium">{prediction.trestbps} mmHg</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">ST Depression</span>
-                          <span className="font-medium">{prediction.oldpeak}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Alert System Panel */}
-              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 mt-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold gradient-text">Alert System</h3>
-                  <button 
-                    onClick={() => setShowThresholdSettings(!showThresholdSettings)}
-                    className="px-4 py-2 bg-[#8F87F1] text-white rounded-lg hover:bg-[#C68EFD] transition-colors"
-                  >
-                    Configure Thresholds
-                  </button>
-                </div>
-
-                {showThresholdSettings && (
-                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <h4 className="text-lg font-medium mb-4">Alert Thresholds</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">High Heart Rate (BPM)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={thresholds.heart_rate_high}
-                          onChange={(e) => handleThresholdChange('heart_rate_high', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#8F87F1] focus:ring focus:ring-[#8F87F1] focus:ring-opacity-50"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Low Heart Rate (BPM)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={thresholds.heart_rate_low}
-                          onChange={(e) => handleThresholdChange('heart_rate_low', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#8F87F1] focus:ring focus:ring-[#8F87F1] focus:ring-opacity-50"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">High Blood Pressure (mmHg)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={thresholds.blood_pressure_high}
-                          onChange={(e) => handleThresholdChange('blood_pressure_high', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#8F87F1] focus:ring focus:ring-[#8F87F1] focus:ring-opacity-50"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Low Blood Pressure (mmHg)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={thresholds.blood_pressure_low}
-                          onChange={(e) => handleThresholdChange('blood_pressure_low', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#8F87F1] focus:ring focus:ring-[#8F87F1] focus:ring-opacity-50"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">High ST Depression</label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={thresholds.st_depression_high}
-                          onChange={(e) => handleThresholdChange('st_depression_high', Number(e.target.value))}
-                          className="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-[#8F87F1] focus:ring focus:ring-[#8F87F1] focus:ring-opacity-50"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  {alerts.map((alert, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 rounded-lg border ${
-                        alert.severity === 'critical' ? 'border-red-500 bg-red-50' :
-                        alert.severity === 'high' ? 'border-orange-500 bg-orange-50' :
-                        alert.severity === 'medium' ? 'border-yellow-500 bg-yellow-50' :
-                        'border-blue-500 bg-blue-50'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <AlertCircle className={`h-5 w-5 ${
-                              alert.severity === 'critical' ? 'text-red-500' :
-                              alert.severity === 'high' ? 'text-orange-500' :
-                              alert.severity === 'medium' ? 'text-yellow-500' :
-                              'text-blue-500'
-                            }`} />
-                            <span className="font-medium">{alert.message}</span>
-                          </div>
-                          <p className="text-sm text-gray-500 mt-1">{alert.timestamp}</p>
-                        </div>
-                        <button
-                          onClick={() => handleAcknowledgeAlert(index)}
-                          className="px-3 py-1 text-sm bg-white rounded-lg border border-gray-200 hover:bg-gray-50"
-                        >
-                          Acknowledge
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {alerts.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      No active alerts
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                <h3 className="text-xl font-semibold mb-4 gradient-text">Real-time Monitoring</h3>
-                <Line data={chartData} options={{
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      position: 'top' as const,
-                    },
-                    title: {
-                      display: true,
-                      text: 'Heart Rate & Blood Pressure Trends',
-                      color: '#8F87F1'
-                    }
-                  },
-                  scales: {
-                    y: {
-                      grid: {
-                        color: '#E9A5F122',
-                      }
-                    },
-                    x: {
-                      grid: {
-                        color: '#E9A5F122',
-                      }
-                    }
-                  }
-                }} />
-              </div>
+              {/* This section is now in SimulationPage component */}
             </div>
           )}
         </div>
-      </div>
+      )}
 
+      {/* Note: The inline simulation UI below has been moved to SimulationPage component */}
+
+      {/* Mini Player Component */}
       {/* Mini Player Component */}
       {simulationStarted && showMiniPlayer && (
         <div className="fixed top-4 right-4 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
@@ -1394,14 +1236,6 @@ function App() {
          </button>
        )}
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-6">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-600 italic">
-            "The greatest wealth is health." — Virgil
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

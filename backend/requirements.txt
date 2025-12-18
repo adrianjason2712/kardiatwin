@@ -1,7 +1,15 @@
+# Flask & Web Framework
+flask>=2.0.0
+flask-cors>=3.0.0
+
+# Database
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# Data Science & ML
 pandas>=1.5.0
 scikit-learn>=1.2.0
 numpy>=1.21.0
-flask>=2.0.0
-flask-cors>=3.0.0
-sqlalchemy>=2.0.0
 
+# Environment
+python-dotenv>=1.0.0

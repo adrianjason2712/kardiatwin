@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Activity, Heart, RefreshCcw, CheckCircle, AlertCircle, Clock, BarChart3 } from 'lucide-react';
 
+interface ExerciseStage {
+  stage_num: number;
+  duration: number;
+  workload: number;
+  target_hr: number;
+}
+
 interface SimulationProgressProps {
   phase: string;
   stage: number;
@@ -11,6 +18,7 @@ interface SimulationProgressProps {
   exerciseDuration: number;
   recoveryDuration: number;
   workloadLevel: number;
+  exerciseStages?: ExerciseStage[];
 }
 
 export const SimulationProgress: React.FC<SimulationProgressProps> = ({
@@ -21,7 +29,8 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
   restDuration,
   exerciseDuration,
   recoveryDuration,
-  workloadLevel
+  workloadLevel,
+  exerciseStages = []
 }) => {
   const [showCompletionPrompt, setShowCompletionPrompt] = useState(false);
   const [restTimer, setRestTimer] = useState(0);
@@ -36,26 +45,43 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
     recovery: 0
   });
 
-  // Calculate the total duration of all phases
-  const totalDuration = restDuration + exerciseDuration + recoveryDuration;
-  
+  // Calculate the total duration of all phases (using actual exercise duration if stages provided)
+  const actualExerciseDuration = exerciseStages.length > 0
+    ? exerciseStages.reduce((sum, s) => sum + s.duration, 0)
+    : exerciseDuration;
+  const totalDuration = restDuration + actualExerciseDuration + recoveryDuration;
+
+  // Calculate elapsed time in current exercise phase (all stages up to current)
+  const getExercisePhaseElapsed = (): number => {
+    if (exerciseStages.length === 0) return stageTime;
+
+    let elapsed = 0;
+    // Sum duration of all completed stages
+    for (let i = 0; i < stage - 1 && i < exerciseStages.length; i++) {
+      elapsed += exerciseStages[i].duration;
+    }
+    // Add time in current stage
+    elapsed += stageTime;
+    return elapsed;
+  };
+
   // Calculate the elapsed time based on the current phase
   let elapsedTime = 0;
   let currentPhaseElapsed = 0;
   let currentPhaseDuration = 0;
-  
+
   if (phase === 'rest') {
     currentPhaseElapsed = stageTime;
     currentPhaseDuration = restDuration;
     elapsedTime = stageTime;
   } else if (phase === 'exercise') {
-    currentPhaseElapsed = stageTime;
-    currentPhaseDuration = exerciseDuration;
-    elapsedTime = restDuration + stageTime;
+    currentPhaseElapsed = getExercisePhaseElapsed();
+    currentPhaseDuration = actualExerciseDuration;
+    elapsedTime = restDuration + currentPhaseElapsed;
   } else if (phase === 'recovery') {
     currentPhaseElapsed = stageTime;
     currentPhaseDuration = recoveryDuration;
-    elapsedTime = restDuration + exerciseDuration + stageTime;
+    elapsedTime = restDuration + actualExerciseDuration + stageTime;
   }
 
   // Track phase history to detect completion
@@ -75,16 +101,17 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
       setCountdownTimer(Math.max(0, restDuration - stageTime));
       setPhaseTimings(prev => ({ ...prev, rest: stageTime }));
     } else if (phase === 'exercise') {
-      // Exercise phase: timer counts up from 0 to exerciseDuration
-      setCountdownTimer(Math.max(0, exerciseDuration - stageTime));
-      setPhaseTimings(prev => ({ ...prev, exercise: stageTime }));
+      // Exercise phase: use actual exercise duration
+      const exerciseElapsed = getExercisePhaseElapsed();
+      setCountdownTimer(Math.max(0, actualExerciseDuration - exerciseElapsed));
+      setPhaseTimings(prev => ({ ...prev, exercise: exerciseElapsed }));
     } else if (phase === 'recovery') {
       // Recovery phase: timer counts up from 0 to recoveryDuration
       setRecoveryTimer(stageTime);
       setCountdownTimer(Math.max(0, recoveryDuration - stageTime));
       setPhaseTimings(prev => ({ ...prev, recovery: stageTime }));
     }
-  }, [phase, stageTime, restDuration, exerciseDuration, recoveryDuration]);
+  }, [phase, stageTime, restDuration, actualExerciseDuration, recoveryDuration, stage, exerciseStages]);
 
   // Sync pause status periodically
   useEffect(() => {
@@ -325,19 +352,19 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
         }`}>
           <div className="text-xs text-green-700 font-medium">Exercise</div>
           <div className="text-sm font-bold">
-            {phase === 'exercise' ? 
-              `${formatTime(currentPhaseElapsed)} / ${formatTime(exerciseDuration)}` : 
-              phase === 'recovery' ? 
-                `${formatTime(exerciseDuration)} / ${formatTime(exerciseDuration)}` : 
-                phase === 'rest' ? 
-                  `00:00 / ${formatTime(exerciseDuration)}` : 
-                  `00:00 / ${formatTime(exerciseDuration)}`
+            {phase === 'exercise' ?
+              `${formatTime(currentPhaseElapsed)} / ${formatTime(actualExerciseDuration)}` :
+              phase === 'recovery' ?
+                `${formatTime(actualExerciseDuration)} / ${formatTime(actualExerciseDuration)}` :
+                phase === 'rest' ?
+                  `00:00 / ${formatTime(actualExerciseDuration)}` :
+                  `00:00 / ${formatTime(actualExerciseDuration)}`
             }
           </div>
           {phase === 'exercise' && (
             <div className="text-xs text-green-600 mt-1 flex items-center justify-center">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
-              ⏱️ Running
+              ⏱️ Stage {stage}
             </div>
           )}
           {completionStatus.exercise && phase !== 'exercise' && (
