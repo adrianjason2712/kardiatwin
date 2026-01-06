@@ -20,6 +20,7 @@ export const HeartAgeCalculatorPage: React.FC<HeartAgeCalculatorPageProps> = ({ 
   const [heartAge, setHeartAge] = useState<HeartAgeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastPhase, setLastPhase] = useState<string | null>(null);
 
   const fetchHeartAge = async () => {
     if (!data || !userData) {
@@ -31,7 +32,7 @@ export const HeartAgeCalculatorPage: React.FC<HeartAgeCalculatorPageProps> = ({ 
     setError(null);
 
     try {
-      const response = await axios.get('http://localhost:5000/biological_age');
+      const response = await axios.get('http://localhost:8000/biological_age');
       setHeartAge(response.data);
     } catch (err) {
       setError('Failed to fetch heart age data. Please ensure the simulation has been run.');
@@ -41,11 +42,14 @@ export const HeartAgeCalculatorPage: React.FC<HeartAgeCalculatorPageProps> = ({ 
     }
   };
 
+  // Only fetch heart age when simulation phase changes (rest -> exercise -> recovery)
+  // This avoids continuous refetching and visual clutter
   useEffect(() => {
-    if (data && userData) {
+    if (data && userData && data.phase && data.phase !== lastPhase) {
+      setLastPhase(data.phase);
       fetchHeartAge();
     }
-  }, [data, userData]);
+  }, [data?.phase, userData]);
 
   const getStatusColor = (status: string): string => {
     switch (status) {

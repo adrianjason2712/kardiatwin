@@ -56,7 +56,7 @@ export const WhatIfCalculatorPage: React.FC<WhatIfCalculatorPageProps> = ({
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/what_if_analysis', whatIfChanges);
+      const response = await axios.post('http://localhost:8000/what_if_analysis', whatIfChanges);
       setWhatIfResults(response.data);
     } catch (err) {
       setError('Failed to fetch What If analysis');

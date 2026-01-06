@@ -117,7 +117,7 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
   useEffect(() => {
     const fetchPause = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/pause_status');
+        const res = await axios.get('http://localhost:8000/pause_status');
         setPaused(Boolean(res.data.paused));
       } catch (_) {}
     };
@@ -130,10 +130,10 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
   const handleTogglePause = async () => {
     try {
       if (paused) {
-        await axios.post('http://localhost:5000/resume_simulation');
+        await axios.post('http://localhost:8000/resume_simulation');
         setPaused(false);
       } else {
-        await axios.post('http://localhost:5000/pause_simulation');
+        await axios.post('http://localhost:8000/pause_simulation');
         setPaused(true);
       }
     } catch (e) {
@@ -297,20 +297,20 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
         ></div>
         
         {/* Exercise section */}
-        <div 
+        <div
           className="absolute h-full bg-green-500"
-          style={{ 
+          style={{
             left: `${(restDuration / totalDuration) * 100}%`,
-            width: `${(exerciseDuration / totalDuration) * 100}%` 
+            width: `${(actualExerciseDuration / totalDuration) * 100}%`
           }}
         ></div>
-        
+
         {/* Recovery section */}
-        <div 
+        <div
           className="absolute h-full bg-purple-500"
-          style={{ 
-            left: `${((restDuration + exerciseDuration) / totalDuration) * 100}%`,
-            width: `${(recoveryDuration / totalDuration) * 100}%` 
+          style={{
+            left: `${((restDuration + actualExerciseDuration) / totalDuration) * 100}%`,
+            width: `${(recoveryDuration / totalDuration) * 100}%`
           }}
         ></div>
         

@@ -404,6 +404,68 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
               </div>
             </div>
 
+            {/* Risk Assessment Card - Elegant Design */}
+            <div className="bg-gradient-to-br from-[#8F87F1] to-[#C68EFD] p-8 rounded-lg text-white shadow-lg flex flex-col justify-between h-full">
+              <div>
+                <h3 className="text-lg font-semibold mb-6 opacity-90">Cardiac Risk Assessment</h3>
+
+                {/* Main Risk Display */}
+                <div className="mb-8">
+                  <p className="text-sm opacity-75 mb-2">Current Status</p>
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <p className={`text-4xl font-bold ${
+                        data.prediction.risk_level === "High Risk" ? 'text-red-300' :
+                        data.prediction.risk_level === "Medium Risk" ? 'text-yellow-200' :
+                        'text-green-300'
+                      }`}>
+                        {data.prediction.probability}%
+                      </p>
+                      <p className="text-xs opacity-75 mt-1">Risk Score</p>
+                    </div>
+                    <div className="flex-1">
+                      <div className="w-full bg-white bg-opacity-20 rounded-full h-2 mb-3">
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            data.prediction.probability > 70 ? 'bg-red-400' :
+                            data.prediction.probability > 40 ? 'bg-yellow-300' :
+                            'bg-green-400'
+                          }`}
+                          style={{width: `${data.prediction.probability}%`}}
+                        ></div>
+                      </div>
+                      <p className={`text-sm font-semibold ${
+                        data.prediction.risk_level === "High Risk" ? 'text-red-300' :
+                        data.prediction.risk_level === "Medium Risk" ? 'text-yellow-200' :
+                        'text-green-300'
+                      }`}>
+                        {data.prediction.risk_level}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trend Indicator */}
+                <div className="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
+                  <p className="text-xs opacity-75 mb-2">Trend</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">
+                      {data.trend === "Worsening" && "📈"}
+                      {data.trend === "Improving" && "📉"}
+                      {data.trend === "Stable" && "➡️"}
+                    </span>
+                    <p className="text-sm font-semibold">{data.trend}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Confidence Badge */}
+              <div className="bg-white bg-opacity-15 rounded-lg p-3 text-center">
+                <p className="text-xs opacity-75 mb-1">Confidence</p>
+                <p className="text-sm font-semibold">{data.prediction.confidence}</p>
+              </div>
+            </div>
+
             <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
               <h3 className="text-xl font-semibold mb-4 gradient-text">3D Heart Visualization</h3>
               <HeartScene heartRate={data.thalach} />
@@ -425,6 +487,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
               }
             }} />
           </div>
+
 
           {/* Exercise Recommendations */}
           <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">

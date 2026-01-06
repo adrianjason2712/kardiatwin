@@ -52,7 +52,18 @@ interface SimulationData {
   oldpeak: number;    // ST Depression
   trestbps: number;   // Blood Pressure
   exang: number;      // Exercise induced angina
-  prediction: string; // Risk prediction
+  prediction: {       // Risk prediction with ML model
+    risk_level: string;     // High Risk | Medium Risk | Low Risk
+    probability: number;    // 0-100 percentage
+    confidence: string;     // High | Medium | Low
+  };
+  trend: string;      // Worsening | Stable | Improving
+  prediction_history: Array<{
+    time: number;
+    probability: number;
+    risk_level: string;
+    phase: string;
+  }>;
   phase: string;      // rest | exercise | recovery
   workload_level: number; // Current workload level
   protocol: string;   // standard | modified_bruce
@@ -97,7 +108,13 @@ function App() {
     oldpeak: 0,
     trestbps: 0,
     exang: 0,
-    prediction: 'Waiting...',
+    prediction: {
+      risk_level: 'Waiting...',
+      probability: 0,
+      confidence: 'Low'
+    },
+    trend: 'Stable',
+    prediction_history: [],
     phase: 'rest',
     workload_level: 0,
     protocol: 'standard',
@@ -152,7 +169,7 @@ function App() {
 
   const fetchWhatIfAnalysis = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/what_if_analysis", whatIfChanges);
+      const response = await axios.post("http://localhost:8000/what_if_analysis", whatIfChanges);
       setWhatIfResults(response.data);
     } catch (error) {
       console.error("Error fetching What If analysis:", error);
@@ -162,7 +179,7 @@ function App() {
 
   const fetchHeartAge = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/biological_age");
+      const response = await axios.get("http://localhost:8000/biological_age");
       setHeartAge(response.data);
     } catch (error) {
       console.error("Error fetching heart age:", error);
@@ -225,7 +242,7 @@ function App() {
         }
       };
       
-      const response = await axios.post("http://localhost:5000/start", submissionData);
+      const response = await axios.post("http://localhost:8000/start", submissionData);
 
       // Store the engine configuration and exercise stages
       if (response.data && response.data.engine_config) {
@@ -246,7 +263,7 @@ function App() {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/prediction?intensity=${exerciseIntensity}`);
+        const response = await axios.get(`http://localhost:8000/prediction?intensity=${exerciseIntensity}`);
         const newData = response.data;
         setData(newData);
         setHistory(prev => [...prev.slice(-19), newData]);
