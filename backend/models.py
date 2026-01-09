@@ -54,6 +54,38 @@ else:
 Base = declarative_base()
 
 
+class User(Base):
+    """Model for storing user account information"""
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(120), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    last_login = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True)
+
+    # Relationships
+    sessions = relationship("SimulationSession", back_populates="user", cascade="all, delete-orphan")
+
+    # Indexes for performance
+    __table_args__ = (
+        Index('idx_user_username', 'username'),
+        Index('idx_user_email', 'email'),
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "created_at": self.created_at.isoformat(),
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "is_active": self.is_active
+        }
+
+
 class SimulationSession(Base):
     """Model for storing simulation session metadata"""
     __tablename__ = 'simulation_sessions'
@@ -62,6 +94,9 @@ class SimulationSession(Base):
     name = Column(String(100), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    # User association (nullable for backwards compatibility with guest simulations)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
 
     # Simulation type classification
     simulation_type = Column(String(50), nullable=False, default="stress_test")  # stress_test | heart_age | what_if
@@ -86,6 +121,9 @@ class SimulationSession(Base):
     risk_score = Column(Float)  # Calculated risk score (0-100)
     abnormalities_detected = Column(JSON, default=[])  # List of abnormalities
     notes = Column(Text)  # Clinical notes or observations
+
+    # Relationship with user
+    user = relationship("User", back_populates="sessions")
 
     # Relationship with data points
     data_points = relationship("SimulationDataPoint", back_populates="session", cascade="all, delete-orphan")

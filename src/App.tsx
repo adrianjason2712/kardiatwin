@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle, MessageCircle, Menu, X, TrendingDown, BarChart3 } from 'lucide-react';
+import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle, MessageCircle, Menu, X, TrendingDown, BarChart3, LogOut, History } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { HeartScene } from './components/HeartScene';
 import PulseChatbot from './components/PulseChatbot';
@@ -8,6 +9,8 @@ import { SimulationProgress } from './components/SimulationProgress';
 import { SimulationPage } from './pages/SimulationPage';
 import { HeartAgeCalculatorPage } from './pages/HeartAgeCalculatorPage';
 import { WhatIfCalculatorPage } from './pages/WhatIfCalculatorPage';
+import { SimulationHistoryPage } from './pages/SimulationHistoryPage';
+import { useAuth } from './contexts/AuthContext';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -145,8 +148,11 @@ function App() {
     alcohol_consumption: userData.alcohol_consumption,
     activity_level: userData.activity_level
   });
-  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if'>('simulation');
+  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if' | 'history'>('simulation');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
   // Update default protocol based on age (following medical standards)
   const updateDefaultProtocolByAge = (age: string) => {
@@ -234,20 +240,26 @@ function App() {
         "Standard Bruce": "standard",
         "Modified Bruce": "modified_bruce"
       };
-      
+
       const submissionData = {
-        ...userData,
+        age: parseInt(userData.age),  // Convert to integer
+        sex: userData.sex,
+        cp: userData.cp,
+        fbs: userData.fbs || "0",
+        restecg: userData.restecg || "0",
+        slope: userData.slope || "1",
+        smoking_status: userData.smoking_status,
+        diabetes_history: userData.diabetes_history,
+        alcohol_consumption: userData.alcohol_consumption,
+        activity_level: userData.activity_level,
         simulation: {
           protocol: protocolMap[userData.protocol as keyof typeof protocolMap] || "standard"
         }
       };
-      
+
       const response = await axios.post("http://localhost:8000/start", submissionData);
 
       // Store the engine configuration and exercise stages
-      if (response.data && response.data.engine_config) {
-        setEngineConfig(response.data.engine_config);
-      }
       if (response.data && response.data.exercise_stages) {
         setExerciseStages(response.data.exercise_stages);
       }
@@ -255,6 +267,7 @@ function App() {
       setSimulationStarted(true);
     } catch (error) {
       console.error("Error starting simulation:", error);
+      alert("Failed to start simulation. Check console for details.");
     }
   };
 
@@ -564,6 +577,20 @@ function App() {
             <TrendingDown className="h-5 w-5 flex-shrink-0" />
             {sidebarOpen && <span className="text-sm font-medium">What If</span>}
           </button>
+
+          {isAuthenticated && (
+            <button
+              onClick={() => setCurrentPage('history')}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                currentPage === 'history'
+                  ? 'bg-blue-50 text-blue-600 border border-blue-300'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <History className="h-5 w-5 flex-shrink-0" />
+              {sidebarOpen && <span className="text-sm font-medium">History</span>}
+            </button>
+          )}
         </nav>
 
         {/* Sidebar Footer */}
@@ -602,13 +629,48 @@ function App() {
                 {currentPage === 'simulation' && 'Cardiac Stress Test Simulation'}
                 {currentPage === 'heart-age' && 'Biological Heart Age Calculator'}
                 {currentPage === 'what-if' && 'What If Analysis'}
+                {currentPage === 'history' && 'Simulation History'}
               </h1>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                {simulationStarted && (
-                  <span className="flex items-center space-x-1">
-                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-                    <span>Simulation Active</span>
-                  </span>
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  {simulationStarted && (
+                    <span className="flex items-center space-x-1">
+                      <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                      <span>Simulation Active</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* User Profile Menu */}
+                {isAuthenticated && user && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-[#8F87F1] flex items-center justify-center text-white text-sm font-bold">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {showUserMenu && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <button
+                          onClick={() => {
+                            logout();
+                            navigate('/login');
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors border-t border-gray-200 rounded-b-lg"
+                        >
+                          <LogOut size={16} />
+                          <span className="text-sm font-medium">Logout</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -648,6 +710,10 @@ function App() {
                 data={data}
                 originalWhatIfChanges={whatIfChanges}
               />
+            )}
+
+            {currentPage === 'history' && (
+              <SimulationHistoryPage />
             )}
           </div>
         </div>

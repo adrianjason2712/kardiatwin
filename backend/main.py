@@ -11,12 +11,17 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import logging
 
-from models import init_db
+from models import init_db, get_db_session, close_db_session, User, SimulationSession, StressTestDataPoint
+from auth import get_password_hash, verify_password, create_access_token, create_refresh_token, verify_token
+from schemas import UserRegister, UserLogin, UserResponse, Token, SimulationSummary, SimulationList
+from dependencies import get_current_user, get_current_user_optional
+from sqlalchemy.orm import Session
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -486,6 +491,7 @@ class SimulationState:
         self.latest_data = None
         self.simulation_thread = None
         self.user_data = {}
+        self.session_id = None  # Database session ID for authenticated users
 
 state = SimulationState()
 alert_thresholds = {
@@ -563,14 +569,210 @@ async def root():
 async def health():
     return {"status": "healthy", "running": state.running}
 
-@app.post("/start")
-async def start_simulation(req: StartSimulationRequest):
+
+# ==================== AUTHENTICATION ENDPOINTS ====================
+
+@app.post("/api/auth/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+async def register(user_data: UserRegister):
+    """Register a new user account"""
+    db = get_db_session()
     try:
+        # Check if user already exists
+        existing_user = db.query(User).filter(
+            (User.username == user_data.username) | (User.email == user_data.email)
+        ).first()
+
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Username or email already registered"
+            )
+
+        # Create new user
+        hashed_password = get_password_hash(user_data.password)
+        new_user = User(
+            username=user_data.username,
+            email=user_data.email,
+            password_hash=hashed_password
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        # Generate tokens
+        access_token = create_access_token(data={"sub": new_user.id})
+        refresh_token = create_refresh_token(data={"sub": new_user.id})
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user": UserResponse.model_validate(new_user)
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Registration error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        close_db_session(db)
+
+
+@app.post("/api/auth/login", response_model=Token)
+async def login(user_data: UserLogin):
+    """Login with username/email and password"""
+    db = get_db_session()
+    try:
+        # Find user by username or email
+        user = db.query(User).filter(
+            (User.username == user_data.username) | (User.email == user_data.username)
+        ).first()
+
+        if not user or not verify_password(user_data.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials"
+            )
+
+        # Update last login
+        user.last_login = datetime.utcnow()
+        db.commit()
+
+        # Generate tokens
+        access_token = create_access_token(data={"sub": user.id})
+        refresh_token = create_refresh_token(data={"sub": user.id})
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user": UserResponse.model_validate(user)
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        close_db_session(db)
+
+
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
+@app.post("/api/auth/refresh", response_model=Token)
+async def refresh_token_endpoint(req: TokenRefreshRequest):
+    """Refresh access token using refresh token"""
+    payload = verify_token(req.refresh_token, token_type="refresh")
+
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+
+    user_id = payload.get("sub")
+    db = get_db_session()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found"
+            )
+
+        access_token = create_access_token(data={"sub": user.id})
+        new_refresh_token = create_refresh_token(data={"sub": user.id})
+
+        return {
+            "access_token": access_token,
+            "refresh_token": new_refresh_token,
+            "token_type": "bearer",
+            "user": UserResponse.model_validate(user)
+        }
+    finally:
+        close_db_session(db)
+
+
+@app.get("/api/auth/me", response_model=UserResponse)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """Get current user information"""
+    return UserResponse.model_validate(current_user)
+
+
+# ==================== SIMULATION HISTORY ENDPOINTS ====================
+
+@app.get("/api/simulations", response_model=SimulationList)
+async def list_user_simulations(
+    limit: int = 10,
+    offset: int = 0,
+    current_user: User = Depends(get_current_user)
+):
+    """Get list of user's simulation sessions"""
+    db = get_db_session()
+    try:
+        # Query simulations for current user
+        sessions = db.query(SimulationSession).filter(
+            SimulationSession.user_id == current_user.id
+        ).order_by(SimulationSession.created_at.desc()).offset(offset).limit(limit).all()
+
+        total = db.query(SimulationSession).filter(
+            SimulationSession.user_id == current_user.id
+        ).count()
+
+        return {
+            "sessions": [SimulationSummary.model_validate(s) for s in sessions],
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        }
+    finally:
+        close_db_session(db)
+
+
+@app.delete("/api/simulations/{session_id}")
+async def delete_simulation(
+    session_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a simulation session"""
+    db = get_db_session()
+    try:
+        session = db.query(SimulationSession).filter(
+            (SimulationSession.id == session_id) & (SimulationSession.user_id == current_user.id)
+        ).first()
+
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Simulation not found or not authorized"
+            )
+
+        db.delete(session)
+        db.commit()
+
+        return {"message": "Simulation deleted successfully"}
+    finally:
+        close_db_session(db)
+
+
+@app.post("/start")
+async def start_simulation(
+    req: StartSimulationRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    logger.info(f"✓ /start endpoint called")
+    db = get_db_session()
+    try:
+        logger.info(f"✓ Request received: age={req.age}, sex={req.sex}")
         cfg = {}
         if req.simulation:
             cfg = req.simulation.dict(exclude_none=True)
 
+        logger.info(f"✓ Creating PhysiologySimulationEngine...")
         state.engine = PhysiologySimulationEngine(config=cfg)
+        logger.info(f"✓ Engine created successfully")
         state.engine.age = req.age
         state.engine.sex = req.sex
         state.engine.cp = req.cp
@@ -588,6 +790,26 @@ async def start_simulation(req: StartSimulationRequest):
         state.user_data = req.dict()
         state.latest_data = state.engine.to_latest_data()
 
+        # Create SimulationSession record if user is authenticated
+        if current_user:
+            session_name = req.session_name or f"Simulation {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+            db_session = SimulationSession(
+                name=session_name,
+                user_id=current_user.id,
+                simulation_type="stress_test",
+                protocol=state.engine.protocol,
+                user_data=req.dict(),
+                patient_age=req.age,
+                patient_gender="M" if req.sex == "1" else "F"
+            )
+            db.add(db_session)
+            db.commit()
+            db.refresh(db_session)
+            state.session_id = db_session.id
+            logger.info(f"✓ Created simulation session {db_session.id} for user {current_user.username}")
+        else:
+            state.session_id = None
+
         protocol = state.engine.protocol
         stages = state.engine.protocol_configs[protocol]["stages"]
         total_duration = sum(s["duration"] for s in stages)
@@ -597,6 +819,7 @@ async def start_simulation(req: StartSimulationRequest):
         return {
             "message": "Simulation started",
             "protocol": protocol,
+            "session_id": state.session_id,
             "exercise_stages": [
                 {"stage_num": i+1, "duration": s["duration"], "workload": s["workload"]}
                 for i, s in enumerate(stages)
@@ -604,8 +827,11 @@ async def start_simulation(req: StartSimulationRequest):
             "total_exercise_duration": total_duration
         }
     except Exception as e:
+        db.rollback()
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        close_db_session(db)
 
 @app.get("/prediction")
 async def get_prediction():
