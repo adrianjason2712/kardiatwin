@@ -8,8 +8,8 @@ interface SimulationSession {
   id: number;
   created_at: string;
   protocol: string;
-  duration: number;
-  risk_score?: number;
+  duration?: number | null;
+  risk_score?: number | null;
 }
 
 interface HistoryResponse {
@@ -143,7 +143,7 @@ export const SimulationHistoryPage: React.FC = () => {
                 </div>
 
                 <div className="col-span-3">
-                  {sim.risk_score !== undefined ? (
+                  {sim.risk_score !== undefined && sim.risk_score !== null ? (
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm"
                         style={{

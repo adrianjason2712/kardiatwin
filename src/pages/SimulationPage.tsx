@@ -415,11 +415,11 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                   <div className="flex items-center gap-4">
                     <div>
                       <p className={`text-4xl font-bold ${
-                        data.prediction.risk_level === "High Risk" ? 'text-red-300' :
-                        data.prediction.risk_level === "Medium Risk" ? 'text-yellow-200' :
+                        data.prediction?.risk_level === "High Risk" ? 'text-red-300' :
+                        data.prediction?.risk_level === "Medium Risk" ? 'text-yellow-200' :
                         'text-green-300'
                       }`}>
-                        {data.prediction.probability}%
+                        {data.prediction?.probability ?? 0}%
                       </p>
                       <p className="text-xs opacity-75 mt-1">Risk Score</p>
                     </div>
@@ -427,19 +427,19 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                       <div className="w-full bg-white bg-opacity-20 rounded-full h-2 mb-3">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
-                            data.prediction.probability > 70 ? 'bg-red-400' :
-                            data.prediction.probability > 40 ? 'bg-yellow-300' :
+                            (data.prediction?.probability ?? 0) > 70 ? 'bg-red-400' :
+                            (data.prediction?.probability ?? 0) > 40 ? 'bg-yellow-300' :
                             'bg-green-400'
                           }`}
-                          style={{width: `${data.prediction.probability}%`}}
+                          style={{width: `${data.prediction?.probability ?? 0}%`}}
                         ></div>
                       </div>
                       <p className={`text-sm font-semibold ${
-                        data.prediction.risk_level === "High Risk" ? 'text-red-300' :
-                        data.prediction.risk_level === "Medium Risk" ? 'text-yellow-200' :
+                        data.prediction?.risk_level === "High Risk" ? 'text-red-300' :
+                        data.prediction?.risk_level === "Medium Risk" ? 'text-yellow-200' :
                         'text-green-300'
                       }`}>
-                        {data.prediction.risk_level}
+                        {data.prediction?.risk_level ?? 'Waiting...'}
                       </p>
                     </div>
                   </div>
@@ -462,7 +462,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
               {/* Confidence Badge */}
               <div className="bg-white bg-opacity-15 rounded-lg p-3 text-center">
                 <p className="text-xs opacity-75 mb-1">Confidence</p>
-                <p className="text-sm font-semibold">{data.prediction.confidence}</p>
+                <p className="text-sm font-semibold">{data.prediction?.confidence ?? 'N/A'}</p>
               </div>
             </div>
 

@@ -28,8 +28,16 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Log error for debugging
+    console.error('API Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      url: originalRequest?.url,
+      message: error.message
+    });
+
+    // Only handle 401 Unauthorized (not other errors)
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
@@ -37,6 +45,7 @@ API.interceptors.response.use(
 
         if (!refreshToken) {
           // No refresh token, clear auth data
+          console.warn('No refresh token available');
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           localStorage.removeItem('user');
@@ -60,6 +69,7 @@ API.interceptors.response.use(
         return API(originalRequest);
       } catch (refreshError) {
         // Refresh failed, clear auth data
+        console.error('Token refresh failed:', refreshError);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
@@ -67,6 +77,7 @@ API.interceptors.response.use(
       }
     }
 
+    // For other errors, just reject them (don't redirect to login)
     return Promise.reject(error);
   }
 );

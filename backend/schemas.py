@@ -77,8 +77,8 @@ class SimulationSummary(BaseModel):
     id: int
     created_at: datetime
     protocol: str
-    duration: float
-    final_risk_score: Optional[float] = None
+    duration: Optional[float] = None
+    risk_score: Optional[float] = None
 
     class Config:
         from_attributes = True

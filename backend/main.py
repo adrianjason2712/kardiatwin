@@ -443,12 +443,22 @@ class PhysiologySimulationEngine:
                 self.protocol_finished = True
 
     def _get_current_stage_config(self):
+        # Validate protocol exists
+        if self.protocol not in self.protocol_configs:
+            logger.warning(f"Invalid protocol: {self.protocol}, defaulting to 'standard'")
+            self.protocol = "standard"
+
         stages = self.protocol_configs[self.protocol]["stages"]
         if self.stage < len(stages):
             return stages[self.stage]
         return None
 
     def _advance_stage(self):
+        # Validate protocol exists
+        if self.protocol not in self.protocol_configs:
+            logger.warning(f"Invalid protocol: {self.protocol}, defaulting to 'standard'")
+            self.protocol = "standard"
+
         stages = self.protocol_configs[self.protocol]["stages"]
         if self.stage < len(stages) - 1:
             self.stage += 1
@@ -492,6 +502,7 @@ class SimulationState:
         self.simulation_thread = None
         self.user_data = {}
         self.session_id = None  # Database session ID for authenticated users
+        self.start_time = None  # Simulation start time for calculating duration
 
 state = SimulationState()
 alert_thresholds = {
@@ -509,25 +520,40 @@ def background_simulation():
     last_update = time.time()
 
     while True:
-        if not state.running:
-            time.sleep(0.5)
-            last_update = time.time()
-            continue
+        try:
+            if not state.running:
+                time.sleep(0.5)
+                last_update = time.time()
+                continue
 
-        if state.engine and state.engine.paused:
-            time.sleep(0.2)
-            last_update = time.time()
-            continue
+            if state.engine and state.engine.paused:
+                time.sleep(0.2)
+                last_update = time.time()
+                continue
 
-        if state.engine:
-            current_time = time.time()
-            dt = current_time - last_update
-            last_update = current_time
+            if state.engine:
+                try:
+                    current_time = time.time()
+                    dt = current_time - last_update
+                    last_update = current_time
 
-            state.engine.update(dt)
-            state.latest_data = state.engine.to_latest_data()
+                    state.engine.update(dt)
 
-        time.sleep(0.016)
+                    try:
+                        state.latest_data = state.engine.to_latest_data()
+                    except Exception as e:
+                        logger.error(f"❌ Error converting engine state to data during {state.engine.phase} phase: {e}", exc_info=True)
+                        raise
+
+                except Exception as e:
+                    logger.error(f"❌ Engine update error during {getattr(state.engine, 'phase', 'unknown')} phase: {e}", exc_info=True)
+                    logger.error(f"Engine state - HR: {getattr(state.engine, 'hr', 'N/A')}, SBP: {getattr(state.engine, 'sbp', 'N/A')}, Stage: {getattr(state.engine, 'stage', 'N/A')}")
+                    state.running = False
+
+            time.sleep(0.016)
+        except Exception as e:
+            logger.error(f"❌ Critical error in background simulation: {e}", exc_info=True)
+            time.sleep(1)
 
 # ==================== APP SETUP ====================
 
@@ -787,6 +813,7 @@ async def start_simulation(
         state.engine.apply_lifestyle_modifiers()
 
         state.running = True
+        state.start_time = time.time()  # Track when simulation started
         state.user_data = req.dict()
         state.latest_data = state.engine.to_latest_data()
 
@@ -835,13 +862,80 @@ async def start_simulation(
 
 @app.get("/prediction")
 async def get_prediction():
-    if not state.running or not state.latest_data:
-        raise HTTPException(status_code=400, detail="No active simulation")
-    return state.latest_data
+    try:
+        if not state.running or not state.latest_data:
+            raise HTTPException(status_code=400, detail="No active simulation")
+
+        # Ensure data has required fields with safe defaults
+        try:
+            data = state.latest_data.copy() if isinstance(state.latest_data, dict) else {}
+        except Exception as e:
+            logger.error(f"Error copying latest_data: {e}")
+            data = {}
+
+        # Validate prediction structure
+        if not isinstance(data.get("prediction"), dict):
+            data["prediction"] = {
+                "risk_level": "Waiting...",
+                "probability": 0,
+                "confidence": "Low"
+            }
+        else:
+            # Fill in missing prediction fields
+            pred = data["prediction"]
+            if "risk_level" not in pred:
+                pred["risk_level"] = "Waiting..."
+            if "probability" not in pred:
+                pred["probability"] = 0
+            if "confidence" not in pred:
+                pred["confidence"] = "Low"
+
+        return data
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in /prediction endpoint: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Simulation error: {str(e)}")
 
 @app.post("/stop_simulation")
 async def stop():
+    """Stop the simulation and save final metrics to database"""
     state.running = False
+
+    # Save final simulation metrics if this was an authenticated user's session
+    if state.session_id and state.start_time:
+        try:
+            db = get_db_session()
+
+            # Calculate simulation duration in seconds
+            duration = time.time() - state.start_time
+
+            # Extract risk score from latest data
+            risk_score = None
+            if state.latest_data and isinstance(state.latest_data, dict):
+                prediction = state.latest_data.get("prediction", {})
+                if isinstance(prediction, dict):
+                    risk_score = prediction.get("probability")
+
+            # Update the simulation session with final values
+            session = db.query(SimulationSession).filter(
+                SimulationSession.id == state.session_id
+            ).first()
+
+            if session:
+                session.duration = int(duration)
+                session.risk_score = risk_score
+                db.commit()
+                logger.info(f"✓ Saved simulation {state.session_id}: duration={duration:.1f}s, risk_score={risk_score}")
+
+            db.close()
+        except Exception as e:
+            logger.error(f"Error saving simulation metrics: {e}")
+
+    # Reset simulation state
+    state.session_id = None
+    state.start_time = None
+
     return {"message": "Stopped"}
 
 @app.post("/pause_simulation")

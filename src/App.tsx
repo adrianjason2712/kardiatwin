@@ -277,7 +277,17 @@ function App() {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/prediction?intensity=${exerciseIntensity}`);
-        const newData = response.data;
+        let newData = response.data;
+
+        // Ensure data has required structure
+        if (!newData.prediction || typeof newData.prediction !== 'object') {
+          newData.prediction = {
+            risk_level: 'Waiting...',
+            probability: 0,
+            confidence: 'Low'
+          };
+        }
+
         setData(newData);
         setHistory(prev => [...prev.slice(-19), newData]);
       } catch (error) {
