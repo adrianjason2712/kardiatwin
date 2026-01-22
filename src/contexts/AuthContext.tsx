@@ -63,8 +63,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('refresh_token', refresh_token);
       localStorage.setItem('user', JSON.stringify(userData));
     } catch (err: any) {
-      const errorMsg = err.response?.data?.detail || 'Login failed';
-      setError(errorMsg);
+      // Check if server is unreachable (no response from server)
+      if (!err.response) {
+        const errorMsg = 'Server is unreachable. Please make sure the backend is running.';
+        setError(errorMsg);
+      } else {
+        const errorMsg = err.response?.data?.detail || 'Login failed';
+        setError(errorMsg);
+      }
       throw err;
     } finally {
       setIsLoading(false);
@@ -93,8 +99,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('refresh_token', refresh_token);
       localStorage.setItem('user', JSON.stringify(userData));
     } catch (err: any) {
-      const errorMsg = err.response?.data?.detail || 'Registration failed';
-      setError(errorMsg);
+      // Check if server is unreachable (no response from server)
+      if (!err.response) {
+        const errorMsg = 'Server is unreachable. Please make sure the backend is running.';
+        setError(errorMsg);
+      } else {
+        const errorMsg = err.response?.data?.detail || 'Registration failed';
+        setError(errorMsg);
+      }
       throw err;
     } finally {
       setIsLoading(false);

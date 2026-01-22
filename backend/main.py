@@ -690,9 +690,11 @@ class TokenRefreshRequest(BaseModel):
 @app.post("/api/auth/refresh", response_model=Token)
 async def refresh_token_endpoint(req: TokenRefreshRequest):
     """Refresh access token using refresh token"""
+    logger.info(f"Refresh token endpoint called with token: {req.refresh_token[:20]}...")
     payload = verify_token(req.refresh_token, token_type="refresh")
 
     if not payload:
+        logger.error(f"Token verification failed for refresh token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token"
@@ -953,7 +955,7 @@ async def resume():
     return {"message": "Resumed"}
 
 @app.get("/status")
-async def status():
+async def get_status():
     return {
         "running": state.running,
         "paused": state.engine.paused if state.engine else False,

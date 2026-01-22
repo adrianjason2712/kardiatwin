@@ -103,13 +103,18 @@ def verify_token(token: str, token_type: str = "access") -> Optional[dict]:
     Returns:
         Decoded token data or None if invalid/expired
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
     payload = decode_token(token)
 
     if payload is None:
+        logger.error(f"Token decode failed for token_type={token_type}")
         return None
 
     # Check token type for refresh tokens
     if token_type == "refresh" and payload.get("type") != "refresh":
+        logger.error(f"Token type mismatch: expected 'refresh', got '{payload.get('type')}'")
         return None
 
     return payload

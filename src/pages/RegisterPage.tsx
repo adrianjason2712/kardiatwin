@@ -54,8 +54,13 @@ export const RegisterPage: React.FC = () => {
     try {
       await register(username, email, password);
       navigate('/login');
-    } catch (err) {
-      setLocalError(error || 'Registration failed. Please try again.');
+    } catch (err: any) {
+      // Check if server is unreachable
+      if (!err.response) {
+        setLocalError('Server is unreachable. Please make sure the backend is running.');
+      } else {
+        setLocalError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      }
     }
   };
 

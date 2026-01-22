@@ -22,8 +22,13 @@ export const LoginPage: React.FC = () => {
     try {
       await login(username, password);
       navigate('/simulation');
-    } catch (err) {
-      setLocalError(error || 'Login failed. Please try again.');
+    } catch (err: any) {
+      // Check if server is unreachable
+      if (!err.response) {
+        setLocalError('Server is unreachable. Please make sure the backend is running.');
+      } else {
+        setLocalError(err.response?.data?.detail || 'Login failed. Please try again.');
+      }
     }
   };
 
@@ -40,9 +45,9 @@ export const LoginPage: React.FC = () => {
         <p className="text-gray-600 text-center mb-6">Sign in to your account</p>
 
         {/* Error Message */}
-        {(localError || error) && (
+        {localError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
-            {localError || error}
+            {localError}
           </div>
         )}
 
