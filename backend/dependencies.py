@@ -41,8 +41,8 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user_id: int = payload.get("sub")
-    if user_id is None:
+    user_id_str = payload.get("sub")
+    if user_id_str is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
@@ -51,7 +51,7 @@ async def get_current_user(
 
     session = get_db_session()
     try:
-        user = session.query(User).filter(User.id == user_id).first()
+        user = session.query(User).filter(User.id == int(user_id_str)).first()
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -84,13 +84,13 @@ async def get_current_user_optional(
     if payload is None:
         return None
 
-    user_id: int = payload.get("sub")
-    if user_id is None:
+    user_id_str = payload.get("sub")
+    if user_id_str is None:
         return None
 
     session = get_db_session()
     try:
-        user = session.query(User).filter(User.id == user_id).first()
+        user = session.query(User).filter(User.id == int(user_id_str)).first()
         return user
     finally:
         session.close()

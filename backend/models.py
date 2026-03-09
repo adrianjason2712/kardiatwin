@@ -68,6 +68,7 @@ class User(Base):
 
     # Relationships
     sessions = relationship("SimulationSession", back_populates="user", cascade="all, delete-orphan")
+    profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
     # Indexes for performance
     __table_args__ = (
@@ -85,6 +86,55 @@ class User(Base):
             "is_active": self.is_active
         }
 
+
+class UserProfile(Base):
+    """Model for storing user physiological profile data"""
+    __tablename__ = 'user_profiles'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), unique=True, nullable=False, index=True)
+    
+    age = Column(Integer, nullable=True)
+    sex = Column(String(10), nullable=True)
+    cp = Column(String(10), nullable=True)
+    fbs = Column(String(10), nullable=True)
+    restecg = Column(String(10), nullable=True)
+    smoking_status = Column(String(50), nullable=True)
+    diabetes_history = Column(String(50), nullable=True)
+    alcohol_consumption = Column(String(50), nullable=True)
+    activity_level = Column(String(50), nullable=True)
+    
+    # Bot Context / RAG Only (Non-simulation dependent)
+    height = Column(Float, nullable=True) # in cm
+    weight = Column(Float, nullable=True) # in kg
+    family_history = Column(Text, nullable=True)
+    allergies = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    # Relationship
+    user = relationship("User", back_populates="profile")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "age": self.age,
+            "sex": self.sex,
+            "cp": self.cp,
+            "fbs": self.fbs,
+            "restecg": self.restecg,
+            "smoking_status": self.smoking_status,
+            "diabetes_history": self.diabetes_history,
+            "alcohol_consumption": self.alcohol_consumption,
+            "activity_level": self.activity_level,
+            "height": self.height,
+            "weight": self.weight,
+            "family_history": self.family_history,
+            "allergies": self.allergies,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
 
 class SimulationSession(Base):
     """Model for storing simulation session metadata"""

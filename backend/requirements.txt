@@ -1,10 +1,16 @@
-# Flask & Web Framework
-flask>=2.0.0
-flask-cors>=3.0.0
+# Web Framework
+fastapi>=0.95.0
+uvicorn>=0.21.0
+python-multipart>=0.0.5
 
 # Database
 sqlalchemy>=2.0.0
 psycopg2-binary>=2.9.0
+
+# Authentication & Security
+passlib>=1.7.4
+argon2-cffi>=21.3.0
+python-jose[cryptography]>=3.3.0
 
 # Data Science & ML
 pandas>=1.5.0

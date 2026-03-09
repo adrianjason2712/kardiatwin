@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Routes, Route } from 'react-router-dom';
-import axios from 'axios';
-import { Heart, Activity, Droplets, Zap, Gauge, AlertCircle, CheckCircle2, XCircle, MessageCircle, Menu, X, TrendingDown, BarChart3, LogOut, History } from 'lucide-react';
-import { Line } from 'react-chartjs-2';
-import { HeartScene } from './components/HeartScene';
+import { useNavigate } from 'react-router-dom';
+import API from './utils/axios';
+import { Heart, Activity, Droplets, Zap, AlertCircle, CheckCircle2, MessageCircle, Menu, X, TrendingDown, LogOut, History, User, XCircle } from 'lucide-react';
 import PulseChatbot from './components/PulseChatbot';
-import { SimulationProgress } from './components/SimulationProgress';
 import { SimulationPage } from './pages/SimulationPage';
 import { HeartAgeCalculatorPage } from './pages/HeartAgeCalculatorPage';
 import { WhatIfCalculatorPage } from './pages/WhatIfCalculatorPage';
 import { SimulationHistoryPage } from './pages/SimulationHistoryPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { useAuth } from './contexts/AuthContext';
 import {
   Chart as ChartJS,
@@ -137,6 +135,7 @@ function App() {
   });
   const [exerciseStages, setExerciseStages] = useState<any[]>([]);
   const [exerciseIntensity, setExerciseIntensity] = useState(50);
+  const [pollingInterval, setPollingInterval] = useState<any | null>(null);
   const [showMiniPlayer, setShowMiniPlayer] = useState(true);
   const [showChatbot, setShowChatbot] = useState(false);
   const [showWhatIfMode, setShowWhatIfMode] = useState(false);
@@ -148,11 +147,54 @@ function App() {
     alcohol_consumption: userData.alcohol_consumption,
     activity_level: userData.activity_level
   });
-  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if' | 'history'>('simulation');
+  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if' | 'history' | 'profile'>('simulation');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [thresholds, setThresholds] = useState({
+    heart_rate_high: 170,
+    blood_pressure_high: 220,
+    st_depression_high: 2.0
+  });
+  const [alerts, setAlerts] = useState<any[]>([]);
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
+
+  // Fetch profile when authenticated to prefill data
+  useEffect(() => {
+    if (isAuthenticated) {
+      API.get('/api/profile')
+        .then(res => {
+          if (res.data && res.data.id !== 0) {
+            setUserData(prev => ({
+              ...prev,
+              age: res.data.age?.toString() || prev.age,
+              sex: res.data.sex || prev.sex,
+              cp: res.data.cp || prev.cp,
+              fbs: res.data.fbs || prev.fbs,
+              restecg: res.data.restecg || prev.restecg,
+              smoking_status: res.data.smoking_status || prev.smoking_status,
+              diabetes_history: res.data.diabetes_history || prev.diabetes_history,
+              alcohol_consumption: res.data.alcohol_consumption || prev.alcohol_consumption,
+              activity_level: res.data.activity_level || prev.activity_level,
+            }));
+          }
+        })
+        .catch(err => console.error('Failed to load profile for prefill', err));
+
+      API.get('/thresholds')
+        .then(res => setThresholds(res.data))
+        .catch(err => console.error('Failed to load thresholds', err));
+    }
+  }, [isAuthenticated]);
+
+  const handleUpdateThresholds = async (newThresholds: any) => {
+    try {
+      const response = await API.post('/thresholds', newThresholds);
+      setThresholds(response.data.thresholds);
+    } catch (err) {
+      console.error('Failed to update thresholds', err);
+    }
+  };
 
   // Update default protocol based on age (following medical standards)
   const updateDefaultProtocolByAge = (age: string) => {
@@ -175,7 +217,7 @@ function App() {
 
   const fetchWhatIfAnalysis = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/what_if_analysis", whatIfChanges);
+      const response = await API.post("/what_if_analysis", whatIfChanges);
       setWhatIfResults(response.data);
     } catch (error) {
       console.error("Error fetching What If analysis:", error);
@@ -185,7 +227,7 @@ function App() {
 
   const fetchHeartAge = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/biological_age");
+      const response = await API.get("/biological_age");
       setHeartAge(response.data);
     } catch (error) {
       console.error("Error fetching heart age:", error);
@@ -206,17 +248,17 @@ function App() {
 
     // Count risk factors
     let riskFactors = 0;
-    
+
     // Heart rate risk
     if (data.thalach > heartRateThreshold) {
       riskFactors++;
     }
-    
+
     // Blood pressure risk
     if (data.trestbps > bloodPressureThreshold) {
       riskFactors++;
     }
-    
+
     // ST depression risk
     if (data.oldpeak > stDepressionThreshold) {
       riskFactors++;
@@ -257,7 +299,7 @@ function App() {
         }
       };
 
-      const response = await axios.post("http://localhost:8000/start", submissionData);
+      const response = await API.post("/start", submissionData);
 
       // Store the engine configuration and exercise stages
       if (response.data && response.data.exercise_stages) {
@@ -271,12 +313,49 @@ function App() {
     }
   };
 
+  const handleStopSimulation = async () => {
+    try {
+      // Call backend to stop simulation and save metrics
+      await API.post("/stop_simulation");
+
+      // Reset local state
+      setSimulationStarted(false);
+      setData({
+        thalach: 0,
+        chol: 0,
+        oldpeak: 0,
+        trestbps: 0,
+        exang: 0,
+        prediction: {
+          risk_level: 'Waiting...',
+          probability: 0,
+          confidence: 'Low'
+        },
+        trend: 'Stable',
+        prediction_history: [],
+        phase: 'rest',
+        workload_level: 0,
+        protocol: 'standard',
+        stage: 0,
+        stage_time: 0,
+        future_predictions: []
+      });
+      setHistory([]);
+
+      // Navigate to history page to see the completed simulation
+      setCurrentPage('history');
+    } catch (error) {
+      console.error("Error stopping simulation:", error);
+      alert("Failed to stop simulation. Check console for details.");
+    }
+  };
+
   useEffect(() => {
     if (!simulationStarted) return;
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/prediction?intensity=${exerciseIntensity}`);
+        const response = await API.get(`/prediction?intensity=${exerciseIntensity}`);
         let newData = response.data;
 
         // Ensure data has required structure
@@ -296,7 +375,21 @@ function App() {
     };
 
     const interval = setInterval(fetchData, 1000);
-    return () => clearInterval(interval);
+
+    const fetchAlerts = async () => {
+      try {
+        const response = await API.get('/alerts');
+        setAlerts(response.data.alerts);
+      } catch (err) {
+        console.error("Error fetching alerts:", err);
+      }
+    };
+    const alertsInterval = setInterval(fetchAlerts, 1000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(alertsInterval);
+    };
   }, [simulationStarted, exerciseIntensity]);
 
   const chartData = {
@@ -324,7 +417,7 @@ function App() {
   const getExerciseRecommendations = (data: SimulationData): ExerciseRecommendation[] => {
     // Get chest pain type from user data
     const chestPainType = userData.cp;
-    
+
     // Always return all exercise types with their current status
     return [
       {
@@ -368,9 +461,9 @@ function App() {
         status: data.thalach < 180 ? 'recommended' : 'caution'
       },
       {
-      type: 'Yoga',
-      intensity: 'Low',
-      duration: '30-60 minutes',
+        type: 'Yoga',
+        intensity: 'Low',
+        duration: '30-60 minutes',
         benefits: chestPainType === "0" ? [
           'Improves breathing control',
           'Reduces stress and anxiety',
@@ -405,7 +498,7 @@ function App() {
           'Build practice gradually',
           'Focus on relaxation'
         ],
-      status: 'recommended'
+        status: 'recommended'
       },
       {
         type: 'Swimming',
@@ -525,7 +618,7 @@ function App() {
           'Medical clearance needed',
           'Monitor for any symptoms'
         ],
-        status: data.prediction === 'High Risk' || data.thalach > 170 ? 'avoid' : 'caution'
+        status: data.prediction?.risk_level === 'High Risk' || data.thalach > 170 ? 'avoid' : 'caution'
       }
     ];
   };
@@ -554,11 +647,10 @@ function App() {
         <nav className="flex-1 p-4 space-y-2">
           <button
             onClick={() => setCurrentPage('simulation')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              currentPage === 'simulation'
-                ? 'bg-[#8F87F1] bg-opacity-10 text-[#8F87F1] border border-[#8F87F1]'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${currentPage === 'simulation'
+              ? 'bg-[#8F87F1] bg-opacity-10 text-[#8F87F1] border border-[#8F87F1]'
+              : 'text-gray-700 hover:bg-gray-100'
+              }`}
           >
             <Activity className="h-5 w-5 flex-shrink-0" />
             {sidebarOpen && <span className="text-sm font-medium">Simulation</span>}
@@ -566,11 +658,10 @@ function App() {
 
           <button
             onClick={() => setCurrentPage('heart-age')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              currentPage === 'heart-age'
-                ? 'bg-red-50 text-red-600 border border-red-300'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${currentPage === 'heart-age'
+              ? 'bg-red-50 text-red-600 border border-red-300'
+              : 'text-gray-700 hover:bg-gray-100'
+              }`}
           >
             <Heart className="h-5 w-5 flex-shrink-0" />
             {sidebarOpen && <span className="text-sm font-medium">Heart Age</span>}
@@ -578,28 +669,38 @@ function App() {
 
           <button
             onClick={() => setCurrentPage('what-if')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              currentPage === 'what-if'
-                ? 'bg-purple-50 text-purple-600 border border-purple-300'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${currentPage === 'what-if'
+              ? 'bg-purple-50 text-purple-600 border border-purple-300'
+              : 'text-gray-700 hover:bg-gray-100'
+              }`}
           >
             <TrendingDown className="h-5 w-5 flex-shrink-0" />
             {sidebarOpen && <span className="text-sm font-medium">What If</span>}
           </button>
 
           {isAuthenticated && (
-            <button
-              onClick={() => setCurrentPage('history')}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                currentPage === 'history'
+            <>
+              <button
+                onClick={() => setCurrentPage('profile')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${currentPage === 'profile'
+                  ? 'bg-indigo-50 text-indigo-600 border border-indigo-300'
+                  : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+              >
+                <User className="h-5 w-5 flex-shrink-0" />
+                {sidebarOpen && <span className="text-sm font-medium">Profile</span>}
+              </button>
+              <button
+                onClick={() => setCurrentPage('history')}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${currentPage === 'history'
                   ? 'bg-blue-50 text-blue-600 border border-blue-300'
                   : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              <History className="h-5 w-5 flex-shrink-0" />
-              {sidebarOpen && <span className="text-sm font-medium">History</span>}
-            </button>
+                  }`}
+              >
+                <History className="h-5 w-5 flex-shrink-0" />
+                {sidebarOpen && <span className="text-sm font-medium">History</span>}
+              </button>
+            </>
           )}
         </nav>
 
@@ -607,9 +708,8 @@ function App() {
         <div className="p-4 border-t border-gray-200 space-y-2">
           <button
             onClick={() => setShowChatbot(!showChatbot)}
-            className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors ${
-              showChatbot ? 'bg-gray-100' : ''
-            }`}
+            className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors ${showChatbot ? 'bg-gray-100' : ''
+              }`}
             title="Chat Assistant"
           >
             <MessageCircle className="h-5 w-5 flex-shrink-0" />
@@ -618,9 +718,8 @@ function App() {
 
           <button
             onClick={() => setShowMiniPlayer(!showMiniPlayer)}
-            className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors ${
-              showMiniPlayer ? 'bg-gray-100' : ''
-            }`}
+            className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors ${showMiniPlayer ? 'bg-gray-100' : ''
+              }`}
             title="Vital Signs Widget"
           >
             <Heart className="h-5 w-5 flex-shrink-0" />
@@ -640,6 +739,7 @@ function App() {
                 {currentPage === 'heart-age' && 'Biological Heart Age Calculator'}
                 {currentPage === 'what-if' && 'What If Analysis'}
                 {currentPage === 'history' && 'Simulation History'}
+                {currentPage === 'profile' && 'User Profile'}
               </h1>
               <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -694,16 +794,19 @@ function App() {
               <SimulationPage
                 userData={userData}
                 data={data}
-                history={history}
                 simulationStarted={simulationStarted}
                 isFormComplete={isFormComplete}
                 handleSubmit={handleSubmit}
+                handleStopSimulation={handleStopSimulation}
                 setUserData={setUserData}
                 updateDefaultProtocolByAge={updateDefaultProtocolByAge}
                 getExerciseRecommendations={getExerciseRecommendations}
                 chartData={chartData}
                 engineConfig={engineConfig}
                 exerciseStages={exerciseStages}
+                thresholds={thresholds}
+                handleUpdateThresholds={handleUpdateThresholds}
+                alerts={alerts}
               />
             )}
 
@@ -725,6 +828,10 @@ function App() {
             {currentPage === 'history' && (
               <SimulationHistoryPage />
             )}
+
+            {currentPage === 'profile' && (
+              <ProfilePage />
+            )}
           </div>
         </div>
       </div>
@@ -734,60 +841,54 @@ function App() {
         <div className="bg-white rounded-xl shadow-xl p-6 mb-8">
           {!simulationStarted ? (
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-                             {/* Form Completion Status */}
-               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                 <div className="flex items-center justify-between">
-                   <h3 className="text-lg font-medium text-gray-700">Required Parameters</h3>
-                   <div className="flex items-center space-x-2">
-                     <span className="text-sm text-gray-600">Completion:</span>
-                     <span className={`text-sm font-medium ${
-                       isFormComplete() ? 'text-green-600' : 'text-orange-600'
-                     }`}>
-                       {isFormComplete() ? 'Complete ✓' : 'Incomplete ⚠'}
-                     </span>
-                   </div>
-                 </div>
-                 <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
-                   <div className={`flex items-center space-x-2 text-sm ${
-                     userData.age !== '' ? 'text-green-600' : 'text-gray-500'
-                   }`}>
-                     {userData.age !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                     <span>Age: {userData.age !== '' ? 'Selected' : 'Required'}</span>
-                   </div>
-                   <div className={`flex items-center space-x-2 text-sm ${
-                     userData.sex !== '' ? 'text-green-600' : 'text-gray-500'
-                   }`}>
-                     {userData.sex !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                     <span>Gender: {userData.sex !== '' ? 'Selected' : 'Required'}</span>
-                   </div>
-                   <div className={`flex items-center space-x-2 text-sm ${
-                     userData.cp !== '' ? 'text-green-600' : 'text-gray-500'
-                   }`}>
-                     {userData.cp !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                     <span>Chest Pain: {userData.cp !== '' ? 'Selected' : 'Required'}</span>
-                   </div>
-                   <div className={`flex items-center space-x-2 text-sm ${
-                     userData.protocol !== '' ? 'text-green-600' : 'text-gray-500'
-                   }`}>
-                     {userData.protocol !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                     <span>Protocol: {userData.protocol !== '' ? 'Selected' : 'Required'}</span>
-                   </div>
-                 </div>
-               </div>
+              {/* Form Completion Status */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium text-gray-700">Required Parameters</h3>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-600">Completion:</span>
+                    <span className={`text-sm font-medium ${isFormComplete() ? 'text-green-600' : 'text-orange-600'
+                      }`}>
+                      {isFormComplete() ? 'Complete ✓' : 'Incomplete ⚠'}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className={`flex items-center space-x-2 text-sm ${userData.age !== '' ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                    {userData.age !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                    <span>Age: {userData.age !== '' ? 'Selected' : 'Required'}</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 text-sm ${userData.sex !== '' ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                    {userData.sex !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                    <span>Gender: {userData.sex !== '' ? 'Selected' : 'Required'}</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 text-sm ${userData.cp !== '' ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                    {userData.cp !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                    <span>Chest Pain: {userData.cp !== '' ? 'Selected' : 'Required'}</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 text-sm ${userData.protocol !== '' ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                    {userData.protocol !== '' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                    <span>Protocol: {userData.protocol !== '' ? 'Selected' : 'Required'}</span>
+                  </div>
+                </div>
+              </div>
 
-               {/* User Input Section */}
-               <div className="space-y-8">
+              {/* User Input Section */}
+              <div className="space-y-8">
                 {/* Age Input Section */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Age Range</h2>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        parseInt(userData.age) >= 18 && parseInt(userData.age) <= 30 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${parseInt(userData.age) >= 18 && parseInt(userData.age) <= 30 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
                       onClick={() => {
-                        setUserData({...userData, age: "25"});
-                        updateProtocolBasedOnAge("25");
+                        setUserData({ ...userData, age: "25" });
+                        updateDefaultProtocolByAge("25");
                       }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">18-30</div>
@@ -806,13 +907,12 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        parseInt(userData.age) >= 31 && parseInt(userData.age) <= 45 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${parseInt(userData.age) >= 31 && parseInt(userData.age) <= 45 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
                       onClick={() => {
-                        setUserData({...userData, age: "38"});
-                        updateProtocolBasedOnAge("38");
+                        setUserData({ ...userData, age: "38" });
+                        updateDefaultProtocolByAge("38");
                       }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">31-45</div>
@@ -831,13 +931,12 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        parseInt(userData.age) >= 46 && parseInt(userData.age) <= 60 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${parseInt(userData.age) >= 46 && parseInt(userData.age) <= 60 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
                       onClick={() => {
-                        setUserData({...userData, age: "53"});
-                        updateProtocolBasedOnAge("53");
+                        setUserData({ ...userData, age: "53" });
+                        updateDefaultProtocolByAge("53");
                       }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">46-60</div>
@@ -856,13 +955,12 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        parseInt(userData.age) > 60 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${parseInt(userData.age) > 60 ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
                       onClick={() => {
-                        setUserData({...userData, age: "65"});
-                        updateProtocolBasedOnAge("65");
+                        setUserData({ ...userData, age: "65" });
+                        updateDefaultProtocolByAge("65");
                       }}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">60+</div>
@@ -883,16 +981,15 @@ function App() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Gender Input Section */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Gender</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div 
-                      className={`p-6 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.sex === "1" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, sex: "1"})}
+                    <div
+                      className={`p-6 rounded-lg border cursor-pointer transition-all duration-200 ${userData.sex === "1" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, sex: "1" })}
                     >
                       <div className="flex items-center justify-center mb-4">
                         <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
@@ -915,11 +1012,10 @@ function App() {
                         </ul>
                       </div>
                     </div>
-                    <div 
-                      className={`p-6 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.sex === "0" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, sex: "0"})}
+                    <div
+                      className={`p-6 rounded-lg border cursor-pointer transition-all duration-200 ${userData.sex === "0" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, sex: "0" })}
                     >
                       <div className="flex items-center justify-center mb-4">
                         <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center">
@@ -944,16 +1040,15 @@ function App() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Chest Pain Type Section */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Chest Pain Type</h2>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.cp === "0" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, cp: "0"})}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "0" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, cp: "0" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Typical Angina</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -971,11 +1066,10 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.cp === "1" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, cp: "1"})}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "1" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, cp: "1" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Atypical Angina</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -993,11 +1087,10 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.cp === "2" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, cp: "2"})}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "2" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, cp: "2" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Non-Anginal Pain</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -1015,11 +1108,10 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.cp === "3" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, cp: "3"})}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "3" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, cp: "3" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Asymptomatic</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -1044,11 +1136,10 @@ function App() {
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Exercise Protocol</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.protocol === "Standard Bruce" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, protocol: "Standard Bruce"})}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.protocol === "Standard Bruce" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, protocol: "Standard Bruce" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Standard Bruce</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -1066,11 +1157,10 @@ function App() {
                         </li>
                       </ul>
                     </div>
-                    <div 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        userData.protocol === "Modified Bruce" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                      }`}
-                      onClick={() => setUserData({...userData, protocol: "Modified Bruce"})}
+                    <div
+                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.protocol === "Modified Bruce" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                        }`}
+                      onClick={() => setUserData({ ...userData, protocol: "Modified Bruce" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Modified Bruce</div>
                       <ul className="text-sm text-gray-600 space-y-1">
@@ -1109,12 +1199,11 @@ function App() {
                       ].map(option => (
                         <div
                           key={option.value}
-                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                            userData.smoking_status === option.value
-                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
-                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                          }`}
-                          onClick={() => setUserData({...userData, smoking_status: option.value})}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.smoking_status === option.value
+                            ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                            : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                            }`}
+                          onClick={() => setUserData({ ...userData, smoking_status: option.value })}
                         >
                           <div className="font-medium text-gray-700 text-center">{option.label}</div>
                           <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
@@ -1134,12 +1223,11 @@ function App() {
                       ].map(option => (
                         <div
                           key={option.value}
-                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                            userData.diabetes_history === option.value
-                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
-                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                          }`}
-                          onClick={() => setUserData({...userData, diabetes_history: option.value})}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.diabetes_history === option.value
+                            ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                            : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                            }`}
+                          onClick={() => setUserData({ ...userData, diabetes_history: option.value })}
                         >
                           <div className="font-medium text-gray-700 text-center">{option.label}</div>
                           <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
@@ -1159,12 +1247,11 @@ function App() {
                       ].map(option => (
                         <div
                           key={option.value}
-                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                            userData.alcohol_consumption === option.value
-                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
-                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                          }`}
-                          onClick={() => setUserData({...userData, alcohol_consumption: option.value})}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.alcohol_consumption === option.value
+                            ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                            : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                            }`}
+                          onClick={() => setUserData({ ...userData, alcohol_consumption: option.value })}
                         >
                           <div className="font-medium text-gray-700 text-center">{option.label}</div>
                           <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
@@ -1184,12 +1271,11 @@ function App() {
                       ].map(option => (
                         <div
                           key={option.value}
-                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                            userData.activity_level === option.value
-                              ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
-                              : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
-                          }`}
-                          onClick={() => setUserData({...userData, activity_level: option.value})}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.activity_level === option.value
+                            ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105'
+                            : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
+                            }`}
+                          onClick={() => setUserData({ ...userData, activity_level: option.value })}
                         >
                           <div className="font-medium text-gray-700 text-center">{option.label}</div>
                           <div className="text-xs text-gray-600 text-center mt-1">{option.description}</div>
@@ -1200,17 +1286,16 @@ function App() {
                 </div>
               </div>
 
-                             <button
-                 type="submit"
-                 disabled={!isFormComplete()}
-                 className={`w-full py-3 px-4 rounded-lg font-medium transition duration-200 shadow-lg ${
-                   isFormComplete()
-                     ? 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:opacity-90'
-                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                 }`}
-               >
-                 {isFormComplete() ? 'Start Simulation' : 'Please Select All Required Parameters'}
-               </button>
+              <button
+                type="submit"
+                disabled={!isFormComplete()}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition duration-200 shadow-lg ${isFormComplete()
+                  ? 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:opacity-90'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+              >
+                {isFormComplete() ? 'Start Simulation' : 'Please Select All Required Parameters'}
+              </button>
             </form>
           ) : (
             <div>
@@ -1232,7 +1317,7 @@ function App() {
               <Heart className="h-4 w-4 text-white" />
               <span className="text-white text-sm font-medium">Vital Signs</span>
             </div>
-            <button 
+            <button
               onClick={() => setShowMiniPlayer(false)}
               className="text-white hover:text-gray-200 transition-colors"
             >
@@ -1249,7 +1334,7 @@ function App() {
               </div>
               <p className="text-lg font-bold text-gray-800">{data.thalach} BPM</p>
             </div>
-            
+
             <div className="bg-gray-50 p-2 rounded-lg">
               <div className="flex items-center space-x-1 mb-1">
                 <Droplets className="h-3 w-3 text-[#C68EFD]" />
@@ -1257,7 +1342,7 @@ function App() {
               </div>
               <p className="text-lg font-bold text-gray-800">{data.chol} mg/dL</p>
             </div>
-            
+
             <div className="bg-gray-50 p-2 rounded-lg">
               <div className="flex items-center space-x-1 mb-1">
                 <Zap className="h-3 w-3 text-[#E9A5F1]" />
@@ -1265,7 +1350,7 @@ function App() {
               </div>
               <p className="text-lg font-bold text-gray-800">{data.oldpeak}</p>
             </div>
-            
+
             <div className="bg-gray-50 p-2 rounded-lg">
               <div className="flex items-center space-x-1 mb-1">
                 <Activity className="h-3 w-3 text-[#FED2E2]" />
@@ -1282,9 +1367,9 @@ function App() {
                 <span className="text-xs text-gray-600">Age Range</span>
                 <span className="text-xs font-medium text-gray-800">
                   {userData.age === "25" ? "18-30" :
-                   userData.age === "38" ? "31-45" :
-                   userData.age === "53" ? "46-60" :
-                   "60+"}
+                    userData.age === "38" ? "31-45" :
+                      userData.age === "53" ? "46-60" :
+                        "60+"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -1297,9 +1382,9 @@ function App() {
                 <span className="text-xs text-gray-600">Chest Pain Type</span>
                 <span className="text-xs font-medium text-gray-800">
                   {userData.cp === "0" ? "Typical Angina" :
-                   userData.cp === "1" ? "Atypical Angina" :
-                   userData.cp === "2" ? "Non-Anginal Pain" :
-                   "Asymptomatic"}
+                    userData.cp === "1" ? "Atypical Angina" :
+                      userData.cp === "2" ? "Non-Anginal Pain" :
+                        "Asymptomatic"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -1313,21 +1398,21 @@ function App() {
         </div>
       )}
 
-             {/* Chatbot Component */}
-       <PulseChatbot 
-         isOpen={showChatbot} 
-         onClose={() => setShowChatbot(false)} 
-       />
+      {/* Chatbot Component */}
+      <PulseChatbot
+        isOpen={showChatbot}
+        onClose={() => setShowChatbot(false)}
+      />
 
-       {/* Floating Chat Button */}
-       {!showChatbot && (
-         <button
-           onClick={() => setShowChatbot(true)}
-           className="fixed bottom-4 right-4 w-14 h-14 bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 z-40 flex items-center justify-center"
-         >
-           <MessageCircle className="w-6 h-6" />
-         </button>
-       )}
+      {/* Floating Chat Button */}
+      {!showChatbot && (
+        <button
+          onClick={() => setShowChatbot(true)}
+          className="fixed bottom-4 right-4 w-14 h-14 bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 z-40 flex items-center justify-center"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
+      )}
 
     </div>
   );

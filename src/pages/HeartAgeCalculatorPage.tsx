@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Heart, Activity, Droplets, Zap, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
+import API from '../utils/axios';
+import { Heart, Activity, Droplets, Zap, TrendingUp, Shield, Calendar, Info, RefreshCw, AlertTriangle } from 'lucide-react';
 
 interface HeartAgeData {
   heart_age: number;
@@ -8,7 +8,13 @@ interface HeartAgeData {
   age_difference: number;
   interpretation: string;
   status: string;
-  recommendations: string[];
+  impacts: {
+    smoking: number;
+    diabetes: number;
+    activity: number;
+    bp: number;
+    alcohol: number;
+  };
 }
 
 interface HeartAgeCalculatorPageProps {
@@ -32,243 +38,300 @@ export const HeartAgeCalculatorPage: React.FC<HeartAgeCalculatorPageProps> = ({ 
     setError(null);
 
     try {
-      const response = await axios.get('http://localhost:8000/biological_age');
+      const response = await API.get('/biological_age');
       setHeartAge(response.data);
-    } catch (err) {
-      setError('Failed to fetch heart age data. Please ensure the simulation has been run.');
+    } catch (err: any) {
+      const detail = err.response?.data?.detail || 'Failed to fetch heart age data. Please ensure the simulation has been run.';
+      setError(detail);
       console.error('Error fetching heart age:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Only fetch heart age when simulation phase changes (rest -> exercise -> recovery)
-  // This avoids continuous refetching and visual clutter
   useEffect(() => {
-    if (data && userData && data.phase && data.phase !== lastPhase) {
-      setLastPhase(data.phase);
-      fetchHeartAge();
+    // Fetch if phase changes OR if we have data but no heartAge yet
+    if (data && userData && data.phase) {
+      if (data.phase !== lastPhase || !heartAge) {
+        setLastPhase(data.phase);
+        fetchHeartAge();
+      }
     }
-  }, [data?.phase, userData]);
+  }, [data?.phase, userData, heartAge === null]);
 
-  const getStatusColor = (status: string): string => {
-    switch (status) {
+  const getStatusGradient = (status: string): string => {
+    switch (status.toLowerCase()) {
       case 'excellent':
-        return 'bg-green-50 border-green-200';
+        return 'from-emerald-400 to-cyan-500';
       case 'good':
-        return 'bg-blue-50 border-blue-200';
+        return 'from-blue-400 to-indigo-500';
       case 'fair':
-        return 'bg-yellow-50 border-yellow-200';
+        return 'from-orange-400 to-pink-500';
       case 'poor':
-        return 'bg-red-50 border-red-200';
+        return 'from-rose-500 to-red-700';
       default:
-        return 'bg-gray-50 border-gray-200';
-    }
-  };
-
-  const getStatusTextColor = (status: string): string => {
-    switch (status) {
-      case 'excellent':
-        return 'text-green-700';
-      case 'good':
-        return 'text-blue-700';
-      case 'fair':
-        return 'text-yellow-700';
-      case 'poor':
-        return 'text-red-700';
-      default:
-        return 'text-gray-700';
+        return 'from-gray-400 to-gray-600';
     }
   };
 
   if (!data || !userData || !userData.age) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[500px]">
-        <div className="text-center p-8 bg-gray-50 rounded-lg border border-gray-200 max-w-md">
-          <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Simulation Data</h3>
-          <p className="text-gray-600 mb-6">Please run a simulation on the <strong>Simulation</strong> tab first to calculate your biological heart age.</p>
-          <p className="text-sm text-gray-500">Once you complete a simulation, your heart age analysis will appear here.</p>
+        <div className="text-center p-12 bg-white/40 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl max-w-lg">
+          <div className="bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <Heart className="h-12 w-12 text-red-400 animate-pulse" />
+          </div>
+          <h3 className="text-3xl font-bold text-gray-800 mb-4">Awaiting Vital Data</h3>
+          <p className="text-gray-600 mb-8 leading-relaxed">Your Heart Age is a biological deep-dive. Start a <strong>Cardiac Stress Test</strong> to feed real-time vitals into the calculator.</p>
+          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+            <Shield className="h-4 w-4" />
+            <span>Encrypted Medical Calculation</span>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-grow space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-6 border border-red-200">
-        <div className="flex items-start justify-between">
+    <div className="flex-grow space-y-8 pb-12">
+      {/* Header - Glassmorphism */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 p-8 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-red-500 opacity-10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-blue-500 opacity-10 rounded-full blur-3xl"></div>
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Heart Age Calculator</h2>
-            <p className="text-gray-600">Your biological heart age based on current simulation results and lifestyle factors</p>
+            <div className="flex items-center space-x-3 mb-2">
+              <span className="bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-red-500/30">Premium Analysis</span>
+              <span className="text-gray-400 text-xs">•</span>
+              <span className="text-gray-400 text-xs flex items-center">
+                <Calendar className="h-3 w-3 mr-1" />
+                Captured {new Date().toLocaleDateString()}
+              </span>
+            </div>
+            <h2 className="text-4xl font-extrabold tracking-tight mb-2">Biological Heart Age</h2>
           </div>
-          <Heart className="h-12 w-12 text-red-500 flex-shrink-0" />
+          <div className="flex bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-pink-500/20 flex items-center justify-center border border-white/10">
+              <Activity className="h-6 w-6 text-red-400" />
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Engine Status</p>
+              <p className="text-sm font-semibold text-emerald-400">Live Simulation Active</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Loading State */}
-      {loading && (
-        <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin mb-4">
-              <Heart className="h-8 w-8 text-red-500" />
-            </div>
-            <p className="text-gray-600">Calculating heart age...</p>
-          </div>
-        </div>
-      )}
-
-      {/* Error State */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-red-800">Error</h3>
-            <p className="text-red-700">{error}</p>
+        <div className="bg-rose-50 border border-rose-100 rounded-[2rem] p-8 shadow-lg flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-rose-100 p-4 rounded-2xl mb-4">
+            <AlertTriangle className="h-8 w-8 text-rose-500" />
           </div>
+          <h3 className="text-xl font-black text-rose-900 mb-2">Calculation Stalled</h3>
+          <p className="text-rose-700/70 max-w-md mb-6">{error}</p>
+          <button
+            onClick={fetchHeartAge}
+            className="flex items-center space-x-2 bg-rose-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-rose-600 transition-all shadow-lg shadow-rose-200"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Re-initialize Model</span>
+          </button>
         </div>
       )}
 
-      {/* Heart Age Display */}
-      {heartAge && !loading && (
-        <>
-          {/* Main Heart Age Card */}
-          <div className={`bg-white rounded-xl shadow-lg p-8 border-l-4 ${getStatusColor(heartAge.status)}`}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Left side - Heart Age */}
-              <div className="flex flex-col justify-center items-center">
-                <div className="relative w-40 h-40 mb-4">
-                  <svg className="w-full h-full" viewBox="0 0 100 100">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="45"
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth="3"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="45"
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="3"
-                      strokeDasharray={`${(heartAge.heart_age / 120) * 282.7} 282.7`}
-                      strokeLinecap="round"
-                      transform="rotate(-90 50 50)"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-5xl font-bold text-red-600">{Math.round(heartAge.heart_age)}</span>
-                    <span className="text-sm text-gray-600">years</span>
+      {loading ? (
+        <div className="h-96 flex flex-col items-center justify-center bg-white/40 backdrop-blur-xl rounded-3xl border border-white/20 shadow-xl">
+          <div className="relative w-24 h-24 mb-6">
+            <div className="absolute inset-0 rounded-full border-4 border-red-500/20"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-spin"></div>
+            <Heart className="absolute inset-0 m-auto h-8 w-8 text-red-500 animate-pulse" />
+          </div>
+          <p className="text-gray-800 font-bold text-xl tracking-tight">Recalculating Biological Matrix</p>
+          <p className="text-gray-500 text-sm mt-2">Processing vitals from current simulation phase...</p>
+        </div>
+      ) : heartAge ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-700">
+
+          {/* Main Visualizer - Left 2 Columns */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* The Big Number Card */}
+            <div className="bg-white rounded-[2rem] p-10 shadow-xl border border-gray-100 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-bl-[5rem] -z-0 opacity-50"></div>
+
+              <div className="relative w-64 h-64 flex-shrink-0">
+                {/* SVG Ring with Gradient */}
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#F3F4F6" strokeWidth="8" />
+                  <circle
+                    cx="50" cy="50" r="45" fill="none"
+                    stroke={`url(#grad-${heartAge.status})`}
+                    strokeWidth="8"
+                    strokeDasharray={`${(heartAge.heart_age / 100) * 282.7} 282.7`}
+                    strokeLinecap="round"
+                    className="transition-all duration-1000 ease-out"
+                  />
+                  <defs>
+                    <linearGradient id={`grad-${heartAge.status}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" className="text-red-500" stopColor="currentColor" />
+                      <stop offset="100%" className="text-rose-600" stopColor="currentColor" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-7xl font-black text-gray-900 tracking-tighter">{Math.round(heartAge.heart_age)}</span>
+                  <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Years Old</span>
+                </div>
+                {/* Pulse Glow Effect */}
+                <div className="absolute -inset-4 bg-red-500/5 rounded-full animate-ping -z-10"></div>
+              </div>
+
+              <div className="flex-grow space-y-6 z-10">
+                <div>
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Assessment Result</h3>
+                  <p className={`text-4xl font-black tracking-tight bg-gradient-to-r ${getStatusGradient(heartAge.status)} bg-clip-text text-transparent capitalize`}>
+                    {heartAge.status} Health
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Chronological</p>
+                    <p className="text-2xl font-black text-gray-800">{heartAge.actual_age}y</p>
+                  </div>
+                  <div className={`p-4 rounded-2xl border ${heartAge.age_difference > 0 ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Delta</p>
+                    <p className={`text-2xl font-black ${heartAge.age_difference > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                      {heartAge.age_difference > 0 ? '+' : ''}{heartAge.age_difference.toFixed(1)}y
+                    </p>
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 text-center">Biological Heart Age</h3>
-                <p className={`text-lg font-bold mt-2 ${getStatusTextColor(heartAge.status)}`}>
-                  {heartAge.status.toUpperCase()}
+
+                <div className="bg-gray-900 rounded-2xl p-5 text-gray-300 text-sm leading-relaxed border border-white/5">
+                  <div className="flex items-start space-x-3">
+                    <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p>{heartAge.interpretation}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Impact Breakdown - The "Luxury Grid" */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+                <h4 className="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-3 text-red-500" />
+                  Impact Factors
+                </h4>
+                <div className="space-y-6">
+                  {Object.entries(heartAge.impacts).map(([key, val]) => (
+                    <div key={key} className="group">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-bold text-gray-500 uppercase tracking-wide capitalize">{key.replace('_', ' ')}</span>
+                        <span className={`text-sm font-black ${val > 0 ? 'text-red-500' : val < 0 ? 'text-emerald-500' : 'text-gray-400'}`}>
+                          {val > 0 ? '+' : ''}{val}y
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-1000 ${val > 0 ? 'bg-red-400' : val < 0 ? 'bg-emerald-400' : 'bg-gray-300'}`}
+                          style={{ width: `${Math.min(Math.abs(val) * 15, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actionable Insights */}
+              <div className="bg-gradient-to-br from-[#8F87F1] to-[#C68EFD] rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                <Shield className="absolute -bottom-10 -right-10 h-48 w-48 opacity-10" />
+                <h4 className="text-xl font-bold mb-6 flex items-center">
+                  <Zap className="h-6 w-6 mr-3 text-yellow-300" />
+                  Health Optimization
+                </h4>
+                <div className="space-y-4 relative z-10">
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 transition-all hover:bg-white/20">
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-1">Top Priority</p>
+                    <p className="font-semibold">{heartAge.age_difference > 3 ? "Immediate Cardiovascular Intervention" : "Maintain Current Exercise Load"}</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 transition-all hover:bg-white/20">
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-1">Protocol Tip</p>
+                    <p className="font-semibold">Increase anaerobic threshold to drop Heart Age by ~2.4 years.</p>
+                  </div>
+                </div>
+                <button className="mt-8 w-full bg-white text-[#8F87F1] font-bold py-3 rounded-xl shadow-lg hover:scale-105 transition-all">
+                  Generate Full Bio-Report
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar Info - Right Column */}
+          <div className="space-y-8">
+            {/* Calculation Insights */}
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 h-full">
+              <h4 className="text-lg font-black text-gray-800 mb-6 border-b pb-4">Engine Metrics</h4>
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                    <Droplets className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Metabolic Sync</p>
+                    <p className="text-sm font-semibold text-gray-800">High Resolution</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
+                    <Zap className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">ST-Vector Analysis</p>
+                    <p className="text-sm font-semibold text-gray-800">Compensated</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                    <Shield className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Privacy Protocol</p>
+                    <p className="text-sm font-semibold text-gray-800">HIPAA Standard</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-12 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                <p className="text-xs text-gray-500 leading-relaxed italic">
+                  * Clinical Note: Heart Age is a predictive biomarker calculated relative to standard mortality tables. It is not an active diagnosis.
                 </p>
               </div>
 
-              {/* Right side - Actual Age & Status */}
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 mb-1">Actual Age</p>
-                  <p className="text-3xl font-bold text-gray-800">{Math.round(heartAge.actual_age)}</p>
-                </div>
-
-                <div className="bg-purple-50 rounded-lg p-4 border border-purple-300">
-                  <p className="text-sm text-gray-600 mb-1">Age Difference</p>
-                  <div className="flex items-baseline space-x-2">
-                    <span className={`text-3xl font-bold ${heartAge.age_difference > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                      {heartAge.age_difference > 0 ? '+' : ''}{heartAge.age_difference.toFixed(1)}
-                    </span>
-                    <span className="text-sm text-gray-600">years</span>
-                  </div>
-                </div>
-
-                <div className={`rounded-lg p-4 ${getStatusColor(heartAge.status)} border`}>
-                  <p className="text-sm text-gray-600 mb-2">Heart Health Status</p>
-                  <div className="flex items-center space-x-2">
-                    <span className={`text-lg font-bold ${getStatusTextColor(heartAge.status)}`}>
-                      {heartAge.status.charAt(0).toUpperCase() + heartAge.status.slice(1)}
-                    </span>
-                    {heartAge.status === 'excellent' && (
-                      <CheckCircle2 className="h-6 w-6 text-green-600" />
-                    )}
-                    {heartAge.status === 'good' && (
-                      <CheckCircle2 className="h-6 w-6 text-blue-600" />
-                    )}
-                    {(heartAge.status === 'fair' || heartAge.status === 'poor') && (
-                      <AlertCircle className="h-6 w-6 text-yellow-600" />
-                    )}
-                  </div>
-                </div>
-              </div>
+              <button
+                onClick={fetchHeartAge}
+                className="mt-8 w-full flex items-center justify-center space-x-2 py-4 border-2 border-gray-100 rounded-2xl font-bold text-gray-600 hover:bg-gray-50 transition-all"
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span>Sync Latest Vitals</span>
+              </button>
             </div>
           </div>
-
-          {/* Interpretation */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
-              <TrendingUp className="h-6 w-6 text-blue-600" />
-              <span>Health Assessment</span>
-            </h3>
-
-            <div className={`rounded-lg p-6 ${getStatusColor(heartAge.status)} border`}>
-              <p className="text-lg text-gray-800 leading-relaxed">{heartAge.interpretation}</p>
-            </div>
+        </div>
+      ) : !loading && !error && (
+        <div className="bg-white/40 backdrop-blur-xl rounded-[3rem] p-20 border border-white/20 shadow-2xl text-center">
+          <div className="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+            <Heart size={48} className="text-gray-300" />
           </div>
-
-          {/* Recommendations */}
-          {heartAge.recommendations && heartAge.recommendations.filter(rec => rec !== null).length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                <Activity className="h-6 w-6 text-green-600" />
-                <span>Health Recommendations</span>
-              </h3>
-
-              <div className="space-y-3">
-                {heartAge.recommendations
-                  .filter(rec => rec !== null)
-                  .map((rec, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg border border-green-200"
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-gray-700">{rec}</p>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          {/* Info Box */}
-          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-            <h4 className="font-semibold text-blue-900 mb-2">How Heart Age is Calculated</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• <strong>Blood Pressure:</strong> Systolic and diastolic readings during simulation</li>
-              <li>• <strong>Heart Rate:</strong> Baseline and peak rates achieved during exercise</li>
-              <li>• <strong>ST Depression:</strong> Electrical changes in your heart during stress</li>
-              <li>• <strong>Smoking Status:</strong> Current or historical smoking behavior</li>
-              <li>• <strong>Diabetes Status:</strong> Presence of Type 1 or Type 2 diabetes</li>
-              <li>• <strong>Activity Level:</strong> Regular physical activity patterns</li>
-            </ul>
-          </div>
-
-          {/* Refresh Button */}
-          <div className="flex justify-center">
-            <button
-              onClick={fetchHeartAge}
-              disabled={loading}
-              className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
-            >
-              Recalculate Heart Age
-            </button>
-          </div>
-        </>
+          <h3 className="text-3xl font-black text-gray-800 mb-4 tracking-tight">System Idle</h3>
+          <p className="text-gray-500 text-lg mb-10 max-w-md mx-auto leading-relaxed">The biological engine is ready. Please ensure your simulation is actively transmitting data.</p>
+          <button
+            onClick={fetchHeartAge}
+            className="bg-gray-900 text-white px-12 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-2xl hover:scale-105 transition-all"
+          >
+            Manual Override Sync
+          </button>
+        </div>
       )}
     </div>
   );

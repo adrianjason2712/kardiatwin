@@ -6,9 +6,10 @@ import { Heart } from 'lucide-react';
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [localError, setLocalError] = useState('');
   const navigate = useNavigate();
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,15 +21,13 @@ export const LoginPage: React.FC = () => {
     }
 
     try {
-      await login(username, password);
+      await login(username, password, rememberMe);
       navigate('/simulation');
     } catch (err: any) {
-      // Check if server is unreachable
-      if (!err.response) {
-        setLocalError('Server is unreachable. Please make sure the backend is running.');
-      } else {
-        setLocalError(err.response?.data?.detail || 'Login failed. Please try again.');
-      }
+      // Error handling is done in AuthContext, just display the error
+      // The error message is already set in the auth context
+      const errorMsg = err.response?.data?.detail || 'Login failed. Please try again.';
+      setLocalError(errorMsg);
     }
   };
 
@@ -46,8 +45,9 @@ export const LoginPage: React.FC = () => {
 
         {/* Error Message */}
         {localError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
-            {localError}
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm flex items-start">
+            <span className="mr-3 mt-0.5">⚠</span>
+            <span>{localError}</span>
           </div>
         )}
 
@@ -62,8 +62,9 @@ export const LoginPage: React.FC = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username or email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8F87F1] focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8F87F1] focus:border-transparent transition"
               disabled={isLoading}
+              autoComplete="username"
             />
           </div>
 
@@ -76,19 +77,34 @@ export const LoginPage: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8F87F1] focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8F87F1] focus:border-transparent transition"
               disabled={isLoading}
+              autoComplete="current-password"
             />
+          </div>
+
+          {/* Remember Me Checkbox */}
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={isLoading}
+              className="w-4 h-4 text-[#8F87F1] bg-gray-100 border-gray-300 rounded focus:ring-2 focus:ring-[#8F87F1] cursor-pointer"
+            />
+            <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700 cursor-pointer hover:text-gray-900">
+              Remember me for 30 days
+            </label>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-2 px-4 rounded-lg font-medium transition duration-200 ${
-              isLoading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:opacity-90'
-            }`}
+            className={`w-full py-2 px-4 rounded-lg font-medium transition duration-200 ${isLoading
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:opacity-90'
+              }`}
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>

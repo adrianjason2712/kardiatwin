@@ -79,6 +79,7 @@ class SimulationSummary(BaseModel):
     protocol: str
     duration: Optional[float] = None
     risk_score: Optional[float] = None
+    heart_age: Optional[float] = None
 
     class Config:
         from_attributes = True
@@ -96,3 +97,37 @@ class SimulationList(BaseModel):
     total: int
     limit: int
     offset: int
+
+# ==================== User Profile Models ====================
+
+class UserProfileBase(BaseModel):
+    age: Optional[int] = None
+    sex: Optional[str] = None
+    cp: Optional[str] = None
+    fbs: Optional[str] = None
+    restecg: Optional[str] = None
+    smoking_status: Optional[str] = None
+    diabetes_history: Optional[str] = None
+    alcohol_consumption: Optional[str] = None
+    activity_level: Optional[str] = None
+    
+    # Bot Context Fields
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    family_history: Optional[str] = None
+    allergies: Optional[str] = None
+
+class UserProfileCreate(UserProfileBase):
+    pass
+
+class UserProfileUpdate(UserProfileBase):
+    pass
+
+class UserProfileResponse(UserProfileBase):
+    id: int
+    user_id: int
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
