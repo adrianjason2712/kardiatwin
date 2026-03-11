@@ -41,7 +41,13 @@ export function ProfilePage() {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+
+        if (name === 'age' && value) {
+            const num = parseInt(value);
+            if (num > 105) value = "105";
+        }
+
         setProfile((prev) => ({
             ...prev,
             [name]: (name === 'age' || name === 'height' || name === 'weight') ? (value ? parseFloat(value) : undefined) : value,
@@ -75,29 +81,33 @@ export function ProfilePage() {
         );
     }
 
-    const renderInput = (label: string, name: string, type: string, placeholder?: string, tooltip?: string) => (
-        <div className="group">
-            <div className="flex items-center space-x-2 mb-1.5">
-                <label className="block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-indigo-600">{label}</label>
-                {tooltip && (
-                    <div className="relative group/tooltip">
-                        <HelpCircle className="h-3.5 w-3.5 text-gray-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
-                            {tooltip}
+    const renderInput = (label: string, name: string, type: string, placeholder?: string, tooltip?: string) => {
+        const isAge = name === 'age';
+        return (
+            <div className="group">
+                <div className="flex items-center space-x-2 mb-1.5">
+                    <label className="block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-indigo-600">{label}</label>
+                    {tooltip && (
+                        <div className="relative group/tooltip">
+                            <HelpCircle className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+                                {tooltip}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
+                <input
+                    type={type}
+                    name={name}
+                    value={(profile as any)[name] || ''}
+                    onChange={handleChange}
+                    {...(isAge ? { min: 18, max: 105 } : {})}
+                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-gray-800 placeholder-gray-400 disabled:opacity-50"
+                    placeholder={placeholder}
+                />
             </div>
-            <input
-                type={type}
-                name={name}
-                value={(profile as any)[name] || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-gray-800 placeholder-gray-400"
-                placeholder={placeholder}
-            />
-        </div>
-    );
+        );
+    };
 
     const renderSelect = (label: string, name: string, options: { value: string; label: string }[], tooltip?: string) => (
         <div className="group">

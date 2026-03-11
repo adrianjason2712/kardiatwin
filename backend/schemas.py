@@ -101,7 +101,7 @@ class SimulationList(BaseModel):
 # ==================== User Profile Models ====================
 
 class UserProfileBase(BaseModel):
-    age: Optional[int] = None
+    age: Optional[int] = Field(None, ge=18, le=105)
     sex: Optional[str] = None
     cp: Optional[str] = None
     fbs: Optional[str] = None

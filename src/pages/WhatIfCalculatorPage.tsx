@@ -101,25 +101,7 @@ export const WhatIfCalculatorPage: React.FC<WhatIfCalculatorPageProps> = ({
             </p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 min-w-[280px]">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Diagnostic Sync</span>
-              <div className="flex items-center space-x-1.5">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[10px] font-black text-emerald-400">READY</span>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-end">
-                <p className="text-white/60 text-xs font-bold uppercase tracking-tighter">Baseline HR</p>
-                <p className="text-2xl font-black">72 <span className="text-[10px] text-white/30">BPM</span></p>
-              </div>
-              <div className="flex justify-between items-end">
-                <p className="text-white/60 text-xs font-bold uppercase tracking-tighter">Current SBP Mod</p>
-                <p className="text-2xl font-black">{whatIfResults?.current.sbp_modifier.toFixed(2) || '1.00'}x</p>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
 

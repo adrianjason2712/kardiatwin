@@ -3,6 +3,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/axios';
 import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import {
   Trash2,
   Calendar,
   Activity,
@@ -16,6 +28,17 @@ import {
   Zap,
   XCircle
 } from 'lucide-react';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 interface SimulationSession {
   id: number;
@@ -44,10 +67,32 @@ export const SimulationHistoryPage: React.FC = () => {
   const [creatingTest, setCreatingTest] = useState(false);
   const [isClearingAll, setIsClearingAll] = useState(false);
   const [selectedSim, setSelectedSim] = useState<SimulationSession | null>(null);
+  const [simDataPoints, setSimDataPoints] = useState<any[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   useEffect(() => {
     fetchSimulations();
   }, [refreshKey]);
+
+  useEffect(() => {
+    if (selectedSim) {
+      fetchSimDataPoints(selectedSim.id);
+    } else {
+      setSimDataPoints([]);
+    }
+  }, [selectedSim]);
+
+  const fetchSimDataPoints = async (id: number) => {
+    setIsLoadingData(true);
+    try {
+      const response = await API.get(`/api/simulations/${id}/data`);
+      setSimDataPoints(response.data.data_points || []);
+    } catch (err) {
+      console.error('Failed to fetch data points', err);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
 
   const createTestSimulation = async () => {
     setCreatingTest(true);
@@ -121,7 +166,9 @@ export const SimulationHistoryPage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Ensure the UTC timezone 'Z' is appended so the browser correctly converts to local time
+    const safeDateString = dateString.endsWith('Z') || dateString.includes('+') ? dateString : `${dateString}Z`;
+    const date = new Date(safeDateString);
     return {
       full: date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
       time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
@@ -374,6 +421,64 @@ export const SimulationHistoryPage: React.FC = () => {
                     <span className="text-emerald-600 font-bold"> {((selectedSim.risk_score || 0) < 30) ? 'High' : ((selectedSim.risk_score || 0) < 70) ? 'Moderate' : 'Strained'}</span>.
                     Recommended follow-up includes maintaining consistent metabolic activity and monitoring systolic variations under load.
                   </p>
+                </div>
+              </div>
+
+              {/* Chart Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Telemetry Analysis</h4>
+                </div>
+                <div className="bg-white rounded-3xl p-6 border border-gray-100 h-64 shadow-inner">
+                  {isLoadingData ? (
+                    <div className="flex flex-col items-center justify-center h-full space-y-3">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8F87F1]"></div>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Reconstructing Timeline...</p>
+                    </div>
+                  ) : simDataPoints.length > 0 ? (
+                    <Line
+                      data={{
+                        labels: simDataPoints.map(d => `${d.timestamp}s`),
+                        datasets: [
+                          {
+                            label: 'Heart Rate (BPM)',
+                            data: simDataPoints.map(d => d.heart_rate),
+                            borderColor: 'rgb(244, 63, 94)',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                          },
+                          {
+                            label: 'Systolic BP (mmHg)',
+                            data: simDataPoints.map(d => d.blood_pressure),
+                            borderColor: 'rgb(167, 139, 250)',
+                            backgroundColor: 'transparent',
+                            tension: 0.4
+                          }
+                        ]
+                      }}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                          mode: 'index',
+                          intersect: false,
+                        },
+                        scales: {
+                          y: { beginAtZero: false },
+                          x: { ticks: { maxTicksLimit: 10 } }
+                        },
+                        elements: {
+                          point: { radius: 0 }
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <Activity className="h-8 w-8 text-gray-300 mb-2" />
+                      <div className="text-gray-400 font-medium text-sm">No fine-grained telemetry data available for this legacy session.</div>
+                    </div>
+                  )}
                 </div>
               </div>
 

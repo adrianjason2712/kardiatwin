@@ -1,6 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Zap, Activity, Heart, Shield, Bell, XCircle } from 'lucide-react';
-import { HeartScene } from '../components/HeartScene';
+import { CheckCircle2, Zap, Activity, Heart, Shield, Bell, XCircle, AlertCircle } from 'lucide-react'; import { HeartScene } from '../components/HeartScene';
 import { SimulationProgress } from '../components/SimulationProgress';
 import { Line } from 'react-chartjs-2';
 
@@ -57,59 +56,72 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
   return (
     <div className="flex-grow">
       {!simulationStarted ? (
-        <div className="bg-white rounded-xl shadow-xl p-6 mb-8">
+        <div className="relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-[3rem] shadow-2xl p-8 md:p-12 mb-8 border border-white/40">
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-[#8F87F1] opacity-5 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-[#C68EFD] opacity-5 rounded-full blur-[100px] pointer-events-none"></div>
+
           <form
             onSubmit={handleSubmit}
             onKeyPress={(e) => {
-              // Prevent form submission on Enter key unless it's the submit button
               if (e.key === 'Enter' && !(e.target as HTMLElement).classList.contains('submit-button')) {
                 e.preventDefault();
               }
             }}
-            className="max-w-2xl mx-auto space-y-6"
+            className="relative z-10 max-w-4xl mx-auto space-y-10"
           >
-            {/* Form Completion Status & Tab Navigation */}
-            <div className="mb-6">
-              {/* Completion Status */}
-              <div className="p-4 bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] rounded-lg mb-4 text-white">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Simulation Setup</h3>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm opacity-90">Status:</span>
-                    <span className={`text-sm font-medium ${isFormComplete() ? 'bg-green-500' : 'bg-orange-500'
-                      } px-2 py-1 rounded-full`}>
-                      {isFormComplete() ? '✓ Complete' : '⚠ Incomplete'}
+            {/* Premium Header & Tabs */}
+            <div>
+              <div className="p-8 bg-gradient-to-r from-[#1a1c2c] to-[#4a1942] rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl border border-white/10">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-[#8F87F1] opacity-30 rounded-full blur-[50px] pointer-events-none"></div>
+
+                <div className="flex flex-col md:flex-row md:items-center justify-between relative z-10 gap-6">
+                  <div className="flex items-center space-x-5">
+                    <div className="bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/5">
+                      <Activity className="h-8 w-8 text-[#E2DDFE]" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-black tracking-tight mb-1">Simulation Setup</h3>
+                      <p className="text-white/60 text-sm font-medium">Configure your digital twin parameters</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 bg-black/20 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Engine Status</span>
+                    <span className={`text-xs font-black uppercase tracking-wider flex items-center ${isFormComplete() ? 'text-emerald-400' : 'text-orange-400'
+                      }`}>
+                      {isFormComplete() ? (
+                        <><CheckCircle2 className="w-4 h-4 mr-1.5" /> Ready for Launch</>
+                      ) : (
+                        <><AlertCircle className="w-4 h-4 mr-1.5" /> Pending Config</>
+                      )}
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Tab Navigation */}
-              <div className="flex space-x-2 border-b-2 border-gray-200">
+              <div className="flex space-x-3 mt-8 border-b border-gray-100 overflow-x-auto pb-4 hide-scrollbar">
                 <button
                   type="button"
                   onClick={() => setActiveTab('required')}
-                  className={`px-4 py-3 font-medium transition-all ${activeTab === 'required'
-                    ? 'border-b-2 border-[#8F87F1] text-[#8F87F1]'
-                    : 'text-gray-600 hover:text-gray-800'
+                  className={`flex items-center space-x-3 px-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all ${activeTab === 'required'
+                    ? 'bg-[#8F87F1]/10 text-[#8F87F1] shadow-inner'
+                    : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
                     }`}
                 >
-                  <div className="flex items-center space-x-2">
-                    <span>Basic Information</span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-full ${userData.age !== '' && userData.sex !== '' && userData.cp !== '' && userData.protocol !== ''
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-orange-100 text-orange-700'
-                      }`}>
-                      {[userData.age, userData.sex, userData.cp, userData.protocol].filter(x => x !== '').length}/4
-                    </span>
-                  </div>
+                  <span>Basic Information</span>
+                  <span className={`flex items-center justify-center h-6 px-2 rounded-full text-[10px] font-black ${userData.age !== '' && userData.sex !== '' && userData.cp !== '' && userData.protocol !== ''
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-orange-100 text-orange-700'
+                    }`}>
+                    {[userData.age, userData.sex, userData.cp, userData.protocol].filter(x => x !== '').length}/4
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('lifestyle')}
-                  className={`px-4 py-3 font-medium transition-all ${activeTab === 'lifestyle'
-                    ? 'border-b-2 border-[#8F87F1] text-[#8F87F1]'
-                    : 'text-gray-600 hover:text-gray-800'
+                  className={`flex items-center space-x-3 px-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all ${activeTab === 'lifestyle'
+                    ? 'bg-[#c68efd]/10 text-[#c68efd] shadow-inner'
+                    : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
                     }`}
                 >
                   <span>Lifestyle & Medical</span>
@@ -117,21 +129,19 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('safety')}
-                  className={`px-4 py-3 font-medium transition-all ${activeTab === 'safety'
-                    ? 'border-b-2 border-[#8F87F1] text-[#8F87F1]'
-                    : 'text-gray-600 hover:text-gray-800'
+                  className={`flex items-center space-x-3 px-6 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all ${activeTab === 'safety'
+                    ? 'bg-emerald-500/10 text-emerald-600 shadow-inner'
+                    : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
                     }`}
                 >
-                  <div className="flex items-center space-x-2">
-                    <Shield className="h-4 w-4" />
-                    <span>Safety Settings</span>
-                  </div>
+                  <Shield className="h-4 w-4" />
+                  <span>Safety Settings</span>
                 </button>
               </div>
             </div>
 
             {/* Tab Content */}
-            <div className="space-y-6">
+            <div className="min-h-[400px]">
               {/* REQUIRED TAB */}
               {activeTab === 'required' && (
                 <>
@@ -145,7 +155,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                         <input
                           type="range"
                           min="18"
-                          max="100"
+                          max="105"
                           value={userData.age || '50'}
                           onChange={(e) => {
                             setUserData({ ...userData, age: e.target.value });
@@ -260,112 +270,154 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
 
               {/* LIFESTYLE TAB */}
               {activeTab === 'lifestyle' && (
-                <>
-                  {/* Lifestyle Section */}
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800 mb-4">Lifestyle & Medical History</h2>
-                      <p className="text-gray-600 text-sm mb-6">These factors help personalize your simulation</p>
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="mb-8">
+                    <h2 className="text-3xl font-black text-gray-800 tracking-tight">Lifestyle & Medical History</h2>
+                    <p className="text-gray-500 mt-2 font-medium">These biomarkers establish your digital twin's baseline resilience.</p>
+                  </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Smoking Status */}
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-3 block">Smoking Status</label>
-                          <div className="space-y-2">
-                            {[
-                              { value: 'non_smoker', label: 'Non-Smoker' },
-                              { value: 'ex_smoker', label: 'Ex-Smoker' },
-                              { value: 'smoker', label: 'Smoker' }
-                            ].map((option) => (
-                              <div
-                                key={option.value}
-                                className={`p-3 rounded-lg border cursor-pointer transition-all ${userData.smoking_status === option.value ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5' : 'border-gray-200 hover:border-[#8F87F1]'
-                                  }`}
-                                onClick={() => setUserData({ ...userData, smoking_status: option.value })}
-                              >
-                                <div className="text-sm font-medium text-gray-700">{option.label}</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    {/* Smoking Status */}
+                    <div className="space-y-3">
+                      <label className="flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <Zap className="h-3 w-3 mr-2 text-[#8F87F1]" /> Smoking Status
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'non_smoker', label: 'Non-Smoker' },
+                          { value: 'ex_smoker', label: 'Ex-Smoker' },
+                          { value: 'smoker', label: 'Smoker' }
+                        ].map((option) => (
+                          <div
+                            key={option.value}
+                            className={`group relative overflow-hidden p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-center ${userData.smoking_status === option.value
+                              ? 'border-[#8F87F1] bg-gradient-to-br from-[#8F87F1]/5 to-[#C68EFD]/5 shadow-sm scale-[1.02]'
+                              : 'border-gray-100 hover:border-[#8F87F1]/30 hover:bg-gray-50/50'
+                              }`}
+                            onClick={() => setUserData({ ...userData, smoking_status: option.value })}
+                          >
+                            <div className={`text-xs font-bold transition-colors ${userData.smoking_status === option.value ? 'text-[#8F87F1]' : 'text-gray-600 group-hover:text-gray-900'}`}>{option.label}</div>
+                            {userData.smoking_status === option.value && (
+                              <div className="absolute top-1 right-1">
+                                <CheckCircle2 className="h-3 w-3 text-[#8F87F1]" />
                               </div>
-                            ))}
+                            )}
                           </div>
-                        </div>
+                        ))}
+                      </div>
+                    </div>
 
-                        {/* Diabetes History */}
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-3 block">Diabetes History</label>
-                          <div className="space-y-2">
-                            {[
-                              { value: 'none', label: 'None' },
-                              { value: 'type_1', label: 'Type 1' },
-                              { value: 'type_2', label: 'Type 2' }
-                            ].map((option) => (
-                              <div
-                                key={option.value}
-                                className={`p-3 rounded-lg border cursor-pointer transition-all ${userData.diabetes_history === option.value ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5' : 'border-gray-200 hover:border-[#8F87F1]'
-                                  }`}
-                                onClick={() => setUserData({ ...userData, diabetes_history: option.value })}
-                              >
-                                <div className="text-sm font-medium text-gray-700">{option.label}</div>
+                    {/* Diabetes History */}
+                    <div className="space-y-3">
+                      <label className="flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <Activity className="h-3 w-3 mr-2 text-[#C68EFD]" /> Diabetes History
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'none', label: 'None' },
+                          { value: 'type_1', label: 'Type 1' },
+                          { value: 'type_2', label: 'Type 2' }
+                        ].map((option) => (
+                          <div
+                            key={option.value}
+                            className={`group relative overflow-hidden p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-center ${userData.diabetes_history === option.value
+                              ? 'border-[#C68EFD] bg-gradient-to-br from-[#8F87F1]/5 to-[#C68EFD]/5 shadow-sm scale-[1.02]'
+                              : 'border-gray-100 hover:border-[#C68EFD]/30 hover:bg-gray-50/50'
+                              }`}
+                            onClick={() => setUserData({ ...userData, diabetes_history: option.value })}
+                          >
+                            <div className={`text-xs font-bold transition-colors ${userData.diabetes_history === option.value ? 'text-[#C68EFD]' : 'text-gray-600 group-hover:text-gray-900'}`}>{option.label}</div>
+                            {userData.diabetes_history === option.value && (
+                              <div className="absolute top-1 right-1">
+                                <CheckCircle2 className="h-3 w-3 text-[#C68EFD]" />
                               </div>
-                            ))}
+                            )}
                           </div>
-                        </div>
+                        ))}
+                      </div>
+                    </div>
 
-                        {/* Alcohol Consumption */}
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-3 block">Alcohol Consumption</label>
-                          <div className="space-y-2">
-                            {[
-                              { value: 'none', label: 'None' },
-                              { value: 'moderate', label: 'Moderate' },
-                              { value: 'heavy', label: 'Heavy' }
-                            ].map((option) => (
-                              <div
-                                key={option.value}
-                                className={`p-3 rounded-lg border cursor-pointer transition-all ${userData.alcohol_consumption === option.value ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5' : 'border-gray-200 hover:border-[#8F87F1]'
-                                  }`}
-                                onClick={() => setUserData({ ...userData, alcohol_consumption: option.value })}
-                              >
-                                <div className="text-sm font-medium text-gray-700">{option.label}</div>
+                    {/* Alcohol Consumption */}
+                    <div className="space-y-3">
+                      <label className="flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        Alcohol Consumption
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'none', label: 'None' },
+                          { value: 'moderate', label: 'Moderate' },
+                          { value: 'heavy', label: 'Heavy' }
+                        ].map((option) => (
+                          <div
+                            key={option.value}
+                            className={`group relative overflow-hidden p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-center ${userData.alcohol_consumption === option.value
+                              ? 'border-[#8F87F1] bg-gradient-to-br from-[#8F87F1]/5 to-[#C68EFD]/5 shadow-sm scale-[1.02]'
+                              : 'border-gray-100 hover:border-[#8F87F1]/30 hover:bg-gray-50/50'
+                              }`}
+                            onClick={() => setUserData({ ...userData, alcohol_consumption: option.value })}
+                          >
+                            <div className={`text-xs font-bold transition-colors ${userData.alcohol_consumption === option.value ? 'text-[#8F87F1]' : 'text-gray-600 group-hover:text-gray-900'}`}>{option.label}</div>
+                            {userData.alcohol_consumption === option.value && (
+                              <div className="absolute top-1 right-1">
+                                <CheckCircle2 className="h-3 w-3 text-[#8F87F1]" />
                               </div>
-                            ))}
+                            )}
                           </div>
-                        </div>
+                        ))}
+                      </div>
+                    </div>
 
-                        {/* Activity Level */}
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-3 block">Activity Level</label>
-                          <div className="space-y-2">
-                            {[
-                              { value: 'sedentary', label: 'Sedentary' },
-                              { value: 'active', label: 'Active' },
-                              { value: 'athlete', label: 'Athlete' }
-                            ].map((option) => (
-                              <div
-                                key={option.value}
-                                className={`p-3 rounded-lg border cursor-pointer transition-all ${userData.activity_level === option.value ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5' : 'border-gray-200 hover:border-[#8F87F1]'
-                                  }`}
-                                onClick={() => setUserData({ ...userData, activity_level: option.value })}
-                              >
-                                <div className="text-sm font-medium text-gray-700">{option.label}</div>
+                    {/* Activity Level */}
+                    <div className="space-y-3">
+                      <label className="flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <Heart className="h-3 w-3 mr-2 text-[#8F87F1]" /> Activity Level
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'sedentary', label: 'Sedentary' },
+                          { value: 'active', label: 'Active' },
+                          { value: 'athlete', label: 'Athlete' }
+                        ].map((option) => (
+                          <div
+                            key={option.value}
+                            className={`group relative overflow-hidden p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-center ${userData.activity_level === option.value
+                              ? 'border-[#C68EFD] bg-gradient-to-br from-[#8F87F1]/5 to-[#C68EFD]/5 shadow-sm scale-[1.02]'
+                              : 'border-gray-100 hover:border-[#C68EFD]/30 hover:bg-gray-50/50'
+                              }`}
+                            onClick={() => setUserData({ ...userData, activity_level: option.value })}
+                          >
+                            <div className={`text-xs font-bold transition-colors ${userData.activity_level === option.value ? 'text-[#C68EFD]' : 'text-gray-600 group-hover:text-gray-900'}`}>{option.label}</div>
+                            {userData.activity_level === option.value && (
+                              <div className="absolute top-1 right-1">
+                                <CheckCircle2 className="h-3 w-3 text-[#C68EFD]" />
                               </div>
-                            ))}
+                            )}
                           </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={!isFormComplete()}
-                    className={`submit-button w-full py-3 px-4 rounded-lg font-medium transition duration-200 shadow-lg ${isFormComplete()
-                      ? 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:opacity-90'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                  >
-                    {isFormComplete() ? 'Start Simulation' : 'Please Select All Required Parameters'}
-                  </button>
-                </>
+                  <div className="mt-12">
+                    <button
+                      type="submit"
+                      disabled={!isFormComplete()}
+                      className={`submit-button w-full relative overflow-hidden py-5 px-8 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-2xl ${isFormComplete()
+                        ? 'bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] text-white hover:scale-[1.02] hover:shadow-[#8F87F1]/40'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }`}
+                    >
+                      {isFormComplete() ? (
+                        <div className="flex items-center justify-center space-x-3">
+                          <Activity className="h-5 w-5 animate-pulse" />
+                          <span>Initialize Cardiac Simulation</span>
+                        </div>
+                      ) : (
+                        <span>Configuration Incomplete</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
               )}
 
               {/* SAFETY TAB */}
@@ -464,8 +516,8 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5 text-center">Bio-Risk</span>
                 <div className={`px-3 py-1 rounded-full font-black text-sm tracking-widest ${(data.prediction?.probability ?? 0) > 70 ? 'bg-rose-50 text-rose-500' :
-                    (data.prediction?.probability ?? 0) > 40 ? 'bg-orange-50 text-orange-500' :
-                      'bg-emerald-50 text-emerald-500'
+                  (data.prediction?.probability ?? 0) > 40 ? 'bg-orange-50 text-orange-500' :
+                    'bg-emerald-50 text-emerald-500'
                   }`}>
                   {data.prediction?.probability ?? 0}%
                 </div>
@@ -498,8 +550,8 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                 key={tab.id}
                 onClick={() => setSimTab(tab.id as any)}
                 className={`flex items-center space-x-2 px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all duration-200 ${simTab === tab.id
-                    ? 'bg-white text-[#8F87F1] shadow-md scale-105'
-                    : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-white text-[#8F87F1] shadow-md scale-105'
+                  : 'text-gray-400 hover:text-gray-600'
                   }`}
               >
                 {tab.icon}
@@ -564,8 +616,8 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                       <p className="text-4xl font-black text-gray-800">{data.oldpeak} <span className="text-xs text-gray-400 uppercase">mm</span></p>
                     </div>
                     <div className={`p-4 rounded-2xl ${data.trend === "Worsening" ? "bg-rose-50 text-rose-500" :
-                        data.trend === "Improving" ? "bg-emerald-50 text-emerald-500" :
-                          "bg-gray-50 text-gray-500"
+                      data.trend === "Improving" ? "bg-emerald-50 text-emerald-500" :
+                        "bg-gray-50 text-gray-500"
                       }`}>
                       <p className="text-[8px] font-black uppercase mb-1">Functional Trend</p>
                       <p className="text-sm font-black">{data.trend.toUpperCase()} {data.trend === "Worsening" ? "📈" : data.trend === "Improving" ? "📉" : "➡️"}</p>
@@ -609,8 +661,8 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                   <div
                     key={index}
                     className={`p-6 rounded-3xl border transition-all hover:translate-y-[-4px] ${exercise.status === 'recommended' ? 'border-emerald-100 bg-emerald-50/30' :
-                        exercise.status === 'caution' ? 'border-orange-100 bg-orange-50/30' :
-                          'border-rose-100 bg-rose-50/30'
+                      exercise.status === 'caution' ? 'border-orange-100 bg-orange-50/30' :
+                        'border-rose-100 bg-rose-50/30'
                       }`}
                   >
                     <h4 className="text-lg font-black text-gray-800 mb-2">{exercise.type}</h4>
