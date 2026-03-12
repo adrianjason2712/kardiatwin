@@ -233,103 +233,111 @@ class PhysiologySimulationEngine:
         # 1. Select Sex Baseline
         ref = self.male_ref if self.sex == "1" else self.female_ref
         
-        hr_offset = 0.0
-        sbp_offset = 0.0
-        exercise_hr_mult = 1.0
-        exercise_sbp_mult = 1.0
-        recovery_efficiency = 1.0
+        self.hr_offset = 0.0
+        self.sbp_offset = 0.0
+        self.exercise_hr_mult = 1.0
+        self.exercise_sbp_mult = 1.0
+        self.recovery_efficiency = 1.0
         
         # 2. Apply Age Modifiers (>40y)
         if self.age > 40:
             years_over = self.age - 40
-            sbp_offset += years_over * 0.6
-            recovery_efficiency *= (1.0 - (years_over * 0.01))
+            self.sbp_offset += years_over * 0.6
+            self.recovery_efficiency *= (1.0 - (years_over * 0.01))
+            
+            # Post-65 Vascular Stiffness (ESBPR)
+            if self.age >= 65:
+                # Women over 65 have significantly higher vascular resistance
+                stiffness_mult = 1.25 if self.sex == "0" else 1.10
+                self.exercise_sbp_mult *= stiffness_mult
             
         # 3. Apply Activity Level
         if self.activity_level == "athlete":
-            hr_offset -= 15.0
-            sbp_offset -= 5.0
-            exercise_hr_mult *= 0.8
-            recovery_efficiency *= 2.0
+            self.hr_offset -= 15.0 if self.sex == "1" else 12.0
+            self.sbp_offset -= 5.0
+            self.exercise_hr_mult *= 0.80 if self.sex == "1" else 0.85
+            self.recovery_efficiency *= 2.0 if self.sex == "1" else 1.7
         elif self.activity_level == "sedentary":
-            hr_offset += 10.0
-            sbp_offset += 5.0
-            exercise_hr_mult *= 1.2
-            recovery_efficiency *= 0.85
+            self.hr_offset += 10.0 if self.sex == "1" else 12.0
+            self.sbp_offset += 5.0 if self.sex == "1" else 8.0
+            self.exercise_hr_mult *= 1.20 if self.sex == "1" else 1.25
+            self.recovery_efficiency *= 0.85 if self.sex == "1" else 0.80
             
         # 4. Apply Smoking
         if self.smoking_status == "smoker":
-            hr_offset += 8.0          # Literature: +7-10 BPM (Harte & Meston 2012)
-            sbp_offset += 10.0
-            exercise_hr_mult *= 0.9   # Blunted chronotropic response
-            recovery_efficiency *= 0.8
+            self.hr_offset += 8.0 if self.sex == "1" else 11.0
+            self.sbp_offset += 10.0
+            self.exercise_hr_mult *= 0.90 if self.sex == "1" else 0.82
+            self.recovery_efficiency *= 0.80 if self.sex == "1" else 0.70
         elif self.smoking_status == "ex_smoker":
-            hr_offset += 2.0
-            sbp_offset += 2.0
-            exercise_hr_mult *= 0.97
-            recovery_efficiency *= 0.95
+            self.hr_offset += 2.0 if self.sex == "1" else 4.0
+            self.sbp_offset += 2.0
+            self.exercise_hr_mult *= 0.97 if self.sex == "1" else 0.92
+            self.recovery_efficiency *= 0.95 if self.sex == "1" else 0.90
             
         # 5. Apply Diabetes
         if "type" in str(self.diabetes_history):
             if self.diabetes_history == "type_1":
-                hr_offset += 8.0
-                sbp_offset += 12.0
-                exercise_sbp_mult *= 1.25 # EEBP
-                recovery_efficiency *= 0.7
+                self.hr_offset += 8.0 if self.sex == "1" else 10.0
+                self.sbp_offset += 12.0 if self.sex == "1" else 15.0
+                self.exercise_sbp_mult *= 1.25 if self.sex == "1" else 1.45
+                self.recovery_efficiency *= 0.70 if self.sex == "1" else 0.65
             elif self.diabetes_history == "type_2":
-                hr_offset += 6.0
-                sbp_offset += 10.0
-                exercise_sbp_mult *= 1.15
-                recovery_efficiency *= 0.8
+                self.hr_offset += 6.0 if self.sex == "1" else 9.0
+                self.sbp_offset += 10.0 if self.sex == "1" else 12.0
+                self.exercise_sbp_mult *= 1.15 if self.sex == "1" else 1.35
+                self.recovery_efficiency *= 0.80 if self.sex == "1" else 0.75
                 
         # 6. Apply Alcohol
         if self.alcohol_consumption == "heavy":
-            hr_offset += 8.0          # Catecholamine surge, sympathetic activation
-            sbp_offset += 8.0
-            exercise_hr_mult *= 1.15  # Blunted cardiac output
-            exercise_sbp_mult *= 1.15
-            recovery_efficiency *= 0.80  # Impaired vagal tone recovery
+            self.hr_offset += 8.0 if self.sex == "1" else 12.0
+            self.sbp_offset += 8.0
+            self.exercise_hr_mult *= 1.15 if self.sex == "1" else 1.25
+            self.exercise_sbp_mult *= 1.15 if self.sex == "1" else 1.25
+            self.recovery_efficiency *= 0.80 if self.sex == "1" else 0.75
         elif self.alcohol_consumption == "moderate":
-            hr_offset += 2.0
-            sbp_offset += 2.0
-            exercise_hr_mult *= 1.05
-            exercise_sbp_mult *= 1.05
-            recovery_efficiency *= 0.98
+            self.hr_offset += 2.0 if self.sex == "1" else 4.0
+            self.sbp_offset += 2.0
+            self.exercise_hr_mult *= 1.05
+            self.exercise_sbp_mult *= 1.05
+            self.recovery_efficiency *= 0.98 if self.sex == "1" else 0.95
 
         # ── 7. INTERACTION EFFECTS (clinically mandatory) ──────────────
         # Heavy alcohol destroys athletic cardiac adaptation.
         # A heavy drinker CANNOT physiologically maintain athlete-level
         # resting HR (alcoholic cardiomyopathy, reduced VO2max, afib risk).
         if self.alcohol_consumption == "heavy" and self.activity_level == "athlete":
-            # Claw back ~70% of the athlete HR benefit — they can no longer
-            # sustain full cardiac adaptation under chronic alcohol toxicity.
-            hr_offset += 10.0         # Partial reversal of -15 athlete bonus
-            recovery_efficiency *= 0.75  # Massively impaired recovery
+            # Claw back ~70% of the athlete HR benefit
+            self.hr_offset += 10.0         # Partial reversal of -15 athlete bonus
+            self.recovery_efficiency *= 0.75  # Massively impaired recovery
 
         # Diabetes + Athlete: autonomic neuropathy blunts HR response
         if "type" in str(self.diabetes_history) and self.activity_level == "athlete":
-            hr_offset += 4.0          # Diabetic neuropathy reduces conditioning benefit
-            recovery_efficiency *= 0.85
+            self.hr_offset += 4.0          # Diabetic neuropathy reduces conditioning benefit
+            self.recovery_efficiency *= 0.85
 
         # Heavy alcohol + diabetes: worst combination for cardiac stress
         if self.alcohol_consumption == "heavy" and "type" in str(self.diabetes_history):
-            sbp_offset += 5.0
-            exercise_sbp_mult *= 1.10
+            self.sbp_offset += 5.0
+            self.exercise_sbp_mult *= 1.10
 
         # 7. Finalize Internal Constants
-        self.baseline_hr = ref["hr"] + hr_offset
-        self.baseline_sbp = ref["sbp"] + sbp_offset
-        self.max_hr = 220 - self.age
-        self.peak_sbp_cap = ref["peak_sbp"] + (sbp_offset if sbp_offset > 0 else 0)
+        self.baseline_hr = ref["hr"] + self.hr_offset
+        self.baseline_sbp = ref["sbp"] + self.sbp_offset
+        if self.sex == "0":  # Female (Gulati formula)
+            self.max_hr = 206 - (0.88 * self.age)
+        else:                # Male (Fox formula)
+            self.max_hr = 220 - self.age
+        self.peak_sbp_cap = ref["peak_sbp"] + (self.sbp_offset if self.sbp_offset > 0 else 0)
         
-        self.hr_increase_rate_per_min = 11.0 * exercise_hr_mult
-        self.sbp_increase_per_level = 12.0 * exercise_sbp_mult
-        self.recovery_rate_per_min = ref["recovery"] * recovery_efficiency
+        self.hr_increase_rate_per_min = 11.0 * self.exercise_hr_mult
+        self.sbp_increase_per_level = 12.0 * self.exercise_sbp_mult
+        self.recovery_rate_per_min = ref["recovery"] * self.recovery_efficiency
         
         # Compatibility Fields for UI/Analysis
-        self.hr_modifier = exercise_hr_mult
-        self.sbp_modifier = exercise_sbp_mult
-        self.recovery_modifier = recovery_efficiency
+        self.hr_modifier = self.exercise_hr_mult
+        self.sbp_modifier = self.exercise_sbp_mult
+        self.recovery_modifier = self.recovery_efficiency
         
         # Reset state to new baseline
         self.hr = self.baseline_hr

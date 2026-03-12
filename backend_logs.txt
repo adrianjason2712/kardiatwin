@@ -1,0 +1,13 @@
+2026-03-13 02:18:52,434 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-13 02:18:52,460 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-13 02:23:20,858 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-13 02:23:20,895 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-13 02:27:02,946 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-13 02:27:02,970 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-13 02:27:02,971 [INFO] [LOG] Digital Twin Calibrated: RR=17.0 BPM/min, Rest=75/115
+2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=68/138
+2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=11.9 BPM/min, Rest=75/133
+2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=5.8 BPM/min, Rest=102/172
+2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=3.7 BPM/min, Rest=120/173
+2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
+2026-03-13 02:27:02,977 [INFO] [LOG] Digital Twin Calibrated: RR=28.9 BPM/min, Rest=63/110

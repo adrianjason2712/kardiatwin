@@ -104,6 +104,7 @@ class UserProfile(Base):
     diabetes_history = Column(String(50), nullable=True)
     alcohol_consumption = Column(String(50), nullable=True)
     activity_level = Column(String(50), nullable=True)
+    pad_history = Column(String(10), nullable=True, default="none")
     
     # Bot Context / RAG Only (Non-simulation dependent)
     height = Column(Float, nullable=True) # in cm
@@ -130,6 +131,7 @@ class UserProfile(Base):
             "diabetes_history": self.diabetes_history,
             "alcohol_consumption": self.alcohol_consumption,
             "activity_level": self.activity_level,
+            "pad_history": self.pad_history,
             "height": self.height,
             "weight": self.weight,
             "family_history": self.family_history,
@@ -169,6 +171,7 @@ class SimulationSession(Base):
     diabetes_history = Column(String(20))
     alcohol_consumption = Column(String(20))
     activity_level = Column(String(20))
+    pad_history = Column(String(10), default="none")
 
     # Metadata and tags for analysis
     sim_metadata = Column(JSON, default={})  # Flexible metadata per simulation type

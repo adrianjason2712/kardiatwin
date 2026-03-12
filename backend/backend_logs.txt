@@ -220,3 +220,142 @@
 2026-03-12 22:23:34,243 [INFO] [SUCCESS] Simulation started: Age 24, non_smoker
 2026-03-12 22:23:34,265 [INFO] [SUCCESS] Saved Heart Age (23.0) for session 128
 2026-03-12 22:23:41,232 [INFO] [SUCCESS] Saved simulation 128: duration=6.6s, risk_score=68.0
+2026-03-12 23:27:03,000 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 23:27:10,158 [INFO] [SUCCESS] ML model loaded
+2026-03-12 23:27:10,183 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 23:27:10,273 [INFO] [SUCCESS] Database initialized
+2026-03-12 23:27:10,274 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 23:27:10,792 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 23:27:14,571 [INFO] [SUCCESS] ML model loaded
+2026-03-12 23:27:14,605 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 23:27:14,667 [INFO] [SUCCESS] Database initialized
+2026-03-12 23:27:14,669 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 23:28:47,545 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 23:28:51,425 [INFO] [SUCCESS] ML model loaded
+2026-03-12 23:28:51,451 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 23:28:51,517 [INFO] [SUCCESS] Database initialized
+2026-03-12 23:28:51,519 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 23:56:32,425 [INFO] [LOG] /start endpoint called
+2026-03-12 23:56:32,425 [INFO] [LOG] Request received: age=22, sex=1
+2026-03-12 23:56:32,426 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 23:56:32,426 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 23:56:32,426 [INFO] [LOG] Digital Twin Calibrated: RR=22.8 BPM/min, Rest=71/123
+2026-03-12 23:56:32,462 [INFO] [SUCCESS] Created simulation session 129 for user demo_user
+2026-03-12 23:56:32,462 [INFO] [SUCCESS] Simulation started: Age 22, non_smoker
+2026-03-12 23:56:32,586 [INFO] [SUCCESS] Saved Heart Age (21.0) for session 129
+2026-03-12 23:56:46,220 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-12 23:56:46,250 [INFO] [SUCCESS] Saved What-If analysis for session 129
+2026-03-13 00:08:54,017 [INFO] [SUCCESS] Saved simulation 129: duration=720.1s, risk_score=74.0
+2026-03-13 01:06:44,777 [INFO] [LOG] /start endpoint called
+2026-03-13 01:06:44,784 [INFO] [LOG] Request received: age=22, sex=1
+2026-03-13 01:06:44,786 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 01:06:44,793 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 01:06:44,797 [INFO] [LOG] Digital Twin Calibrated: RR=22.8 BPM/min, Rest=71/123
+2026-03-13 01:06:44,929 [INFO] [SUCCESS] Created simulation session 130 for user demo_user
+2026-03-13 01:06:44,930 [INFO] [SUCCESS] Simulation started: Age 22, non_smoker
+2026-03-13 01:06:44,983 [INFO] [SUCCESS] Saved Heart Age (21.0) for session 130
+2026-03-13 01:07:07,248 [INFO] [SUCCESS] Saved Heart Age (21.0) for session 130
+2026-03-13 01:07:07,254 [INFO] [SUCCESS] Saved Heart Age (21.0) for session 130
+2026-03-13 01:07:46,020 [INFO] [SUCCESS] Saved Heart Age (21.0) for session 130
+2026-03-13 01:07:55,747 [INFO] [SUCCESS] Saved simulation 130: duration=70.4s, risk_score=68.0
+2026-03-13 01:08:08,562 [INFO] [LOG] /start endpoint called
+2026-03-13 01:08:08,562 [INFO] [LOG] Request received: age=49, sex=1
+2026-03-13 01:08:08,562 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 01:08:08,564 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 01:08:08,564 [INFO] [LOG] Digital Twin Calibrated: RR=34.6 BPM/min, Rest=53/120
+2026-03-13 01:08:08,580 [INFO] [SUCCESS] Created simulation session 131 for user demo_user
+2026-03-13 01:08:08,580 [INFO] [SUCCESS] Simulation started: Age 49, non_smoker
+2026-03-13 01:08:08,609 [INFO] [SUCCESS] Saved Heart Age (46.0) for session 131
+2026-03-13 01:08:29,992 [INFO] [SUCCESS] Saved Heart Age (46.0) for session 131
+2026-03-13 01:08:29,997 [INFO] [SUCCESS] Saved Heart Age (46.0) for session 131
+2026-03-13 01:08:41,795 [INFO] [SUCCESS] Saved simulation 131: duration=33.0s, risk_score=66.0
+2026-03-13 01:08:56,644 [INFO] [LOG] /start endpoint called
+2026-03-13 01:08:56,644 [INFO] [LOG] Request received: age=77, sex=1
+2026-03-13 01:08:56,644 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 01:08:56,644 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 01:08:56,644 [INFO] [LOG] Digital Twin Calibrated: RR=23.9 BPM/min, Rest=53/137
+2026-03-13 01:08:56,665 [INFO] [SUCCESS] Created simulation session 132 for user demo_user
+2026-03-13 01:08:56,665 [INFO] [SUCCESS] Simulation started: Age 77, non_smoker
+2026-03-13 01:08:56,690 [INFO] [SUCCESS] Saved Heart Age (74.0) for session 132
+2026-03-13 01:09:06,090 [INFO] [SUCCESS] Saved simulation 132: duration=9.3s, risk_score=55.0
+2026-03-13 01:24:01,490 [INFO] [LOG] /start endpoint called
+2026-03-13 01:24:01,493 [INFO] [LOG] Request received: age=77, sex=1
+2026-03-13 01:24:01,494 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 01:24:01,496 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 01:24:01,496 [INFO] [LOG] Digital Twin Calibrated: RR=23.9 BPM/min, Rest=53/137
+2026-03-13 01:24:01,556 [INFO] [SUCCESS] Created simulation session 133 for user demo_user
+2026-03-13 01:24:01,556 [INFO] [SUCCESS] Simulation started: Age 77, non_smoker
+2026-03-13 01:24:01,627 [INFO] [SUCCESS] Saved Heart Age (74.0) for session 133
+2026-03-13 01:24:19,385 [INFO] [SUCCESS] Saved simulation 133: duration=17.5s, risk_score=55.0
+2026-03-13 02:17:31,775 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:17:39,999 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:17:40,028 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:17:40,124 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:17:40,125 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:17:44,211 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:17:44,238 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:17:44,415 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:17:44,416 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:17:44,857 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:17:51,796 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:17:51,826 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:17:51,934 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:17:51,935 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:23:27,904 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:23:33,168 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:23:33,197 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:23:33,384 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:23:33,384 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:23:51,070 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:23:55,400 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:23:55,425 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:23:55,485 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:23:55,486 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:24:06,386 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:24:10,868 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:24:10,912 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:24:10,984 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:24:10,986 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:29:33,511 [INFO] [LOG] /start endpoint called
+2026-03-13 02:29:33,511 [INFO] [LOG] Request received: age=34, sex=0
+2026-03-13 02:29:33,514 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 02:29:33,514 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 02:29:33,514 [INFO] [LOG] Digital Twin Calibrated: RR=20.2 BPM/min, Rest=74/120
+2026-03-13 02:29:33,598 [INFO] [SUCCESS] Created simulation session 134 for user demo_user
+2026-03-13 02:29:33,598 [INFO] [SUCCESS] Simulation started: Age 34, smoker
+2026-03-13 02:29:33,672 [INFO] [SUCCESS] Saved Heart Age (36.0) for session 134
+2026-03-13 02:29:45,955 [INFO] [SUCCESS] Saved Heart Age (36.0) for session 134
+2026-03-13 02:29:45,956 [INFO] [SUCCESS] Saved Heart Age (36.0) for session 134
+2026-03-13 02:29:59,205 [INFO] [LOG] Digital Twin Calibrated: RR=28.9 BPM/min, Rest=63/110
+2026-03-13 02:29:59,234 [INFO] [SUCCESS] Saved What-If analysis for session 134
+2026-03-13 02:36:25,068 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:36:30,405 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:36:30,432 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:36:30,518 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:36:30,518 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:36:44,324 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:36:47,938 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:36:47,962 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:36:48,023 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:36:48,024 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:36:58,227 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:37:01,895 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:37:01,918 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:37:01,984 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:37:01,986 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:37:08,044 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:37:11,508 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:37:11,529 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:37:11,587 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:37:11,593 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:37:44,081 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:37:48,009 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:37:48,032 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:37:48,090 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:37:48,093 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:37:56,227 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:37:59,895 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:37:59,916 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:37:59,979 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:37:59,980 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:38:04,011 [INFO] [SHUTDOWN] Shutting down...
