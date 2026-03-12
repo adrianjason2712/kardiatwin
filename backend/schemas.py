@@ -88,6 +88,7 @@ class SimulationSummary(BaseModel):
     diabetes_history: Optional[str] = None
     alcohol_consumption: Optional[str] = None
     activity_level: Optional[str] = None
+    pad_history: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -111,13 +112,14 @@ class SimulationList(BaseModel):
 class UserProfileBase(BaseModel):
     age: Optional[int] = Field(None, ge=18, le=105)
     sex: Optional[str] = None
-    cp: Optional[str] = None
-    fbs: Optional[str] = None
-    restecg: Optional[str] = None
     smoking_status: Optional[str] = None
     diabetes_history: Optional[str] = None
     alcohol_consumption: Optional[str] = None
     activity_level: Optional[str] = None
+    pad_history: Optional[str] = None
+    cp: Optional[str] = None
+    fbs: Optional[str] = None
+    restecg: Optional[str] = None
     
     # Bot Context Fields
     height: Optional[float] = None

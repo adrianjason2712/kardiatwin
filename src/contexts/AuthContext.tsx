@@ -5,6 +5,7 @@ interface User {
   id: number;
   username: string;
   email: string;
+  profile_name?: string;
   created_at: string;
 }
 

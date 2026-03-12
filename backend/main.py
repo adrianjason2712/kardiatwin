@@ -68,6 +68,10 @@ class ActivityLevel(str, Enum):
     ACTIVE = "active"
     ATHLETE = "athlete"
 
+class PADHistory(str, Enum):
+    NO_PAD = "no_pad"
+    PAD = "pad"
+
 # ==================== PYDANTIC MODELS ====================
 
 class SimulationConfig(BaseModel):
@@ -92,9 +96,9 @@ class SimulationConfig(BaseModel):
         return v
 
 class StartSimulationRequest(BaseModel):
-    age: int = Field(..., ge=18, le=100)
+    age: int = Field(..., ge=18, le=105)
     sex: str = Field(..., pattern="^[01]$")
-    cp: str = Field(..., pattern="^[0-3]$")
+    cp: str = Field("0", pattern="^[0-3]$")
     fbs: Optional[str] = "0"
     restecg: Optional[str] = "0"
     slope: Optional[str] = "1"
@@ -104,6 +108,7 @@ class StartSimulationRequest(BaseModel):
     diabetes_history: DiabetesHistory = DiabetesHistory.NONE
     alcohol_consumption: AlcoholConsumption = AlcoholConsumption.NONE
     activity_level: ActivityLevel = ActivityLevel.ACTIVE
+    pad_history: PADHistory = PADHistory.NO_PAD
     simulation: Optional[SimulationConfig] = None
     session_name: Optional[str] = None
 
@@ -112,6 +117,7 @@ class WhatIfInput(BaseModel):
     diabetes_history: Optional[DiabetesHistory] = None
     alcohol_consumption: Optional[AlcoholConsumption] = None
     activity_level: Optional[ActivityLevel] = None
+    pad_history: Optional[PADHistory] = None
 
 class ThresholdUpdate(BaseModel):
     heart_rate_high: Optional[float] = None
@@ -131,8 +137,8 @@ class PhysiologySimulationEngine:
         self.age = 50
         
         # Reference Constants (Healthy Adult <50)
-        self.male_ref = {"hr": 68.0, "sbp": 120.0, "recovery": 19.0, "peak_sbp": 220.0}
-        self.female_ref = {"hr": 75.0, "sbp": 115.0, "recovery": 17.0, "peak_sbp": 200.0}
+        self.male_ref = {"hr": 71.0, "sbp": 115.0, "recovery": 19.0, "peak_sbp": 220.0}
+        self.female_ref = {"hr": 78.0, "sbp": 110.0, "recovery": 17.0, "peak_sbp": 200.0}
         
         # Simulation State
         self.baseline_hr = 72.0
@@ -197,6 +203,7 @@ class PhysiologySimulationEngine:
         self.diabetes_history = "none"
         self.alcohol_consumption = "none"
         self.activity_level = "active"
+        self.pad_history = "no_pad"
 
         # Modifiers
         self.sbp_modifier = 1.0
@@ -237,7 +244,7 @@ class PhysiologySimulationEngine:
         self.sbp_offset = 0.0
         self.exercise_hr_mult = 1.0
         self.exercise_sbp_mult = 1.0
-        self.recovery_efficiency = 1.0
+        self.recovery_efficiency = 1.0 if self.sex == "1" else 0.85 # 0.85x Default Lag for Females
         
         # 2. Apply Age Modifiers (>40y)
         if self.age > 40:
@@ -261,6 +268,7 @@ class PhysiologySimulationEngine:
             self.hr_offset += 10.0 if self.sex == "1" else 12.0
             self.sbp_offset += 5.0 if self.sex == "1" else 8.0
             self.exercise_hr_mult *= 1.20 if self.sex == "1" else 1.25
+            self.exercise_sbp_mult *= 1.15 if self.sex == "1" else 1.25
             self.recovery_efficiency *= 0.85 if self.sex == "1" else 0.80
             
         # 4. Apply Smoking
@@ -302,7 +310,23 @@ class PhysiologySimulationEngine:
             self.exercise_sbp_mult *= 1.05
             self.recovery_efficiency *= 0.98 if self.sex == "1" else 0.95
 
-        # ── 7. INTERACTION EFFECTS (clinically mandatory) ──────────────
+        # ── 7. PATHOLOGY: PAD (Peripheral Artery Disease) ──────────────
+        if self.pad_history == "pad":
+            # Sympathetic & Vascular rest overload
+            self.hr_offset += 5.0
+            self.sbp_offset += 15.0
+            
+            # Exaggerated Pressor/Chronotropic Reflex
+            self.exercise_hr_mult *= 1.20 if self.sex == "1" else 1.35
+            self.exercise_sbp_mult *= 1.50
+            
+            # Ischemic Plateau (Massive oxygen debt & autonomic lag)
+            if self.sex == "0":
+                self.recovery_efficiency *= 0.40  # Constant high lag for PAD females
+            else:
+                self.recovery_efficiency *= 0.42 if self.age >= 65 else 0.50
+
+        # ── 8. INTERACTION EFFECTS (clinically mandatory) ──────────────
         # Heavy alcohol destroys athletic cardiac adaptation.
         # A heavy drinker CANNOT physiologically maintain athlete-level
         # resting HR (alcoholic cardiomyopathy, reduced VO2max, afib risk).
@@ -974,7 +998,6 @@ async def get_user_profile(current_user: User = Depends(get_current_user)):
     finally:
         close_db_session(db)
 
-
 @app.post("/api/profile", response_model=UserProfileResponse)
 async def update_user_profile(
     profile_data: UserProfileUpdate,
@@ -1247,6 +1270,7 @@ async def start_simulation(
         state.engine.diabetes_history = req.diabetes_history.value
         state.engine.alcohol_consumption = req.alcohol_consumption.value
         state.engine.activity_level = req.activity_level.value
+        state.engine.pad_history = req.pad_history.value
 
         state.engine.apply_modifiers()
 
@@ -1269,7 +1293,8 @@ async def start_simulation(
                 smoking_status=req.smoking_status.value,
                 diabetes_history=req.diabetes_history.value,
                 alcohol_consumption=req.alcohol_consumption.value,
-                activity_level=req.activity_level.value
+                activity_level=req.activity_level.value,
+                pad_history=req.pad_history.value
             )
             db.add(db_session)
             db.commit()
@@ -1468,6 +1493,7 @@ async def what_if(
                     current_engine.diabetes_history = profile.diabetes_history if profile.diabetes_history else "none"
                     current_engine.alcohol_consumption = profile.alcohol_consumption if profile.alcohol_consumption else "none"
                     current_engine.activity_level = profile.activity_level if profile.activity_level else "active"
+                    current_engine.pad_history = profile.pad_history if profile.pad_history else "no_pad"
                 
                 current_engine.apply_modifiers()
                 source = "Saved History"
@@ -1494,6 +1520,7 @@ async def what_if(
     hyp.diabetes_history = (req.diabetes_history.value if req.diabetes_history and req.diabetes_history != "" else current_engine.diabetes_history)
     hyp.alcohol_consumption = (req.alcohol_consumption.value if req.alcohol_consumption and req.alcohol_consumption != "" else current_engine.alcohol_consumption)
     hyp.activity_level = (req.activity_level.value if req.activity_level and req.activity_level != "" else current_engine.activity_level)
+    hyp.pad_history = (req.pad_history.value if req.pad_history and req.pad_history != "" else current_engine.pad_history)
     
     # Re-apply all modifiers to the clone
     hyp.apply_modifiers()
@@ -1589,7 +1616,8 @@ async def biological_age():
         "diabetes": 0,
         "activity": 0,
         "bp": 0,
-        "alcohol": 0
+        "alcohol": 0,
+        "pad": 0
     }
 
     if state.engine.smoking_status == "smoker":
@@ -1612,6 +1640,9 @@ async def biological_age():
     
     if state.engine.alcohol_consumption == "heavy":
         impacts["alcohol"] = 2.0
+        
+    if state.engine.pad_history == "pad":
+        impacts["pad"] = 15.0  # PAD is a severe vascular age accelerator
 
     total_adjustment = sum(impacts.values())
     heart_age = age + total_adjustment

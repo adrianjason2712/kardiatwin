@@ -11,6 +11,7 @@ interface UserProfile {
     diabetes_history?: string;
     alcohol_consumption?: string;
     activity_level?: string;
+    pad_history?: string;
     // Context Fields
     height?: number;
     weight?: number;
@@ -248,6 +249,11 @@ export function ProfilePage() {
                                 { value: 'type_1', label: 'Type 1 Diabetes' },
                                 { value: 'type_2', label: 'Type 2 Diabetes' }
                             ])}
+
+                            {renderSelect('Peripheral Artery Disease', 'pad_history', [
+                                { value: 'no_pad', label: 'No PAD' },
+                                { value: 'pad', label: 'PAD Diagnosed' }
+                            ], "Baseline vascular status.")}
 
                             <div className="group">
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Family Cardiac History</label>

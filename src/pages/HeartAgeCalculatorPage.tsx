@@ -14,6 +14,7 @@ interface HeartAgeData {
     activity: number;
     bp: number;
     alcohol: number;
+    pad: number;
   };
 }
 

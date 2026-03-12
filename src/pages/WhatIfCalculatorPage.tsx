@@ -39,7 +39,8 @@ export const WhatIfCalculatorPage: React.FC<WhatIfCalculatorPageProps> = ({
     smoking_status: userData?.smoking_status || '',
     diabetes_history: userData?.diabetes_history || '',
     alcohol_consumption: userData?.alcohol_consumption || '',
-    activity_level: userData?.activity_level || ''
+    activity_level: userData?.activity_level || '',
+    pad_history: userData?.pad_history || 'no_pad'
   });
 
   const [whatIfResults, setWhatIfResults] = useState<WhatIfResults | null>(null);
@@ -206,6 +207,29 @@ export const WhatIfCalculatorPage: React.FC<WhatIfCalculatorPageProps> = ({
                     >
                       <span className="text-xl mb-1">{opt.icon}</span>
                       <span className={`text-[9px] font-black uppercase ${whatIfChanges.alcohol_consumption === opt.id ? 'text-[#8F87F1]' : 'text-gray-500'}`}>{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* PAD Selection */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Vascular Status (PAD)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'no_pad', label: 'No PAD (Managed)', impact: 'Clear' },
+                    { id: 'pad', label: 'PAD Diagnosed', impact: 'Resistance' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setWhatIfChanges({ ...whatIfChanges, pad_history: opt.id })}
+                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${whatIfChanges.pad_history === opt.id
+                        ? 'border-[#8F87F1] bg-[#8F87F1]/5 shadow-sm scale-[1.02]'
+                        : 'border-gray-50 bg-gray-50/50 hover:bg-gray-100/50 hover:border-gray-200'
+                        }`}
+                    >
+                      <span className={`font-black text-[10px] uppercase ${whatIfChanges.pad_history === opt.id ? 'text-[#8F87F1]' : 'text-gray-700'}`}>{opt.label}</span>
+                      <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${opt.id === 'none' ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-500'}`}>{opt.impact}</span>
                     </button>
                   ))}
                 </div>

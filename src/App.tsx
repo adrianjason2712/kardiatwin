@@ -39,12 +39,12 @@ interface UserData {
   fbs: string;
   restecg: string;
   slope: string;
-  protocol: string;  // Add protocol selection
-  // Lifestyle & History parameters
-  smoking_status?: string;  // "non_smoker" | "smoker" | "ex_smoker"
-  diabetes_history?: string;  // "none" | "type_1" | "type_2"
-  alcohol_consumption?: string;  // "none" | "moderate" | "heavy"
-  activity_level?: string;  // "sedentary" | "active" | "athlete"
+  smoking_status: string;
+  diabetes_history: string;
+  alcohol_consumption: string;
+  activity_level: string;
+  pad_history: string;
+  protocol: string;
 }
 
 interface SimulationData {
@@ -96,11 +96,12 @@ function App() {
     fbs: '0',
     restecg: '0',
     slope: '1',
-    protocol: 'Standard Bruce', // Default to Standard Bruce
     smoking_status: 'non_smoker',
     diabetes_history: 'none',
     alcohol_consumption: 'none',
-    activity_level: 'active'
+    activity_level: 'active',
+    pad_history: 'no_pad',
+    protocol: ''
   });
 
   const [data, setData] = useState<SimulationData>({
@@ -169,13 +170,11 @@ function App() {
               ...prev,
               age: res.data.age?.toString() || prev.age,
               sex: res.data.sex || prev.sex,
-              cp: res.data.cp || prev.cp,
-              fbs: res.data.fbs || prev.fbs,
-              restecg: res.data.restecg || prev.restecg,
               smoking_status: res.data.smoking_status || prev.smoking_status,
               diabetes_history: res.data.diabetes_history || prev.diabetes_history,
               alcohol_consumption: res.data.alcohol_consumption || prev.alcohol_consumption,
               activity_level: res.data.activity_level || prev.activity_level,
+              pad_history: res.data.pad_history || prev.pad_history,
             }));
           }
         })
@@ -294,6 +293,7 @@ function App() {
         diabetes_history: userData.diabetes_history,
         alcohol_consumption: userData.alcohol_consumption,
         activity_level: userData.activity_level,
+        pad_history: userData.pad_history,
         simulation: {
           protocol: protocolMap[userData.protocol as keyof typeof protocolMap] || "standard"
         }
@@ -1041,7 +1041,8 @@ function App() {
                   </div>
                 </div>
 
-                {/* Chest Pain Type Section */}
+
+                {/* Protocol Selection Section */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">Chest Pain Type</h2>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1051,20 +1052,6 @@ function App() {
                       onClick={() => setUserData({ ...userData, cp: "0" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Typical Angina</div>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Triggered by exertion
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Relieved by rest
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Pressure/squeezing
-                        </li>
-                      </ul>
                     </div>
                     <div
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "1" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
@@ -1072,20 +1059,6 @@ function App() {
                       onClick={() => setUserData({ ...userData, cp: "1" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Atypical Angina</div>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          May occur at rest
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Different sensations
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Common in women
-                        </li>
-                      </ul>
                     </div>
                     <div
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "2" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
@@ -1093,20 +1066,6 @@ function App() {
                       onClick={() => setUserData({ ...userData, cp: "2" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Non-Anginal Pain</div>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Not heart-related
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Sharp/stabbing
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Localized pain
-                        </li>
-                      </ul>
                     </div>
                     <div
                       className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${userData.cp === "3" ? 'border-[#8F87F1] bg-[#8F87F1] bg-opacity-5 scale-105' : 'border-gray-200 hover:border-[#8F87F1] hover:bg-[#8F87F1] hover:bg-opacity-5'
@@ -1114,20 +1073,6 @@ function App() {
                       onClick={() => setUserData({ ...userData, cp: "3" })}
                     >
                       <div className="font-medium text-gray-700 text-center mb-2">Asymptomatic</div>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          No chest pain
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          May have other symptoms
-                        </li>
-                        <li className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                          Risk factors present
-                        </li>
-                      </ul>
                     </div>
                   </div>
                 </div>

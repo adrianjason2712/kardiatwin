@@ -97,14 +97,16 @@ class UserProfile(Base):
     
     age = Column(Integer, nullable=True)
     sex = Column(String(10), nullable=True)
-    cp = Column(String(10), nullable=True)
-    fbs = Column(String(10), nullable=True)
-    restecg = Column(String(10), nullable=True)
     smoking_status = Column(String(50), nullable=True)
     diabetes_history = Column(String(50), nullable=True)
     alcohol_consumption = Column(String(50), nullable=True)
     activity_level = Column(String(50), nullable=True)
-    pad_history = Column(String(10), nullable=True, default="none")
+    pad_history = Column(String(10), nullable=True, default="no_pad")
+    
+    # Restoring clinical fields roll back
+    cp = Column(String(10), nullable=True)
+    fbs = Column(String(10), nullable=True)
+    restecg = Column(String(10), nullable=True)
     
     # Bot Context / RAG Only (Non-simulation dependent)
     height = Column(Float, nullable=True) # in cm
@@ -124,14 +126,14 @@ class UserProfile(Base):
             "user_id": self.user_id,
             "age": self.age,
             "sex": self.sex,
-            "cp": self.cp,
-            "fbs": self.fbs,
-            "restecg": self.restecg,
             "smoking_status": self.smoking_status,
             "diabetes_history": self.diabetes_history,
             "alcohol_consumption": self.alcohol_consumption,
             "activity_level": self.activity_level,
             "pad_history": self.pad_history,
+            "cp": self.cp,
+            "fbs": self.fbs,
+            "restecg": self.restecg,
             "height": self.height,
             "weight": self.weight,
             "family_history": self.family_history,
@@ -171,7 +173,7 @@ class SimulationSession(Base):
     diabetes_history = Column(String(20))
     alcohol_consumption = Column(String(20))
     activity_level = Column(String(20))
-    pad_history = Column(String(10), default="none")
+    pad_history = Column(String(10), default="no_pad")
 
     # Metadata and tags for analysis
     sim_metadata = Column(JSON, default={})  # Flexible metadata per simulation type

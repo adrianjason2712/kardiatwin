@@ -109,7 +109,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                     }`}
                 >
                   <span>Basic Information</span>
-                  <span className={`flex items-center justify-center h-6 px-2 rounded-full text-[10px] font-black ${userData.age !== '' && userData.sex !== '' && userData.cp !== '' && userData.protocol !== ''
+                  <span className={`flex items-center justify-center h-6 px-2 rounded-full text-[10px] font-black ${userData.age !== '' && userData.sex !== '' && userData.protocol !== ''
                     ? 'bg-emerald-100 text-emerald-700'
                     : 'bg-orange-100 text-orange-700'
                     }`}>
@@ -390,6 +390,35 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                             {userData.activity_level === option.value && (
                               <div className="absolute top-1 right-1">
                                 <CheckCircle2 className="h-3 w-3 text-[#C68EFD]" />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* PAD Status */}
+                    <div className="space-y-3">
+                      <label className="flex items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <Activity className="h-3 w-3 mr-2 text-[#8F87F1]" /> Peripheral Artery Disease
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'none', label: 'No PAD' },
+                          { value: 'pad', label: 'PAD Diagnosed' }
+                        ].map((option) => (
+                          <div
+                            key={option.value}
+                            className={`group relative overflow-hidden p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-center ${userData.pad_history === option.value
+                              ? 'border-[#8F87F1] bg-gradient-to-br from-[#8F87F1]/5 to-[#C68EFD]/5 shadow-sm scale-[1.02]'
+                              : 'border-gray-100 hover:border-[#8F87F1]/30 hover:bg-gray-50/50'
+                              }`}
+                            onClick={() => setUserData({ ...userData, pad_history: option.value })}
+                          >
+                            <div className={`text-xs font-bold transition-colors ${userData.pad_history === option.value ? 'text-[#8F87F1]' : 'text-gray-600 group-hover:text-gray-900'}`}>{option.label}</div>
+                            {userData.pad_history === option.value && (
+                              <div className="absolute top-1 right-1">
+                                <CheckCircle2 className="h-3 w-3 text-[#8F87F1]" />
                               </div>
                             )}
                           </div>

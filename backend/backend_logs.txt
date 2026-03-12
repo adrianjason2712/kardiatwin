@@ -359,3 +359,218 @@
 2026-03-13 02:37:59,979 [INFO] [SUCCESS] Database initialized
 2026-03-13 02:37:59,980 [INFO] [SUCCESS] Simulation thread started
 2026-03-13 02:38:04,011 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:38:07,818 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:38:07,841 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:38:07,909 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:38:07,909 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 02:38:12,116 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 02:38:16,166 [INFO] [SUCCESS] ML model loaded
+2026-03-13 02:38:16,194 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 02:38:16,251 [INFO] [SUCCESS] Database initialized
+2026-03-13 02:38:16,253 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:11:44,241 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:11:51,034 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:11:51,067 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:11:51,152 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:11:51,153 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:11:52,431 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:11:56,247 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:11:56,272 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:11:56,329 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:11:56,330 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:12:01,584 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:12:05,420 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:12:05,449 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:12:05,510 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:12:05,511 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:12:44,352 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:12:48,084 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:12:48,107 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:12:48,172 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:12:48,172 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:14:28,750 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:14:28,775 [INFO] [LOG] Digital Twin Calibrated: RR=12.8 BPM/min, Rest=75/130
+2026-03-13 03:14:28,776 [INFO] [LOG] Digital Twin Calibrated: RR=5.1 BPM/min, Rest=80/145
+2026-03-13 03:14:28,777 [INFO] [LOG] Digital Twin Calibrated: RR=8.5 BPM/min, Rest=80/130
+2026-03-13 03:14:28,778 [INFO] [LOG] Digital Twin Calibrated: RR=6.0 BPM/min, Rest=73/150
+2026-03-13 03:14:40,450 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:14:40,475 [INFO] [LOG] Digital Twin Calibrated: RR=12.8 BPM/min, Rest=75/130
+2026-03-13 03:14:40,477 [INFO] [LOG] Digital Twin Calibrated: RR=5.1 BPM/min, Rest=80/145
+2026-03-13 03:14:40,479 [INFO] [LOG] Digital Twin Calibrated: RR=8.5 BPM/min, Rest=80/130
+2026-03-13 03:14:40,479 [INFO] [LOG] Digital Twin Calibrated: RR=6.0 BPM/min, Rest=73/150
+2026-03-13 03:17:18,858 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:17:18,882 [INFO] [LOG] Digital Twin Calibrated: RR=12.8 BPM/min, Rest=75/130
+2026-03-13 03:17:18,883 [INFO] [LOG] Digital Twin Calibrated: RR=5.1 BPM/min, Rest=80/145
+2026-03-13 03:17:18,883 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=73/135
+2026-03-13 03:17:18,883 [INFO] [LOG] Digital Twin Calibrated: RR=6.0 BPM/min, Rest=73/150
+2026-03-13 03:17:39,760 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:17:44,734 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:17:44,762 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:17:44,828 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:17:44,830 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:17:50,897 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:17:50,919 [INFO] [LOG] Digital Twin Calibrated: RR=12.8 BPM/min, Rest=75/130
+2026-03-13 03:17:50,920 [INFO] [LOG] Digital Twin Calibrated: RR=5.1 BPM/min, Rest=80/145
+2026-03-13 03:17:50,920 [INFO] [LOG] Digital Twin Calibrated: RR=9.5 BPM/min, Rest=73/135
+2026-03-13 03:17:50,920 [INFO] [LOG] Digital Twin Calibrated: RR=6.0 BPM/min, Rest=73/150
+2026-03-13 03:21:43,743 [ERROR] Profile update error: (psycopg2.errors.UndefinedColumn) column user_profiles.pad_history does not exist
+LINE 1: ...s.activity_level AS user_profiles_activity_level, user_profi...
+                                                             ^
+
+[SQL: SELECT user_profiles.id AS user_profiles_id, user_profiles.user_id AS user_profiles_user_id, user_profiles.age AS user_profiles_age, user_profiles.sex AS user_profiles_sex, user_profiles.cp AS user_profiles_cp, user_profiles.fbs AS user_profiles_fbs, user_profiles.restecg AS user_profiles_restecg, user_profiles.smoking_status AS user_profiles_smoking_status, user_profiles.diabetes_history AS user_profiles_diabetes_history, user_profiles.alcohol_consumption AS user_profiles_alcohol_consumption, user_profiles.activity_level AS user_profiles_activity_level, user_profiles.pad_history AS user_profiles_pad_history, user_profiles.height AS user_profiles_height, user_profiles.weight AS user_profiles_weight, user_profiles.family_history AS user_profiles_family_history, user_profiles.allergies AS user_profiles_allergies, user_profiles.created_at AS user_profiles_created_at, user_profiles.updated_at AS user_profiles_updated_at 
+FROM user_profiles 
+WHERE user_profiles.user_id = %(user_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'user_id_1': 6, 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-03-13 03:23:02,964 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:23:08,021 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:23:08,047 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:23:08,108 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:23:08,109 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:25:27,762 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:25:32,222 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:25:32,248 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:25:32,307 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:25:32,309 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:25:41,365 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:25:41,394 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=78/125
+2026-03-13 03:25:41,395 [INFO] [LOG] Digital Twin Calibrated: RR=4.3 BPM/min, Rest=83/140
+2026-03-13 03:25:41,395 [INFO] [LOG] Digital Twin Calibrated: RR=9.5 BPM/min, Rest=76/130
+2026-03-13 03:25:41,395 [INFO] [LOG] Digital Twin Calibrated: RR=6.0 BPM/min, Rest=76/145
+2026-03-13 03:26:04,144 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:26:04,172 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-13 03:26:04,172 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78/110
+2026-03-13 03:26:04,172 [INFO] [LOG] Digital Twin Calibrated: RR=4.3 BPM/min, Rest=83/140
+2026-03-13 03:26:04,172 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89/120
+2026-03-13 03:26:14,408 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:26:14,432 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-13 03:26:14,435 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78/110
+2026-03-13 03:26:14,435 [INFO] [LOG] Digital Twin Calibrated: RR=4.3 BPM/min, Rest=83/140
+2026-03-13 03:26:14,436 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89/120
+2026-03-13 03:26:58,203 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:26:58,230 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-13 03:26:58,232 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78/110
+2026-03-13 03:26:58,233 [INFO] [LOG] Digital Twin Calibrated: RR=4.3 BPM/min, Rest=83/140
+2026-03-13 03:26:58,233 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89/120
+2026-03-13 03:26:58,236 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56/110
+2026-03-13 03:27:30,975 [ERROR] Profile update error: (psycopg2.errors.UndefinedColumn) column user_profiles.pad_history does not exist
+LINE 1: ...s.activity_level AS user_profiles_activity_level, user_profi...
+                                                             ^
+
+[SQL: SELECT user_profiles.id AS user_profiles_id, user_profiles.user_id AS user_profiles_user_id, user_profiles.age AS user_profiles_age, user_profiles.sex AS user_profiles_sex, user_profiles.cp AS user_profiles_cp, user_profiles.fbs AS user_profiles_fbs, user_profiles.restecg AS user_profiles_restecg, user_profiles.smoking_status AS user_profiles_smoking_status, user_profiles.diabetes_history AS user_profiles_diabetes_history, user_profiles.alcohol_consumption AS user_profiles_alcohol_consumption, user_profiles.activity_level AS user_profiles_activity_level, user_profiles.pad_history AS user_profiles_pad_history, user_profiles.height AS user_profiles_height, user_profiles.weight AS user_profiles_weight, user_profiles.family_history AS user_profiles_family_history, user_profiles.allergies AS user_profiles_allergies, user_profiles.created_at AS user_profiles_created_at, user_profiles.updated_at AS user_profiles_updated_at 
+FROM user_profiles 
+WHERE user_profiles.user_id = %(user_id_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'user_id_1': 6, 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-03-13 03:34:40,683 [INFO] [LOG] /start endpoint called
+2026-03-13 03:34:40,685 [INFO] [LOG] Request received: age=26, sex=1
+2026-03-13 03:34:40,687 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 03:34:40,689 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 03:34:40,690 [INFO] [LOG] Digital Twin Calibrated: RR=4.1 BPM/min, Rest=108/168
+2026-03-13 03:34:40,874 [INFO] [SUCCESS] Created simulation session 135 for user demo_user
+2026-03-13 03:34:40,874 [INFO] [SUCCESS] Simulation started: Age 26, smoker
+2026-03-13 03:34:41,026 [INFO] [SUCCESS] Saved Heart Age (56.0) for session 135
+2026-03-13 03:41:32,552 [INFO] [SUCCESS] Saved Heart Age (56.0) for session 135
+2026-03-13 03:41:32,572 [INFO] [SUCCESS] Saved Heart Age (56.0) for session 135
+2026-03-13 03:41:37,425 [INFO] [LOG] Digital Twin Calibrated: RR=9.5 BPM/min, Rest=76/130
+2026-03-13 03:41:37,503 [INFO] [SUCCESS] Saved What-If analysis for session 135
+2026-03-13 03:41:39,479 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:41:46,880 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:41:46,909 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:41:47,003 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:41:47,004 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:41:54,277 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=79/127
+2026-03-13 03:41:54,277 [INFO] [LOG] Digital Twin Calibrated: RR=4.1 BPM/min, Rest=108/168
+2026-03-13 03:42:09,408 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=79/127
+2026-03-13 03:42:09,408 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-13 03:42:14,978 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=79/127
+2026-03-13 03:42:14,978 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-13 03:42:17,847 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=79/127
+2026-03-13 03:42:17,849 [INFO] [LOG] Digital Twin Calibrated: RR=9.5 BPM/min, Rest=76/130
+2026-03-13 03:48:11,000 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:48:17,349 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:48:17,390 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:48:17,462 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:48:17,464 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:52:12,911 [INFO] [DEBUG] Profile update data received: {'age': 23, 'sex': '1', 'cp': '1', 'fbs': '0', 'restecg': '0', 'smoking_status': 'non_smoker', 'diabetes_history': 'type_1', 'alcohol_consumption': 'none', 'activity_level': 'active', 'pad_history': 'none', 'height': 176.0, 'weight': 68.0, 'family_history': 'dad has 30 percent block he is 54', 'allergies': 'nil', 'profile_name': 'demo_user'}
+2026-03-13 03:53:48,766 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:54:00,279 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:54:00,320 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:54:00,529 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:54:00,530 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:55:37,152 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:55:43,898 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:55:43,933 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:55:44,128 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:55:44,128 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 03:58:38,821 [INFO] [DEBUG] Raw Pydantic Model: age=23 sex='1' cp='1' fbs='0' restecg='0' smoking_status='non_smoker' diabetes_history='type_1' alcohol_consumption='none' activity_level='active' pad_history='pad' height=176.0 weight=68.0 family_history='dad has 30 percent block he is 54' allergies='nil' profile_name='demo_user'
+2026-03-13 03:58:38,841 [INFO] [DEBUG] Profile update data received: {'age': 23, 'sex': '1', 'cp': '1', 'fbs': '0', 'restecg': '0', 'smoking_status': 'non_smoker', 'diabetes_history': 'type_1', 'alcohol_consumption': 'none', 'activity_level': 'active', 'pad_history': 'pad', 'height': 176.0, 'weight': 68.0, 'family_history': 'dad has 30 percent block he is 54', 'allergies': 'nil', 'profile_name': 'demo_user'}
+2026-03-13 03:59:01,826 [INFO] [DEBUG] Raw Pydantic Model: age=23 sex='1' cp='1' fbs='0' restecg='0' smoking_status='non_smoker' diabetes_history='type_1' alcohol_consumption='none' activity_level='active' pad_history='none' height=176.0 weight=68.0 family_history='dad has 30 percent block he is 54' allergies='nil' profile_name='demo_user'
+2026-03-13 03:59:01,833 [INFO] [DEBUG] Profile update data received: {'age': 23, 'sex': '1', 'cp': '1', 'fbs': '0', 'restecg': '0', 'smoking_status': 'non_smoker', 'diabetes_history': 'type_1', 'alcohol_consumption': 'none', 'activity_level': 'active', 'pad_history': 'none', 'height': 176.0, 'weight': 68.0, 'family_history': 'dad has 30 percent block he is 54', 'allergies': 'nil', 'profile_name': 'demo_user'}
+2026-03-13 03:59:25,802 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 03:59:34,391 [INFO] [SUCCESS] ML model loaded
+2026-03-13 03:59:34,440 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 03:59:34,575 [INFO] [SUCCESS] Database initialized
+2026-03-13 03:59:34,575 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:00:17,519 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:00:26,068 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:00:26,109 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:00:26,343 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:00:26,343 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:00:31,454 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:00:31,493 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:00:31,577 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:00:31,577 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:00:38,282 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:00:44,806 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:00:44,869 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:00:44,985 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:00:44,985 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:03:33,069 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:03:43,371 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:03:43,410 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:03:43,694 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:03:43,694 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:05:29,707 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:05:39,553 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:05:39,610 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:05:39,744 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:05:39,744 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:08:48,534 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:08:56,174 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:08:56,244 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:08:56,527 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:08:56,528 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:09:17,768 [INFO] [LOG] /start endpoint called
+2026-03-13 04:09:17,768 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-13 04:09:17,768 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:09:17,768 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:09:17,768 [ERROR] Error: 'StartSimulationRequest' object has no attribute 'cp'
+2026-03-13 04:09:36,635 [INFO] [LOG] /start endpoint called
+2026-03-13 04:09:36,636 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-13 04:09:36,636 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:09:36,637 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:09:36,637 [ERROR] Error: 'StartSimulationRequest' object has no attribute 'cp'
+2026-03-13 04:10:19,055 [INFO] [LOG] /start endpoint called
+2026-03-13 04:10:19,056 [INFO] [LOG] Request received: age=38, sex=1
+2026-03-13 04:10:19,056 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:10:19,056 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:10:19,058 [ERROR] Error: 'StartSimulationRequest' object has no attribute 'cp'
+2026-03-13 04:11:06,260 [INFO] [LOG] /start endpoint called
+2026-03-13 04:11:06,261 [INFO] [LOG] Request received: age=31, sex=1
+2026-03-13 04:11:06,261 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:11:06,262 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:11:06,262 [ERROR] Error: 'StartSimulationRequest' object has no attribute 'cp'
+2026-03-13 04:13:07,838 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:13:17,396 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:13:17,441 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:13:17,534 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:13:17,535 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:13:20,644 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:13:26,384 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:13:26,432 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:13:26,544 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:13:26,544 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:14:44,730 [INFO] [SHUTDOWN] Shutting down...
