@@ -4,6 +4,7 @@ import { User, Save, CheckCircle2, AlertCircle, Shield, UserCircle, HelpCircle, 
 import { useAuth } from '../contexts/AuthContext';
 
 interface UserProfile {
+    profile_name?: string;
     age?: number;
     sex?: string;
     smoking_status?: string;
@@ -153,7 +154,9 @@ export function ProfilePage() {
                             {user?.username ? user.username.charAt(0).toUpperCase() : <User size={40} />}
                         </div>
                         <div className="text-center sm:text-left mt-4 sm:mt-0 pb-2 flex-1">
-                            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Medical Passport</h1>
+                            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                                {user?.profile_name || user?.username || 'Medical Passport'}
+                            </h1>
                             <p className="text-gray-500 font-medium flex items-center justify-center sm:justify-start space-x-2 mt-1">
                                 <Shield className="h-4 w-4 text-emerald-500" />
                                 <span>HIPAA Compliant • User Baseline Profile</span>
@@ -184,23 +187,23 @@ export function ProfilePage() {
                             </div>
                         </div>
 
-                        <div className="space-y-5">
-                            {renderInput('Chronological Age', 'age', 'number', 'e.g. 45', "Your current age.")}
-
-                            <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {renderInput('Age', 'age', 'number', 'Enter your age', 'Age helps in standardizing cardiac response predictions')}
                                 {renderSelect('Biological Sex', 'sex', [
                                     { value: '1', label: 'Male' },
                                     { value: '0', label: 'Female' }
                                 ], "Fixed physiological parameter.")}
-
-                                {renderInput('Height (cm)', 'height', 'number', 'e.g. 175')}
                             </div>
 
-                            {renderInput('Weight (kg)', 'weight', 'number', 'e.g. 70')}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {renderInput('Height (cm)', 'height', 'number', 'e.g. 175')}
+                                {renderInput('Weight (kg)', 'weight', 'number', 'e.g. 70')}
+                            </div>
 
-                            <div className="pt-4 border-t border-gray-100">
+                            <div className="pt-6 border-t border-gray-100">
                                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Baseline Lifestyle</h4>
-                                <div className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {renderSelect('Activity Level', 'activity_level', [
                                         { value: 'sedentary', label: 'Sedentary (No regular exercise)' },
                                         { value: 'active', label: 'Active (Regular activity)' },

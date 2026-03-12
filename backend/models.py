@@ -62,6 +62,7 @@ class User(Base):
     username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String(120), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
+    profile_name = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     last_login = Column(DateTime, nullable=True)
     is_active = Column(Boolean, default=True)
@@ -162,6 +163,12 @@ class SimulationSession(Base):
     # Patient demographics
     patient_age = Column(Integer)
     patient_gender = Column(String(10))  # M, F
+
+    # Lifestyle factors (Snapshot at time of test)
+    smoking_status = Column(String(20))
+    diabetes_history = Column(String(20))
+    alcohol_consumption = Column(String(20))
+    activity_level = Column(String(20))
 
     # Metadata and tags for analysis
     sim_metadata = Column(JSON, default={})  # Flexible metadata per simulation type

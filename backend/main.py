@@ -24,16 +24,26 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# File Handler
+file_handler = logging.FileHandler("backend_logs.txt", mode="a")
+file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger.addHandler(file_handler)
+
+# Stream Handler (ensure it shows in uvicorn too)
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger.addHandler(stream_handler)
 
 # Load ML Model
 try:
     with open('heart_model.pkl', 'rb') as file:
         heart_model, scaler = pickle.load(file)
-    logger.info("✓ ML model loaded")
+    logger.info("[SUCCESS] ML model loaded")
 except Exception as e:
-    logger.error(f"✗ Failed to load ML model: {e}")
+    logger.error(f"[ERROR] Failed to load ML model: {e}")
     heart_model, scaler = None, None
 
 # ==================== ENUMS ====================
@@ -116,13 +126,20 @@ class PhysiologySimulationEngine:
     """Cardiac stress test simulator"""
 
     def __init__(self, config=None):
-        # Baselines
+        # Clinical Baselines (Phase 1)
+        self.sex = "1"  # "1"=Male, "0"=Female
+        self.age = 50
+        
+        # Reference Constants (Healthy Adult <50)
+        self.male_ref = {"hr": 68.0, "sbp": 120.0, "recovery": 19.0, "peak_sbp": 220.0}
+        self.female_ref = {"hr": 75.0, "sbp": 115.0, "recovery": 17.0, "peak_sbp": 200.0}
+        
+        # Simulation State
         self.baseline_hr = 72.0
         self.baseline_sbp = 120.0
         self.baseline_dbp = 75.0
         self.baseline_oldpeak = 1.0
-
-        # Current state
+        
         self.hr = self.baseline_hr
         self.sbp = self.baseline_sbp
         self.dbp = self.baseline_dbp
@@ -211,64 +228,114 @@ class PhysiologySimulationEngine:
             self.paused = False
             self.pause_start_time = None
 
-    def apply_age_modifiers(self):
-        if self.age < 30:
-            self.age_modifier = 0.95
-        elif self.age < 40:
-            self.age_modifier = 1.0
-        elif self.age < 50:
-            self.age_modifier = 1.05
-        elif self.age < 60:
-            self.age_modifier = 1.1
-        else:
-            self.age_modifier = 1.15
-
-        self.hr_modifier *= self.age_modifier
-        self.sbp_modifier *= (1.0 + (self.age - 40) * 0.01)
-
-    def apply_lifestyle_modifiers(self):
-        if self.smoking_status == "smoker":
-            self.sbp_modifier *= 1.12
-            self.hr_modifier *= 1.1
-            self.recovery_modifier *= 0.85
-        elif self.smoking_status == "ex_smoker":
-            self.sbp_modifier *= 1.05
-            self.hr_modifier *= 1.02
-
-        if self.diabetes_history == "type_1":
-            self.sbp_modifier *= 1.15
-            self.hr_modifier *= 1.12
-            self.recovery_modifier *= 0.8
-        elif self.diabetes_history == "type_2":
-            self.sbp_modifier *= 1.1
-            self.hr_modifier *= 1.08
-            self.recovery_modifier *= 0.85
-
-        if self.alcohol_consumption == "heavy":
-            self.sbp_modifier *= 1.08
-            self.recovery_modifier *= 0.9
-        elif self.alcohol_consumption == "moderate":
-            self.sbp_modifier *= 1.02
-
-        if self.activity_level == "athlete":
-            self.hr_modifier *= 0.85
-            self.recovery_modifier *= 1.2
-            self.max_workload_capacity = 1.3
-        elif self.activity_level == "active":
-            self.hr_modifier *= 0.95
-            self.recovery_modifier *= 1.1
-            self.max_workload_capacity = 1.1
-        else:
-            self.hr_modifier *= 1.1
-            self.recovery_modifier *= 0.9
-            self.max_workload_capacity = 0.8
+    def apply_modifiers(self):
+        """Standardized Physiology Matrix (Phase 2)"""
+        # 1. Select Sex Baseline
+        ref = self.male_ref if self.sex == "1" else self.female_ref
+        
+        hr_offset = 0.0
+        sbp_offset = 0.0
+        exercise_hr_mult = 1.0
+        exercise_sbp_mult = 1.0
+        recovery_efficiency = 1.0
+        
+        # 2. Apply Age Modifiers (>40y)
+        if self.age > 40:
+            years_over = self.age - 40
+            sbp_offset += years_over * 0.6
+            recovery_efficiency *= (1.0 - (years_over * 0.01))
             
-        # Apply the modifiers directly to the baselines so the simulation starts realistically
-        self.baseline_hr = 72.0 * self.hr_modifier
-        self.baseline_sbp = 120.0 * self.sbp_modifier
+        # 3. Apply Activity Level
+        if self.activity_level == "athlete":
+            hr_offset -= 15.0
+            sbp_offset -= 5.0
+            exercise_hr_mult *= 0.8
+            recovery_efficiency *= 2.0
+        elif self.activity_level == "sedentary":
+            hr_offset += 10.0
+            sbp_offset += 5.0
+            exercise_hr_mult *= 1.2
+            recovery_efficiency *= 0.85
+            
+        # 4. Apply Smoking
+        if self.smoking_status == "smoker":
+            hr_offset += 8.0          # Literature: +7-10 BPM (Harte & Meston 2012)
+            sbp_offset += 10.0
+            exercise_hr_mult *= 0.9   # Blunted chronotropic response
+            recovery_efficiency *= 0.8
+        elif self.smoking_status == "ex_smoker":
+            hr_offset += 2.0
+            sbp_offset += 2.0
+            exercise_hr_mult *= 0.97
+            recovery_efficiency *= 0.95
+            
+        # 5. Apply Diabetes
+        if "type" in str(self.diabetes_history):
+            if self.diabetes_history == "type_1":
+                hr_offset += 8.0
+                sbp_offset += 12.0
+                exercise_sbp_mult *= 1.25 # EEBP
+                recovery_efficiency *= 0.7
+            elif self.diabetes_history == "type_2":
+                hr_offset += 6.0
+                sbp_offset += 10.0
+                exercise_sbp_mult *= 1.15
+                recovery_efficiency *= 0.8
+                
+        # 6. Apply Alcohol
+        if self.alcohol_consumption == "heavy":
+            hr_offset += 8.0          # Catecholamine surge, sympathetic activation
+            sbp_offset += 8.0
+            exercise_hr_mult *= 1.15  # Blunted cardiac output
+            exercise_sbp_mult *= 1.15
+            recovery_efficiency *= 0.80  # Impaired vagal tone recovery
+        elif self.alcohol_consumption == "moderate":
+            hr_offset += 2.0
+            sbp_offset += 2.0
+            exercise_hr_mult *= 1.05
+            exercise_sbp_mult *= 1.05
+            recovery_efficiency *= 0.98
+
+        # ── 7. INTERACTION EFFECTS (clinically mandatory) ──────────────
+        # Heavy alcohol destroys athletic cardiac adaptation.
+        # A heavy drinker CANNOT physiologically maintain athlete-level
+        # resting HR (alcoholic cardiomyopathy, reduced VO2max, afib risk).
+        if self.alcohol_consumption == "heavy" and self.activity_level == "athlete":
+            # Claw back ~70% of the athlete HR benefit — they can no longer
+            # sustain full cardiac adaptation under chronic alcohol toxicity.
+            hr_offset += 10.0         # Partial reversal of -15 athlete bonus
+            recovery_efficiency *= 0.75  # Massively impaired recovery
+
+        # Diabetes + Athlete: autonomic neuropathy blunts HR response
+        if "type" in str(self.diabetes_history) and self.activity_level == "athlete":
+            hr_offset += 4.0          # Diabetic neuropathy reduces conditioning benefit
+            recovery_efficiency *= 0.85
+
+        # Heavy alcohol + diabetes: worst combination for cardiac stress
+        if self.alcohol_consumption == "heavy" and "type" in str(self.diabetes_history):
+            sbp_offset += 5.0
+            exercise_sbp_mult *= 1.10
+
+        # 7. Finalize Internal Constants
+        self.baseline_hr = ref["hr"] + hr_offset
+        self.baseline_sbp = ref["sbp"] + sbp_offset
+        self.max_hr = 220 - self.age
+        self.peak_sbp_cap = ref["peak_sbp"] + (sbp_offset if sbp_offset > 0 else 0)
+        
+        self.hr_increase_rate_per_min = 11.0 * exercise_hr_mult
+        self.sbp_increase_per_level = 12.0 * exercise_sbp_mult
+        self.recovery_rate_per_min = ref["recovery"] * recovery_efficiency
+        
+        # Compatibility Fields for UI/Analysis
+        self.hr_modifier = exercise_hr_mult
+        self.sbp_modifier = exercise_sbp_mult
+        self.recovery_modifier = recovery_efficiency
+        
+        # Reset state to new baseline
         self.hr = self.baseline_hr
         self.sbp = self.baseline_sbp
-        self.recovery_rate_per_min = 15.0 * self.recovery_modifier
+        
+        logger.info(f"[LOG] Digital Twin Calibrated: RR={self.recovery_rate_per_min:.1f} BPM/min, Rest={self.baseline_hr:.0f}/{self.baseline_sbp:.0f}")
 
     def calculate_adaptive_thresholds(self):
         """Calculate personalized risk thresholds based on user profile"""
@@ -350,7 +417,7 @@ class PhysiologySimulationEngine:
             scaled_features = scaler.transform([features])
 
             # Get prediction probability (probability of disease)
-            probability = heart_model.predict_proba(scaled_features)[0][1]
+            probability = float(heart_model.predict_proba(scaled_features)[0][1])
 
             # Get adaptive thresholds
             thresholds = self.calculate_adaptive_thresholds()
@@ -418,6 +485,7 @@ class PhysiologySimulationEngine:
                 self.phase = "exercise"
                 self.phase_elapsed_s = 0.0
                 self.stage = 0
+                self.stage_time = 0.0
         elif self.phase == "exercise":
             current_config = self._get_current_stage_config()
             if current_config is None:
@@ -425,18 +493,17 @@ class PhysiologySimulationEngine:
                 self.phase_elapsed_s = 0.0
                 return
 
-            max_hr = 220 - self.age
-            target_hr = max_hr * current_config["target_hr"] * self.hr_modifier
+            target_hr = self.max_hr * current_config["target_hr"]
 
             if self.hr < target_hr:
                 hr_change = min(
-                    self.hr_increase_rate_per_min * (dt / 60.0) * self.hr_modifier,
+                    self.hr_increase_rate_per_min * (dt / 60.0),
                     target_hr - self.hr
                 )
                 self.hr += hr_change
 
-            sbp_increase = current_config["workload"] * self.sbp_increase_per_level * self.sbp_modifier * dt / 180.0
-            self.sbp = min(self.sbp + sbp_increase, 240.0)
+            sbp_increase = current_config["workload"] * self.sbp_increase_per_level * dt / 180.0
+            self.sbp = min(self.sbp + sbp_increase, self.peak_sbp_cap)
 
             self.stage_time += dt
             current_config = self._get_current_stage_config()
@@ -445,8 +512,13 @@ class PhysiologySimulationEngine:
 
         elif self.phase == "recovery":
             recovery_rate = self.recovery_rate_per_min * (dt / 60.0)
+            
+            # Clinical Rule: SBP normalizes at ~0.8x of HRR speed
+            # Enforce a minimum SBP floor decay of 8 mmHg/min (8 * dt / 60)
+            sbp_recovery = max(recovery_rate * 0.8, 8.0 * (dt / 60.0))
+            
             self.hr = max(self.baseline_hr, self.hr - recovery_rate)
-            self.sbp = max(self.baseline_sbp, self.sbp - (recovery_rate * 0.4))
+            self.sbp = max(self.baseline_sbp, self.sbp - sbp_recovery)
 
             if self.phase_elapsed_s >= self.config["recovery_duration_s"]:
                 self.protocol_finished = True
@@ -497,7 +569,7 @@ class PhysiologySimulationEngine:
             "prediction_history": self.prediction_history,
             "protocol": self.protocol,
             "stage": self.stage + 1,
-            "stage_time": round(self.phase_elapsed_s),
+            "stage_time": round(self.stage_time) if self.phase == "exercise" else round(self.phase_elapsed_s),
             "total_time": round(self.total_duration_s),
             "future_predictions": []
         }
@@ -637,26 +709,47 @@ def background_simulation():
                         # Run the Alert Watchdog
                         check_simulation_alerts()
 
-                        # Periodically save duration to database (every 5 seconds)
-                        if state.session_id and (current_time - last_db_save) > 5.0:
+                        # Periodically save data points and duration to database (every 2 seconds)
+                        if state.session_id and (current_time - last_db_save) > 2.0:
                             try:
                                 db_save = get_db_session()
+                                
+                                # 1. Update session duration
                                 session_record = db_save.query(SimulationSession).filter(
                                     SimulationSession.id == state.session_id
                                 ).first()
                                 if session_record:
                                     session_record.duration = int(state.engine.total_duration_s)
-                                    db_save.commit()
+                                
+                                # Save data point every 2 seconds
+                                dp = StressTestDataPoint(
+                                    session_id=state.session_id,
+                                    timestamp=round(float(state.engine.total_duration_s)),
+                                    heart_rate=float(state.engine.hr),
+                                    blood_pressure_systolic=float(state.engine.sbp),
+                                    blood_pressure_diastolic=float(state.engine.dbp),
+                                    st_depression=float(state.engine.oldpeak),
+                                    protocol=state.engine.protocol,
+                                    stage=int(state.engine.stage + 1),
+                                    stage_time=round(float(state.engine.stage_time)),
+                                    workload_level=float(state.engine.workload_level),
+                                    phase=state.engine.phase,
+                                    exercise_induced_angina=bool(state.engine.exang),
+                                    risk_prediction=state.engine.predict_risk().get("risk_level", "Unknown")
+                                )
+                                db_save.add(dp)
+                                
+                                db_save.commit()
                                 last_db_save = current_time
                                 close_db_session(db_save)
                             except Exception as db_err:
-                                logger.error(f"Error periodically saving duration: {db_err}")
+                                logger.error(f"Error periodically saving to database: {db_err}")
                     except Exception as e:
-                        logger.error(f"❌ Error converting engine state or checking alerts during {state.engine.phase} phase: {e}", exc_info=True)
+                        logger.error(f"[ERROR] Error converting engine state or checking alerts during {state.engine.phase} phase: {e}", exc_info=True)
                         raise
 
                 except Exception as e:
-                    logger.error(f"❌ Engine update error during {getattr(state.engine, 'phase', 'unknown')} phase: {e}", exc_info=True)
+                    logger.error(f"[ERROR] Engine update error during {getattr(state.engine, 'phase', 'unknown')} phase: {e}", exc_info=True)
                     logger.error(f"Engine state - HR: {getattr(state.engine, 'hr', 'N/A')}, SBP: {getattr(state.engine, 'sbp', 'N/A')}, Stage: {getattr(state.engine, 'stage', 'N/A')}")
                     state.running = False
 
@@ -669,17 +762,17 @@ def background_simulation():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("🚀 Starting KardiaTwin FastAPI Server...")
+    logger.info("[STARTUP] Starting KardiaTwin FastAPI Server...")
     init_db()
-    logger.info("✓ Database initialized")
+    logger.info("[SUCCESS] Database initialized")
 
     # Start background thread
     state.simulation_thread = threading.Thread(target=background_simulation, daemon=True)
     state.simulation_thread.start()
-    logger.info("✓ Simulation thread started")
+    logger.info("[SUCCESS] Simulation thread started")
 
     yield
-    logger.info("🛑 Shutting down...")
+    logger.info("[SHUTDOWN] Shutting down...")
 
 app = FastAPI(
     title="KardiaTwin API",
@@ -733,6 +826,7 @@ async def register(user_data: UserRegister):
         hashed_password = get_password_hash(user_data.password)
         new_user = User(
             username=user_data.username,
+            profile_name=user_data.profile_name or user_data.username,
             email=user_data.email,
             password_hash=hashed_password
         )
@@ -770,13 +864,23 @@ async def login(user_data: UserLogin):
             (User.username == user_data.username) | (User.email == user_data.username)
         ).first()
 
-        if not user or not verify_password(user_data.password, user.password_hash):
+        if not user:
+            logger.warning(f"Login failure: User '{user_data.username}' not found")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials"
             )
 
-        # Update last login
+        if not verify_password(user_data.password, user.password_hash):
+            logger.warning(f"Login failure: Incorrect password for user '{user_data.username}'")
+            # For debugging purposes ONLY (shoud be removed in prod)
+            logger.debug(f"Input password: '{user_data.password}'")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials"
+            )
+
+        logger.info(f"Successful login for user '{user.username}' (ID: {user.id})")
         user.last_login = datetime.utcnow()
         db.commit()
 
@@ -854,8 +958,11 @@ async def get_user_profile(current_user: User = Depends(get_current_user)):
         profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
         if not profile:
             # Return empty profile representation
-            return UserProfileResponse(id=0, user_id=current_user.id)
-        return UserProfileResponse.model_validate(profile)
+            return UserProfileResponse(id=0, user_id=current_user.id, profile_name=current_user.profile_name)
+        
+        response_data = UserProfileResponse.model_validate(profile)
+        response_data.profile_name = current_user.profile_name
+        return response_data
     finally:
         close_db_session(db)
 
@@ -868,6 +975,9 @@ async def update_user_profile(
     """Create or update user's profile data"""
     db = get_db_session()
     try:
+        # Merge current_user into this session to avoid "not persistent" error
+        current_user = db.merge(current_user)
+        
         profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
         
         if not profile:
@@ -876,14 +986,22 @@ async def update_user_profile(
             
         # Update fields
         update_data = profile_data.model_dump(exclude_unset=True)
+        
+        # Handle profile_name update on the User model
+        if 'profile_name' in update_data:
+            current_user.profile_name = update_data.pop('profile_name')
+            
         for key, value in update_data.items():
             setattr(profile, key, value)
             
         profile.updated_at = datetime.utcnow()
         db.commit()
         db.refresh(profile)
+        db.refresh(current_user)
         
-        return UserProfileResponse.model_validate(profile)
+        response_data = UserProfileResponse.model_validate(profile)
+        response_data.profile_name = current_user.profile_name
+        return response_data
     except Exception as e:
         db.rollback()
         logger.error(f"Profile update error: {e}")
@@ -914,6 +1032,15 @@ async def list_user_simulations(
         result_sessions = []
         for s in sessions:
             summary = SimulationSummary.model_validate(s)
+            
+            # Map snapshot fields if available
+            summary.patient_age = s.patient_age
+            summary.patient_gender = s.patient_gender
+            summary.smoking_status = s.smoking_status
+            summary.diabetes_history = s.diabetes_history
+            summary.alcohol_consumption = s.alcohol_consumption
+            summary.activity_level = s.activity_level
+
             # Get latest heart age for this session
             from models import HeartAgeDataPoint
             ha_record = db.query(HeartAgeDataPoint).filter(HeartAgeDataPoint.session_id == s.id).first()
@@ -985,8 +1112,8 @@ async def create_test_simulation(
     """Create a dummy simulation for testing purposes (requires authentication)"""
     db = get_db_session()
     try:
-        logger.info(f"📝 Creating test simulation for user: {current_user.username} (ID: {current_user.id})")
-        logger.info(f"📝 User object: {current_user.to_dict()}")
+        logger.info(f"[LOG] Creating test simulation for user: {current_user.username} (ID: {current_user.id})")
+        logger.info(f"[LOG] User object: {current_user.to_dict()}")
 
         # Create a test simulation session
         test_session = SimulationSession(
@@ -1092,17 +1219,17 @@ async def start_simulation(
     req: StartSimulationRequest,
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    logger.info(f"✓ /start endpoint called")
+    logger.info(f"[LOG] /start endpoint called")
     db = get_db_session()
     try:
-        logger.info(f"✓ Request received: age={req.age}, sex={req.sex}")
+        logger.info(f"[LOG] Request received: age={req.age}, sex={req.sex}")
         cfg = {}
         if req.simulation:
             cfg = req.simulation.dict(exclude_none=True)
 
-        logger.info(f"✓ Creating PhysiologySimulationEngine...")
+        logger.info(f"[LOG] Creating PhysiologySimulationEngine...")
         state.engine = PhysiologySimulationEngine(config=cfg)
-        logger.info(f"✓ Engine created successfully")
+        logger.info(f"[SUCCESS] Engine created successfully")
         state.engine.age = req.age
         state.engine.sex = req.sex
         state.engine.cp = req.cp
@@ -1113,8 +1240,7 @@ async def start_simulation(
         state.engine.alcohol_consumption = req.alcohol_consumption.value
         state.engine.activity_level = req.activity_level.value
 
-        state.engine.apply_age_modifiers()
-        state.engine.apply_lifestyle_modifiers()
+        state.engine.apply_modifiers()
 
         state.running = True
         state.start_time = time.time()  # Track when simulation started
@@ -1131,13 +1257,17 @@ async def start_simulation(
                 protocol=state.engine.protocol,
                 user_data=req.dict(),
                 patient_age=req.age,
-                patient_gender="M" if req.sex == "1" else "F"
+                patient_gender="M" if req.sex == "1" else "F",
+                smoking_status=req.smoking_status.value,
+                diabetes_history=req.diabetes_history.value,
+                alcohol_consumption=req.alcohol_consumption.value,
+                activity_level=req.activity_level.value
             )
             db.add(db_session)
             db.commit()
             db.refresh(db_session)
             state.session_id = db_session.id
-            logger.info(f"✓ Created simulation session {db_session.id} for user {current_user.username}")
+            logger.info(f"[SUCCESS] Created simulation session {db_session.id} for user {current_user.username}")
         else:
             state.session_id = None
 
@@ -1145,7 +1275,7 @@ async def start_simulation(
         stages = state.engine.protocol_configs[protocol]["stages"]
         total_duration = sum(s["duration"] for s in stages)
 
-        logger.info(f"✓ Simulation started: Age {req.age}, {req.smoking_status.value}")
+        logger.info(f"[SUCCESS] Simulation started: Age {req.age}, {req.smoking_status.value}")
 
         return {
             "message": "Simulation started",
@@ -1167,36 +1297,19 @@ async def start_simulation(
 @app.get("/prediction")
 async def get_prediction():
     try:
-        if not state.running or not state.latest_data:
-            raise HTTPException(status_code=400, detail="No active simulation")
-
-        # Ensure data has required fields with safe defaults
-        try:
-            data = state.latest_data.copy() if isinstance(state.latest_data, dict) else {}
-        except Exception as e:
-            logger.error(f"Error copying latest_data: {e}")
-            data = {}
-
-        # Validate prediction structure
-        if not isinstance(data.get("prediction"), dict):
-            data["prediction"] = {
-                "risk_level": "Waiting...",
-                "probability": 0,
-                "confidence": "Low"
+        if not state.latest_data:
+            return {
+                "thalach": 0, "trestbps": 0, "oldpeak": 0, "exang": 0,
+                "prediction": {"risk_level": "Waiting...", "probability": 0, "confidence": "Low"},
+                "trend": "Stable", "prediction_history": [], "phase": "idle"
             }
-        else:
-            # Fill in missing prediction fields
-            pred = data["prediction"]
-            if "risk_level" not in pred:
-                pred["risk_level"] = "Waiting..."
-            if "probability" not in pred:
-                pred["probability"] = 0
-            if "confidence" not in pred:
-                pred["confidence"] = "Low"
-
+        
+        # Ensure data has required prediction structure for frontend
+        data = state.latest_data.copy()
+        if not isinstance(data.get("prediction"), dict):
+            data["prediction"] = {"risk_level": "Waiting...", "probability": 0, "confidence": "Low"}
+        
         return data
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Error in /prediction endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Simulation error: {str(e)}")
@@ -1228,13 +1341,13 @@ async def stop():
 
             if session:
                 session.duration = int(duration)
-                session.risk_score = risk_score
+                session.risk_score = float(risk_score) if risk_score is not None else None
                 db.commit()
-                logger.info(f"✓ Saved simulation {state.session_id}: duration={duration:.1f}s, risk_score={risk_score}")
+                logger.info(f"[SUCCESS] Saved simulation {state.session_id}: duration={duration:.1f}s, risk_score={risk_score}")
 
-            db.close()
+            close_db_session(db)
         except Exception as e:
-            logger.error(f"Error saving simulation metrics: {e}")
+            logger.error(f"[ERROR] Error saving simulation metrics: {e}")
 
     # Reset simulation state
     state.session_id = None
@@ -1313,35 +1426,79 @@ async def update_thresholds(updates: ThresholdUpdate):
     return {"thresholds": alert_thresholds}
 
 @app.post("/what_if_analysis")
-async def what_if(req: WhatIfInput):
-    # If no simulation is active, use a synthetic baseline for analysis
-    # instead of just throwing a 400, which avoids "blank screens"
-    if not state.engine:
-        current_engine = PhysiologySimulationEngine()
-        current_engine.apply_age_modifiers()
-        current_engine.apply_lifestyle_modifiers()
-    else:
+async def what_if(
+    req: WhatIfInput,
+    current_user: User = Depends(get_current_user)
+):
+    # Initialize Baseline Engine
+    current_engine = None
+    source = "None"
+    
+    # Tier 1: Is there an active simulation?
+    if state.engine:
         current_engine = state.engine
+        source = "Active Simulation"
+    else:
+        # Tier 2: Check database for the most recent session of the current user
+        try:
+            db = get_db_session()
+            from models import SimulationSession, UserProfile
+            
+            recent_session = db.query(SimulationSession).filter(
+                SimulationSession.user_id == current_user.id
+            ).order_by(SimulationSession.created_at.desc()).first()
+            
+            if recent_session:
+                current_engine = PhysiologySimulationEngine()
+                
+                # Load profile data from that user if available
+                profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+                if profile:
+                    current_engine.age = profile.age if profile.age else 50
+                    current_engine.sex = profile.sex if profile.sex else "1"
+                    current_engine.smoking_status = profile.smoking_status if profile.smoking_status else "non_smoker"
+                    current_engine.diabetes_history = profile.diabetes_history if profile.diabetes_history else "none"
+                    current_engine.alcohol_consumption = profile.alcohol_consumption if profile.alcohol_consumption else "none"
+                    current_engine.activity_level = profile.activity_level if profile.activity_level else "active"
+                
+                current_engine.apply_modifiers()
+                source = "Saved History"
+        except Exception as e:
+            logger.error(f"Error fetching historical baseline: {e}")
+        finally:
+            if 'db' in locals():
+                close_db_session(db)
+
+    # If still no engine, we cannot perform a grounded analysis
+    if not current_engine:
+        raise HTTPException(
+            status_code=428, 
+            detail="Simulation data required. Please complete a stress test simulation first to establish your cardiovascular baseline."
+        )
 
     # Create hypothetical clone
     hyp = PhysiologySimulationEngine(config=current_engine.config)
+    
+    # Apply baseline state
     hyp.age = current_engine.age
-    hyp.apply_age_modifiers()
-
-    # Map inputs, handle empty strings or None
-    # If a field is not provided, keep the current value
+    hyp.sex = current_engine.sex
     hyp.smoking_status = (req.smoking_status.value if req.smoking_status and req.smoking_status != "" else current_engine.smoking_status)
     hyp.diabetes_history = (req.diabetes_history.value if req.diabetes_history and req.diabetes_history != "" else current_engine.diabetes_history)
     hyp.alcohol_consumption = (req.alcohol_consumption.value if req.alcohol_consumption and req.alcohol_consumption != "" else current_engine.alcohol_consumption)
     hyp.activity_level = (req.activity_level.value if req.activity_level and req.activity_level != "" else current_engine.activity_level)
     
-    hyp.apply_lifestyle_modifiers()
+    # Re-apply all modifiers to the clone
+    hyp.apply_modifiers()
 
-    # Calculate predicted improvements
-    sbp_reduction = ((current_engine.sbp_modifier - hyp.sbp_modifier) / current_engine.sbp_modifier * 100)
-    hr_improvement = ((current_engine.hr_modifier - hyp.hr_modifier) / current_engine.hr_modifier * 100)
-    recovery_improvement = ((hyp.recovery_modifier - current_engine.recovery_modifier) / current_engine.recovery_modifier * 100)
+    # Calculate Physiological deltas
+    sbp_reduction = 0.0 if current_engine.sbp_modifier == 0 else ((current_engine.sbp_modifier - hyp.sbp_modifier) / current_engine.sbp_modifier * 100)
+    hr_improvement = 0.0 if current_engine.hr_modifier == 0 else ((current_engine.hr_modifier - hyp.hr_modifier) / current_engine.hr_modifier * 100)
+    recovery_improvement = 0.0 if current_engine.recovery_modifier == 0 else ((hyp.recovery_modifier - current_engine.recovery_modifier) / current_engine.recovery_modifier * 100)
     baseline_hr_red = current_engine.baseline_hr - hyp.baseline_hr
+
+    # Calculate ML Risk for both (Requires unified state)
+    base_risk = current_engine.predict_risk()
+    hyp_risk = hyp.predict_risk()
 
     # Generate personalized message
     positives = []
@@ -1350,31 +1507,66 @@ async def what_if(req: WhatIfInput):
     if recovery_improvement > 5: positives.append("faster cardiovascular recovery")
     
     if positives:
-        message = f"By implementing these changes, your digital twin project indicates a healthier cardiovascular profile with {', '.join(positives)}. This could reduce your overall biological heart age by approximately {round(max(sbp_reduction, hr_improvement) / 2, 1)} years."
+        # Bound years reduced to a realistic clinical range (e.g., max 15 years)
+        years_reduced = min(15.0, round(max(sbp_reduction, hr_improvement) / 5, 1))
+        message = f"By implementing these changes, your digital twin project indicates a healthier cardiovascular profile with {', '.join(positives)}. This could reduce your overall biological heart age by approximately {years_reduced} years."
     else:
         message = "These changes maintain your current cardiovascular stability. Consistent adherence to a healthy lifestyle remains the best preventative measure for long-term heart health."
 
-    return {
+    result_data = {
         "current": {
-            "sbp_modifier": round(current_engine.sbp_modifier, 3),
-            "hr_modifier": round(current_engine.hr_modifier, 3),
-            "recovery_modifier": round(current_engine.recovery_modifier, 3),
-            "baseline_hr": round(current_engine.baseline_hr, 1)
+            "sbp_modifier": round(float(current_engine.sbp_modifier), 3),
+            "hr_modifier": round(float(current_engine.hr_modifier), 3),
+            "recovery_modifier": round(float(current_engine.recovery_modifier), 3),
+            "baseline_hr": round(float(current_engine.baseline_hr), 1),
+            "risk": base_risk,
+            "age": int(current_engine.age)
         },
         "hypothetical": {
-            "sbp_modifier": round(hyp.sbp_modifier, 3),
-            "hr_modifier": round(hyp.hr_modifier, 3),
-            "recovery_modifier": round(hyp.recovery_modifier, 3),
-            "baseline_hr": round(hyp.baseline_hr, 1)
+            "sbp_modifier": round(float(hyp.sbp_modifier), 3),
+            "hr_modifier": round(float(hyp.hr_modifier), 3),
+            "recovery_modifier": round(float(hyp.recovery_modifier), 3),
+            "baseline_hr": round(float(hyp.baseline_hr), 1),
+            "risk": hyp_risk,
+            "age": int(hyp.age)
         },
         "predicted_improvements": {
-            "sbp_reduction": round(sbp_reduction, 1),
-            "hr_improvement": round(hr_improvement, 1),
-            "recovery_improvement": round(recovery_improvement, 1),
-            "baseline_hr_reduction": round(baseline_hr_red, 1)
+            "sbp_reduction": round(float(sbp_reduction), 1),
+            "hr_improvement": round(float(hr_improvement), 1),
+            "recovery_improvement": round(float(recovery_improvement), 1),
+            "baseline_hr_reduction": round(float(baseline_hr_red), 1)
         },
+        "baseline_source": source,
         "message": message
     }
+
+    # Persist What-If results to database if session exists
+    if state.session_id:
+        try:
+            db_save = get_db_session()
+            from models import WhatIfScenarioDataPoint
+            
+            # Save the scenario comparison
+            scenario = WhatIfScenarioDataPoint(
+                session_id=state.session_id,
+                scenario_name="Lifestyle Intervention Analysis",
+                current_value=float(current_engine.sbp_modifier),
+                projected_value=float(hyp.sbp_modifier),
+                improvement=float(sbp_reduction),
+                current_risk_score=float(base_risk.get("probability", 0)),
+                projected_risk_score=float(hyp_risk.get("probability", 0)),
+                risk_reduction=float(base_risk.get("probability", 0) - hyp_risk.get("probability", 0)),
+                impact_type="cardiovascular_profile",
+                confidence=90.0
+            )
+            db_save.add(scenario)
+            db_save.commit()
+            close_db_session(db_save)
+            logger.info(f"[SUCCESS] Saved What-If analysis for session {state.session_id}")
+        except Exception as e:
+            logger.error(f"[ERROR] Error persisting What-If results: {e}")
+
+    return result_data
 
 @app.get("/biological_age")
 async def biological_age():
@@ -1455,8 +1647,9 @@ async def biological_age():
                 db.add(data_point)
             
             db.commit()
+            logger.info(f"[SUCCESS] Saved Heart Age ({heart_age:.1f}) for session {state.session_id}")
         except Exception as e:
-            print(f"Error persisting heart age: {e}")
+            logger.error(f"[ERROR] Error persisting heart age: {e}")
         finally:
             close_db_session(db)
 

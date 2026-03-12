@@ -80,6 +80,14 @@ class SimulationSummary(BaseModel):
     duration: Optional[float] = None
     risk_score: Optional[float] = None
     heart_age: Optional[float] = None
+    
+    # Lifestyle Metadata (Snapshot at time of test)
+    patient_age: Optional[int] = None
+    patient_gender: Optional[str] = None
+    smoking_status: Optional[str] = None
+    diabetes_history: Optional[str] = None
+    alcohol_consumption: Optional[str] = None
+    activity_level: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -116,6 +124,7 @@ class UserProfileBase(BaseModel):
     weight: Optional[float] = None
     family_history: Optional[str] = None
     allergies: Optional[str] = None
+    profile_name: Optional[str] = None
 
 class UserProfileCreate(UserProfileBase):
     pass
@@ -126,6 +135,7 @@ class UserProfileUpdate(UserProfileBase):
 class UserProfileResponse(UserProfileBase):
     id: int
     user_id: int
+    profile_name: Optional[str] = None
     updated_at: Optional[datetime] = None
 
     class Config:

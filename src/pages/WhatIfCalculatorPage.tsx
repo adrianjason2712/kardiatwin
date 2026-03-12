@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import API from '../utils/axios';
 import { TrendingDown, Activity, Heart, Zap, Droplets } from 'lucide-react';
 
 interface WhatIfResults {
@@ -56,7 +56,7 @@ export const WhatIfCalculatorPage: React.FC<WhatIfCalculatorPageProps> = ({
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:8000/what_if_analysis', whatIfChanges);
+      const response = await API.post('/what_if_analysis', whatIfChanges);
       setWhatIfResults(response.data);
     } catch (err) {
       setError('Failed to fetch What If analysis');

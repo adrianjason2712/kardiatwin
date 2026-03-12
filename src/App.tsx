@@ -759,9 +759,9 @@ function App() {
                       className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                       <div className="w-8 h-8 rounded-full bg-[#8F87F1] flex items-center justify-center text-white text-sm font-bold">
-                        {user.username.charAt(0).toUpperCase()}
+                        {(user.profile_name || user.username).charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                      <span className="text-sm font-medium text-gray-700">{user.profile_name || user.username}</span>
                     </button>
 
                     {/* Dropdown Menu */}

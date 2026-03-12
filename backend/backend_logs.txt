@@ -1,0 +1,222 @@
+2026-03-12 20:39:39,816 [INFO] [SUCCESS] ML model loaded
+2026-03-12 20:39:39,869 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 20:39:40,066 [INFO] [SUCCESS] Database initialized
+2026-03-12 20:39:40,066 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 20:40:09,715 [INFO] [LOG] /start endpoint called
+2026-03-12 20:40:09,716 [INFO] [LOG] Request received: age=25, sex=0
+2026-03-12 20:40:09,717 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 20:40:09,717 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 20:40:09,719 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 20:40:09,730 [ERROR] Error: 'smoking_status' is an invalid keyword argument for SimulationSession
+2026-03-12 20:41:39,940 [INFO] [LOG] /start endpoint called
+2026-03-12 20:41:39,940 [INFO] [LOG] Request received: age=25, sex=0
+2026-03-12 20:41:39,946 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 20:41:39,946 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 20:41:39,946 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 20:41:39,954 [ERROR] Error: 'smoking_status' is an invalid keyword argument for SimulationSession
+2026-03-12 20:45:25,107 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 20:57:43,545 [INFO] [LOG] /start endpoint called
+2026-03-12 20:57:43,546 [INFO] [LOG] Request received: age=25, sex=0
+2026-03-12 20:57:43,546 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 20:57:43,547 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 20:57:43,547 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 20:57:43,557 [ERROR] Error: 'smoking_status' is an invalid keyword argument for SimulationSession
+2026-03-12 20:57:48,499 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 20:58:39,071 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 20:58:44,862 [INFO] [SUCCESS] ML model loaded
+2026-03-12 20:58:44,896 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 20:58:44,985 [INFO] [SUCCESS] Database initialized
+2026-03-12 20:58:44,986 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 20:59:42,979 [INFO] Successful login for user 'testuser105' (ID: 11)
+2026-03-12 20:59:43,013 [INFO] [LOG] /start endpoint called
+2026-03-12 20:59:43,013 [INFO] [LOG] Request received: age=35, sex=1
+2026-03-12 20:59:43,013 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 20:59:43,019 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 20:59:43,019 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-12 20:59:43,044 [INFO] [SUCCESS] Created simulation session 116 for user testuser105
+2026-03-12 20:59:43,050 [INFO] [SUCCESS] Simulation started: Age 35, non_smoker
+2026-03-12 21:00:18,062 [INFO] Successful login for user 'testuser105' (ID: 11)
+2026-03-12 21:00:18,075 [INFO] [SUCCESS] Saved simulation 116: duration=35.0s, risk_score=36.0
+2026-03-12 21:01:05,442 [INFO] [LOG] /start endpoint called
+2026-03-12 21:01:05,442 [INFO] [LOG] Request received: age=25, sex=0
+2026-03-12 21:01:05,442 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 21:01:05,442 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 21:01:05,442 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 21:01:05,462 [INFO] [SUCCESS] Created simulation session 117 for user adrianjason
+2026-03-12 21:01:05,462 [INFO] [SUCCESS] Simulation started: Age 25, non_smoker
+2026-03-12 21:01:05,531 [INFO] [SUCCESS] Saved Heart Age (24.0) for session 117
+2026-03-12 21:01:08,965 [INFO] [SUCCESS] Saved simulation 117: duration=3.3s, risk_score=58.0
+2026-03-12 21:02:14,474 [INFO] [LOG] /start endpoint called
+2026-03-12 21:02:14,475 [INFO] [LOG] Request received: age=31, sex=1
+2026-03-12 21:02:14,475 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 21:02:14,475 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 21:02:14,475 [INFO] [LOG] Digital Twin Calibrated: RR=22.8 BPM/min, Rest=71/123
+2026-03-12 21:02:14,491 [INFO] [SUCCESS] Created simulation session 118 for user adrianjason
+2026-03-12 21:02:14,491 [INFO] [SUCCESS] Simulation started: Age 31, non_smoker
+2026-03-12 21:02:14,556 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 118
+2026-03-12 21:02:49,203 [INFO] [SUCCESS] Saved simulation 118: duration=34.7s, risk_score=68.0
+2026-03-12 21:03:02,987 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:03:10,779 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:03:10,802 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:03:10,873 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:03:10,874 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:03:31,181 [WARNING] Login failure: User 'user_demo' not found
+2026-03-12 21:03:35,838 [WARNING] Login failure: User 'user_demo' not found
+2026-03-12 21:23:02,625 [WARNING] Login failure: User 'user_demo' not found
+2026-03-12 21:24:11,963 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-12 21:24:30,466 [INFO] [LOG] /start endpoint called
+2026-03-12 21:24:30,466 [INFO] [LOG] Request received: age=26, sex=0
+2026-03-12 21:24:30,466 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 21:24:30,469 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 21:24:30,469 [INFO] [LOG] Digital Twin Calibrated: RR=34.0 BPM/min, Rest=60/110
+2026-03-12 21:24:30,539 [INFO] [SUCCESS] Created simulation session 119 for user adrianjason
+2026-03-12 21:24:30,539 [INFO] [SUCCESS] Simulation started: Age 26, non_smoker
+2026-03-12 21:24:30,583 [INFO] [SUCCESS] Saved Heart Age (23.0) for session 119
+2026-03-12 21:25:44,205 [INFO] [SUCCESS] Saved simulation 119: duration=73.5s, risk_score=68.0
+2026-03-12 21:25:53,917 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 21:26:44,909 [WARNING] Login failure: User 'user_demo' not found
+2026-03-12 21:26:49,209 [WARNING] Login failure: User 'demo_suer' not found
+2026-03-12 21:26:52,733 [INFO] Successful login for user 'demo_user' (ID: 6)
+2026-03-12 21:27:23,297 [ERROR] Profile update error: Instance '<User at 0x1b5d57a08c0>' is not persistent within this Session
+2026-03-12 21:27:25,762 [ERROR] Profile update error: Instance '<User at 0x1b5d5838e00>' is not persistent within this Session
+2026-03-12 21:28:34,895 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:28:40,628 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:28:40,656 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:28:40,722 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:28:40,722 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:32:23,338 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:32:28,104 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:32:28,128 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:32:28,190 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:32:28,190 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:36:06,138 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:36:10,319 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:36:10,347 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:36:10,415 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:36:10,419 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:36:15,022 [INFO] Successful login for user 'testuser105' (ID: 11)
+2026-03-12 21:36:15,063 [ERROR] Profile update error: 'User' object has no attribute 'profile_name'
+2026-03-12 21:36:15,136 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-12 21:36:15,137 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
+2026-03-12 21:36:27,776 [INFO] [LOG] /start endpoint called
+2026-03-12 21:36:27,776 [INFO] [LOG] Request received: age=22, sex=1
+2026-03-12 21:36:27,776 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 21:36:27,779 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 21:36:27,779 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
+2026-03-12 21:36:27,790 [INFO] [SUCCESS] Created simulation session 120 for user demo_user
+2026-03-12 21:36:27,795 [INFO] [SUCCESS] Simulation started: Age 22, non_smoker
+2026-03-12 21:36:27,860 [INFO] [SUCCESS] Saved Heart Age (19.0) for session 120
+2026-03-12 21:36:30,813 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:36:34,710 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:36:34,740 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:36:34,801 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:36:34,801 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:37:19,417 [ERROR] Profile update error: "UserProfileResponse" object has no field "profile_name"
+2026-03-12 21:38:04,887 [INFO] Successful login for user 'testuser105' (ID: 11)
+2026-03-12 21:38:04,905 [ERROR] Profile update error: "UserProfileResponse" object has no field "profile_name"
+2026-03-12 21:38:04,933 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-12 21:38:04,934 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
+2026-03-12 21:38:06,477 [ERROR] Profile update error: "UserProfileResponse" object has no field "profile_name"
+2026-03-12 21:38:15,313 [ERROR] Profile update error: "UserProfileResponse" object has no field "profile_name"
+2026-03-12 21:38:22,729 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:38:28,537 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:38:28,564 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:38:28,637 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:38:28,637 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:38:31,006 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:38:34,947 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:38:34,996 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:38:35,103 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:38:35,105 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:38:35,482 [INFO] Successful login for user 'testuser105' (ID: 11)
+2026-03-12 21:38:35,598 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=68/120
+2026-03-12 21:38:35,600 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
+2026-03-12 21:39:03,782 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 21:39:09,060 [INFO] [SUCCESS] ML model loaded
+2026-03-12 21:39:09,097 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 21:39:09,167 [INFO] [SUCCESS] Database initialized
+2026-03-12 21:39:09,169 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 21:39:48,398 [INFO] [LOG] /start endpoint called
+2026-03-12 21:39:48,400 [INFO] [LOG] Request received: age=63, sex=0
+2026-03-12 21:39:48,400 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 21:39:48,401 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 21:39:48,401 [INFO] [LOG] Digital Twin Calibrated: RR=7.8 BPM/min, Rest=93/146
+2026-03-12 21:39:48,423 [INFO] [SUCCESS] Created simulation session 121 for user demo_user
+2026-03-12 21:39:48,428 [INFO] [SUCCESS] Simulation started: Age 63, non_smoker
+2026-03-12 21:39:48,492 [INFO] [SUCCESS] Saved Heart Age (72.0) for session 121
+2026-03-12 21:42:20,987 [INFO] [SUCCESS] Saved simulation 121: duration=152.3s, risk_score=83.0
+2026-03-12 21:42:36,831 [INFO] [LOG] /start endpoint called
+2026-03-12 21:42:36,831 [INFO] [LOG] Request received: age=29, sex=0
+2026-03-12 21:42:36,836 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 21:42:36,836 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 21:42:36,836 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 21:42:36,850 [INFO] [SUCCESS] Created simulation session 122 for user demo_user
+2026-03-12 21:42:36,850 [INFO] [SUCCESS] Simulation started: Age 29, non_smoker
+2026-03-12 21:42:36,890 [INFO] [SUCCESS] Saved Heart Age (28.0) for session 122
+2026-03-12 22:15:47,251 [INFO] [SUCCESS] Saved simulation 122: duration=720.2s, risk_score=84.0
+2026-03-12 22:15:55,341 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 22:15:56,809 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 22:15:56,995 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 22:16:19,338 [INFO] Successful login for user 'demo_user' (ID: 6)
+2026-03-12 22:16:25,410 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-12 22:19:53,657 [INFO] [SHUTDOWN] Shutting down...
+2026-03-12 22:20:00,075 [INFO] [SUCCESS] ML model loaded
+2026-03-12 22:20:00,105 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-12 22:20:00,200 [INFO] [SUCCESS] Database initialized
+2026-03-12 22:20:00,201 [INFO] [SUCCESS] Simulation thread started
+2026-03-12 22:20:19,565 [INFO] [LOG] Digital Twin Calibrated: RR=11.2 BPM/min, Rest=76/142
+2026-03-12 22:20:19,565 [INFO] [LOG] Digital Twin Calibrated: RR=16.0 BPM/min, Rest=68/130
+2026-03-12 22:21:32,331 [INFO] [LOG] /start endpoint called
+2026-03-12 22:21:32,332 [INFO] [LOG] Request received: age=26, sex=1
+2026-03-12 22:21:32,332 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 22:21:32,332 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 22:21:32,332 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
+2026-03-12 22:21:32,350 [INFO] [SUCCESS] Created simulation session 123 for user demo_user
+2026-03-12 22:21:32,350 [INFO] [SUCCESS] Simulation started: Age 26, non_smoker
+2026-03-12 22:21:32,410 [INFO] [SUCCESS] Saved Heart Age (23.0) for session 123
+2026-03-12 22:21:38,262 [INFO] [SUCCESS] Saved simulation 123: duration=5.5s, risk_score=66.0
+2026-03-12 22:21:46,794 [INFO] [LOG] /start endpoint called
+2026-03-12 22:21:46,794 [INFO] [LOG] Request received: age=26, sex=0
+2026-03-12 22:21:46,794 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 22:21:46,794 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 22:21:46,794 [INFO] [LOG] Digital Twin Calibrated: RR=34.0 BPM/min, Rest=60/110
+2026-03-12 22:21:46,806 [INFO] [SUCCESS] Created simulation session 124 for user demo_user
+2026-03-12 22:21:46,806 [INFO] [SUCCESS] Simulation started: Age 26, non_smoker
+2026-03-12 22:21:46,837 [INFO] [SUCCESS] Saved Heart Age (23.0) for session 124
+2026-03-12 22:21:49,914 [INFO] [SUCCESS] Saved simulation 124: duration=2.6s, risk_score=77.0
+2026-03-12 22:22:17,277 [INFO] [LOG] /start endpoint called
+2026-03-12 22:22:17,280 [INFO] [LOG] Request received: age=26, sex=0
+2026-03-12 22:22:17,280 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 22:22:17,280 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 22:22:17,281 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 22:22:17,293 [INFO] [SUCCESS] Created simulation session 125 for user demo_user
+2026-03-12 22:22:17,294 [INFO] [SUCCESS] Simulation started: Age 26, non_smoker
+2026-03-12 22:22:17,319 [INFO] [SUCCESS] Saved Heart Age (25.0) for session 125
+2026-03-12 22:22:23,094 [INFO] [SUCCESS] Saved simulation 125: duration=5.6s, risk_score=75.0
+2026-03-12 22:22:58,414 [INFO] [LOG] /start endpoint called
+2026-03-12 22:22:58,414 [INFO] [LOG] Request received: age=61, sex=0
+2026-03-12 22:22:58,414 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 22:22:58,414 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 22:22:58,414 [INFO] [LOG] Digital Twin Calibrated: RR=16.1 BPM/min, Rest=78/131
+2026-03-12 22:22:58,442 [INFO] [SUCCESS] Created simulation session 126 for user demo_user
+2026-03-12 22:22:58,442 [INFO] [SUCCESS] Simulation started: Age 61, non_smoker
+2026-03-12 22:22:58,464 [INFO] [SUCCESS] Saved Heart Age (60.0) for session 126
+2026-03-12 22:23:02,513 [INFO] [SUCCESS] Saved simulation 126: duration=3.9s, risk_score=71.0
+2026-03-12 22:23:17,122 [INFO] [LOG] /start endpoint called
+2026-03-12 22:23:17,122 [INFO] [LOG] Request received: age=24, sex=0
+2026-03-12 22:23:17,123 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 22:23:17,123 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 22:23:17,123 [INFO] [LOG] Digital Twin Calibrated: RR=20.4 BPM/min, Rest=78/118
+2026-03-12 22:23:17,133 [INFO] [SUCCESS] Created simulation session 127 for user demo_user
+2026-03-12 22:23:17,133 [INFO] [SUCCESS] Simulation started: Age 24, non_smoker
+2026-03-12 22:23:17,162 [INFO] [SUCCESS] Saved Heart Age (23.0) for session 127
+2026-03-12 22:23:21,063 [INFO] [SUCCESS] Saved simulation 127: duration=3.5s, risk_score=75.0
+2026-03-12 22:23:34,231 [INFO] [LOG] /start endpoint called
+2026-03-12 22:23:34,231 [INFO] [LOG] Request received: age=24, sex=1
+2026-03-12 22:23:34,231 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-12 22:23:34,231 [INFO] [SUCCESS] Engine created successfully
+2026-03-12 22:23:34,231 [INFO] [LOG] Digital Twin Calibrated: RR=22.8 BPM/min, Rest=71/123
+2026-03-12 22:23:34,242 [INFO] [SUCCESS] Created simulation session 128 for user demo_user
+2026-03-12 22:23:34,243 [INFO] [SUCCESS] Simulation started: Age 24, non_smoker
+2026-03-12 22:23:34,265 [INFO] [SUCCESS] Saved Heart Age (23.0) for session 128
+2026-03-12 22:23:41,232 [INFO] [SUCCESS] Saved simulation 128: duration=6.6s, risk_score=68.0
