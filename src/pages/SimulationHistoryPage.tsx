@@ -47,6 +47,22 @@ interface SimulationSession {
   duration?: number | null;
   risk_score?: number | null;
   heart_age?: number | null;
+  
+  // Clinical Modifiers (Phase 1/2 Snapshots)
+  patient_age?: number | null;
+  patient_gender?: string | null;
+  smoking_status?: string | null;
+  diabetes_history?: string | null;
+  alcohol_consumption?: string | null;
+  activity_level?: string | null;
+  pad_history?: string | null;
+
+  // Advanced Analytics (Phase 2)
+  peak_hr?: number | null;
+  peak_sbp?: number | null;
+  rest_duration?: number | null;
+  exercise_duration?: number | null;
+  recovery_duration?: number | null;
 }
 
 interface HistoryResponse {
@@ -412,6 +428,61 @@ export const SimulationHistoryPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Phase 2: Advanced Phase Breakdown */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Phase Analytics (Duration)</h4>
+                  <div className="bg-white rounded-3xl p-6 border border-gray-100 space-y-4 shadow-sm">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500 font-bold uppercase tracking-tight text-[10px]">Baseline Rest</span>
+                      <span className="font-black text-gray-800">{selectedSim.rest_duration ? `${Math.floor(selectedSim.rest_duration / 60)}m ${selectedSim.rest_duration % 60}s` : '--'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500 font-bold uppercase tracking-tight text-[10px]">Active Exercise</span>
+                      <span className="font-black text-orange-600">{selectedSim.exercise_duration ? `${Math.floor(selectedSim.exercise_duration / 60)}m ${selectedSim.exercise_duration % 60}s` : '--'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500 font-bold uppercase tracking-tight text-[10px]">Clinical Recovery</span>
+                      <span className="font-black text-emerald-600">{selectedSim.recovery_duration ? `${Math.floor(selectedSim.recovery_duration / 60)}m ${selectedSim.recovery_duration % 60}s` : '--'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Peak Physiological Stress</h4>
+                  <div className="bg-white rounded-3xl p-6 border border-gray-100 grid grid-cols-2 gap-4 shadow-sm">
+                    <div className="text-center p-3 bg-rose-50 rounded-2xl">
+                      <p className="text-[10px] font-black uppercase text-rose-600/40 mb-1">Peak HR</p>
+                      <p className="text-xl font-black text-rose-900">{selectedSim.peak_hr ? Math.round(selectedSim.peak_hr) : '--'} <span className="text-[10px]">BPM</span></p>
+                    </div>
+                    <div className="text-center p-3 bg-indigo-50 rounded-2xl">
+                      <p className="text-[10px] font-black uppercase text-indigo-600/40 mb-1">Peak SBP</p>
+                      <p className="text-xl font-black text-indigo-900">{selectedSim.peak_sbp ? Math.round(selectedSim.peak_sbp) : '--'} <span className="text-[10px]">mmHg</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lifestyle Snapshot */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Clinical Context Snapshot (Test Time)</h4>
+                <div className="flex flex-wrap gap-3">
+                  <div className="px-4 py-2 bg-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-600 flex items-center space-x-2">
+                    <Clock size={12} className="text-gray-400" />
+                    <span>Age: {selectedSim.patient_age || '--'}</span>
+                  </div>
+                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center space-x-2 ${selectedSim.smoking_status === 'smoker' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                    <span>{selectedSim.smoking_status?.replace('_', ' ') || 'Non-Smoker'}</span>
+                  </div>
+                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center space-x-2 ${selectedSim.pad_history === 'pad' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>
+                    <span>{selectedSim.pad_history === 'pad' ? 'PAD Positive' : 'No PAD'}</span>
+                  </div>
+                  <div className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl text-[10px] font-black uppercase tracking-widest">
+                    <span>{selectedSim.activity_level?.replace('_', ' ') || 'Active'}</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Diagnostic Commentary</h4>
                 <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100">
@@ -450,7 +521,7 @@ export const SimulationHistoryPage: React.FC = () => {
                           },
                           {
                             label: 'Systolic BP (mmHg)',
-                            data: simDataPoints.map(d => d.blood_pressure),
+                            data: simDataPoints.map(d => d.blood_pressure_systolic),
                             borderColor: 'rgb(167, 139, 250)',
                             backgroundColor: 'transparent',
                             tension: 0.4

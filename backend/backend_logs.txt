@@ -574,3 +574,253 @@ WHERE user_profiles.user_id = %(user_id_1)s
 2026-03-13 04:13:26,544 [INFO] [SUCCESS] Database initialized
 2026-03-13 04:13:26,544 [INFO] [SUCCESS] Simulation thread started
 2026-03-13 04:14:44,730 [INFO] [SHUTDOWN] Shutting down...
+2026-03-13 04:14:52,859 [INFO] [SUCCESS] ML model loaded
+2026-03-13 04:14:52,901 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 04:14:53,032 [INFO] [SUCCESS] Database initialized
+2026-03-13 04:14:53,032 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 04:14:53,109 [INFO] [LOG] /start endpoint called
+2026-03-13 04:14:53,109 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-13 04:14:53,109 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:14:53,109 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:14:53,109 [INFO] [LOG] Digital Twin Calibrated: RR=6.6 BPM/min, Rest=84/142
+2026-03-13 04:14:53,201 [INFO] [SUCCESS] Created simulation session 136 for user demo_user
+2026-03-13 04:14:53,201 [INFO] [SUCCESS] Simulation started: Age 23, non_smoker
+2026-03-13 04:14:53,208 [INFO] [LOG] /start endpoint called
+2026-03-13 04:14:53,208 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-13 04:14:53,208 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:14:53,213 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:14:53,213 [INFO] [LOG] Digital Twin Calibrated: RR=6.6 BPM/min, Rest=84/142
+2026-03-13 04:14:53,238 [INFO] [SUCCESS] Created simulation session 137 for user demo_user
+2026-03-13 04:14:53,239 [INFO] [SUCCESS] Simulation started: Age 23, non_smoker
+2026-03-13 04:14:53,365 [INFO] [SUCCESS] Saved Heart Age (43.0) for session 137
+2026-03-13 04:15:05,751 [INFO] [SUCCESS] Saved simulation 137: duration=12.2s, risk_score=43.0
+2026-03-13 04:15:17,893 [INFO] [LOG] /start endpoint called
+2026-03-13 04:15:17,893 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-13 04:15:17,893 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-13 04:15:17,895 [INFO] [SUCCESS] Engine created successfully
+2026-03-13 04:15:17,896 [INFO] [LOG] Digital Twin Calibrated: RR=11.3 BPM/min, Rest=73/137
+2026-03-13 04:15:17,913 [INFO] [SUCCESS] Created simulation session 138 for user demo_user
+2026-03-13 04:15:17,913 [INFO] [SUCCESS] Simulation started: Age 23, non_smoker
+2026-03-13 04:15:17,951 [INFO] [SUCCESS] Saved Heart Age (38.0) for session 138
+2026-03-13 04:15:24,269 [INFO] [SUCCESS] Saved simulation 138: duration=6.0s, risk_score=40.0
+2026-03-13 21:33:41,601 [INFO] [SUCCESS] ML model loaded
+2026-03-13 21:33:41,673 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-13 21:33:41,963 [INFO] [SUCCESS] Database initialized
+2026-03-13 21:33:41,965 [INFO] [SUCCESS] Simulation thread started
+2026-03-13 21:33:56,009 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-13 21:33:56,065 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-14 00:15:49,942 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:15:49,994 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:15:50,396 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:15:50,396 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:15:55,892 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 00:16:09,792 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-14 00:16:20,528 [WARNING] Login failure: Incorrect password for user 'demo_user'
+2026-03-14 00:16:26,174 [INFO] Successful login for user 'demo_user' (ID: 6)
+2026-03-14 00:17:46,401 [INFO] Successful login for user 'demo_user' (ID: 6)
+2026-03-14 00:37:08,719 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 00:37:15,832 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:37:15,877 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:37:16,070 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:37:16,071 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:37:21,088 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:37:21,137 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:37:21,227 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:37:21,229 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:37:22,816 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 00:37:28,246 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:37:28,303 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:37:28,396 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:37:28,398 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:37:31,333 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 00:37:36,808 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:37:36,853 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:37:36,944 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:37:36,945 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:47:46,502 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 00:47:52,855 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:47:52,903 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:47:53,036 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:47:53,037 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:51:04,087 [WARNING] Login failure: User 'phase2_tester' not found
+2026-03-14 00:51:06,289 [ERROR] Registration error: 'UserRegister' object has no attribute 'profile_name'
+2026-03-14 00:51:08,318 [WARNING] Login failure: User 'phase2_tester' not found
+2026-03-14 00:51:31,229 [ERROR] Registration error: 'UserRegister' object has no attribute 'profile_name'
+2026-03-14 00:51:50,323 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 00:51:56,091 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:51:56,144 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:51:56,279 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:51:56,279 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:52:03,326 [INFO] Successful login for user 'tester_1773429718' (ID: 12)
+2026-03-14 00:52:30,174 [INFO] Successful login for user 'tester_1773429745' (ID: 13)
+2026-03-14 00:52:32,230 [INFO] [LOG] /start endpoint called
+2026-03-14 00:52:32,230 [INFO] [LOG] Request received: age=40, sex=1
+2026-03-14 00:52:32,230 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 00:52:32,230 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 00:52:32,230 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56/110
+2026-03-14 00:52:32,312 [ERROR] Error: (psycopg2.errors.UndefinedColumn) column "rest_duration" of relation "simulation_sessions" does not exist
+LINE 1: ...abnormalities_detected, notes, peak_hr, peak_sbp, rest_durat...
+                                                             ^
+
+[SQL: INSERT INTO simulation_sessions (name, created_at, updated_at, user_id, simulation_type, simulation_subtype, protocol, duration, user_data, patient_age, patient_gender, smoking_status, diabetes_history, alcohol_consumption, activity_level, pad_history, sim_metadata, tags, risk_score, abnormalities_detected, notes, peak_hr, peak_sbp, rest_duration, exercise_duration, recovery_duration) VALUES (%(name)s, %(created_at)s, %(updated_at)s, %(user_id)s, %(simulation_type)s, %(simulation_subtype)s, %(protocol)s, %(duration)s, %(user_data)s::JSON, %(patient_age)s, %(patient_gender)s, %(smoking_status)s, %(diabetes_history)s, %(alcohol_consumption)s, %(activity_level)s, %(pad_history)s, %(sim_metadata)s::JSON, %(tags)s::JSON, %(risk_score)s, %(abnormalities_detected)s::JSON, %(notes)s, %(peak_hr)s, %(peak_sbp)s, %(rest_duration)s, %(exercise_duration)s, %(recovery_duration)s) RETURNING simulation_sessions.id]
+[parameters: {'name': 'Simulation 2026-03-14 00:52', 'created_at': datetime.datetime(2026, 3, 13, 19, 22, 32, 296825), 'updated_at': datetime.datetime(2026, 3, 13, 19, 22, 32, 296825), 'user_id': 13, 'simulation_type': 'stress_test', 'simulation_subtype': None, 'protocol': 'standard', 'duration': None, 'user_data': '{"age": 40, "sex": "1", "cp": "0", "fbs": "0", "restecg": "0", "slope": "1", "ca": "0", "thal": "2", "smoking_status": "non_smoker", "diabetes_histor ... (112 characters truncated) ... "rest_duration_s": 60, "exercise_duration_s": 60, "recovery_duration_s": 300, "max_workload_level": 3, "protocol": "standard"}, "session_name": null}', 'patient_age': 40, 'patient_gender': 'M', 'smoking_status': 'non_smoker', 'diabetes_history': 'none', 'alcohol_consumption': 'none', 'activity_level': 'athlete', 'pad_history': 'no_pad', 'sim_metadata': '{}', 'tags': '[]', 'risk_score': None, 'abnormalities_detected': '[]', 'notes': None, 'peak_hr': None, 'peak_sbp': None, 'rest_duration': None, 'exercise_duration': None, 'recovery_duration': None}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-03-14 00:54:24,156 [INFO] Successful login for user 'tester_1773429859' (ID: 14)
+2026-03-14 00:54:26,218 [INFO] [LOG] /start endpoint called
+2026-03-14 00:54:26,224 [INFO] [LOG] Request received: age=40, sex=1
+2026-03-14 00:54:26,231 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 00:54:26,231 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 00:54:26,231 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56/110
+2026-03-14 00:54:26,308 [INFO] [SUCCESS] Created simulation session 139 for user tester_1773429859
+2026-03-14 00:54:26,317 [INFO] [SUCCESS] Simulation started: Age 40, non_smoker
+2026-03-14 00:57:22,186 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 00:57:30,672 [INFO] [SUCCESS] ML model loaded
+2026-03-14 00:57:30,732 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 00:57:30,863 [INFO] [SUCCESS] Database initialized
+2026-03-14 00:57:30,869 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 00:57:36,506 [INFO] Successful login for user 'tester_1773430052' (ID: 15)
+2026-03-14 00:57:38,572 [INFO] [LOG] /start endpoint called
+2026-03-14 00:57:38,572 [INFO] [LOG] Request received: age=40, sex=1
+2026-03-14 00:57:38,572 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 00:57:38,574 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 00:57:38,574 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56/110
+2026-03-14 00:57:38,613 [INFO] [SUCCESS] Created simulation session 140 for user tester_1773430052
+2026-03-14 00:57:38,613 [INFO] [SUCCESS] Simulation started: Age 40, non_smoker
+2026-03-14 01:07:31,393 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:07:40,277 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:07:40,333 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:07:40,449 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:07:40,450 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:07:50,703 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:07:57,893 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:07:57,968 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:07:58,083 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:07:58,083 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:08:19,492 [INFO] Successful login for user 'tester_1773430694' (ID: 16)
+2026-03-14 01:08:21,565 [INFO] [LOG] /start endpoint called
+2026-03-14 01:08:21,565 [INFO] [LOG] Request received: age=40, sex=1
+2026-03-14 01:08:21,565 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 01:08:21,565 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 01:08:21,568 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56/110
+2026-03-14 01:08:21,675 [INFO] [SUCCESS] Created simulation session 141 for user tester_1773430694
+2026-03-14 01:08:21,676 [INFO] [SUCCESS] Simulation started: Age 40, non_smoker
+2026-03-14 01:10:32,553 [INFO] [SUCCESS] Saved final simulation 141: duration=130.8s, risk_score=47.0
+2026-03-14 01:11:32,661 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:11:40,274 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:11:40,336 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:11:40,460 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:11:40,463 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:12:08,360 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:12:08,431 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:12:08,562 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:12:08,565 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:12:08,568 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:14:53,347 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:14:53,442 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:14:53,564 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:14:53,564 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:14:53,568 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:17:18,586 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:17:18,652 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:17:18,772 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:17:18,774 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:17:44,720 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:17:44,789 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:17:44,912 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:17:44,913 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:18:03,828 [INFO] Successful login for user 'tester_1773431279' (ID: 17)
+2026-03-14 01:18:05,897 [INFO] [LOG] /start endpoint called
+2026-03-14 01:18:05,897 [INFO] [LOG] Request received: age=40, sex=1
+2026-03-14 01:18:05,897 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 01:18:05,901 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 01:18:05,901 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56/110
+2026-03-14 01:18:05,982 [INFO] [SUCCESS] Created simulation session 142 for user tester_1773431279
+2026-03-14 01:18:05,983 [INFO] [SUCCESS] Simulation started: Age 40, non_smoker
+2026-03-14 01:19:30,010 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:19:30,081 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:19:30,215 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:19:30,217 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:20:16,738 [INFO] [SUCCESS] Saved final simulation 142: duration=130.8s, risk_score=47.0
+2026-03-14 01:44:41,444 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:44:48,343 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:44:48,380 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:44:48,478 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:44:48,480 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:47:29,660 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 01:48:03,683 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:48:03,709 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:48:03,777 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:48:03,778 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:48:29,894 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:48:29,918 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:48:29,975 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:48:29,976 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:50:09,041 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:50:09,067 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:50:09,135 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:50:09,136 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:50:16,067 [INFO] [SUCCESS] ML model loaded
+2026-03-14 01:50:16,097 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 01:50:16,180 [INFO] [SUCCESS] Database initialized
+2026-03-14 01:50:16,183 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 01:50:35,911 [INFO] Successful login for user 'demo_user' (ID: 6)
+2026-03-14 01:50:52,057 [INFO] [LOG] /start endpoint called
+2026-03-14 01:50:52,057 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-14 01:50:52,057 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 01:50:52,057 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 01:50:52,057 [INFO] [LOG] Digital Twin Calibrated: RR=6.6 BPM/min, Rest=84/142
+2026-03-14 01:50:52,099 [INFO] [SUCCESS] Created simulation session 143 for user demo_user
+2026-03-14 01:50:52,099 [INFO] [SUCCESS] Simulation started: Age 23, non_smoker
+2026-03-14 01:50:52,246 [INFO] [SUCCESS] Saved Heart Age (43.0) for session 143
+2026-03-14 01:50:58,010 [INFO] [SUCCESS] Saved final simulation 143: duration=5.9s, risk_score=43.0
+2026-03-14 01:58:52,487 [INFO] [LOG] /start endpoint called
+2026-03-14 01:58:52,487 [INFO] [LOG] Request received: age=23, sex=1
+2026-03-14 01:58:52,489 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-14 01:58:52,489 [INFO] [SUCCESS] Engine created successfully
+2026-03-14 01:58:52,489 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=79/127
+2026-03-14 01:58:52,508 [INFO] [SUCCESS] Created simulation session 144 for user demo_user
+2026-03-14 01:58:52,508 [INFO] [SUCCESS] Simulation started: Age 23, non_smoker
+2026-03-14 01:58:52,591 [INFO] [SUCCESS] Saved Heart Age (26.0) for session 144
+2026-03-14 01:59:49,569 [INFO] [SUCCESS] Saved final simulation 144: duration=56.6s, risk_score=38.0
+2026-03-14 02:01:15,094 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:01:18,646 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:01:24,808 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:01:28,722 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:01:41,049 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:02:45,953 [INFO] Successful login for user 'demo_user' (ID: 6)
+2026-03-14 02:11:32,382 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 02:11:45,611 [INFO] [SUCCESS] ML model loaded
+2026-03-14 02:11:45,645 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 02:11:45,787 [INFO] [SUCCESS] Database initialized
+2026-03-14 02:11:45,788 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 02:14:40,584 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 02:14:45,520 [INFO] [SUCCESS] ML model loaded
+2026-03-14 02:14:45,547 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 02:14:45,628 [INFO] [SUCCESS] Database initialized
+2026-03-14 02:14:45,629 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 02:16:40,563 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 02:16:48,834 [INFO] [SUCCESS] ML model loaded
+2026-03-14 02:16:48,865 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 02:16:48,930 [INFO] [SUCCESS] Database initialized
+2026-03-14 02:16:48,932 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 02:16:55,671 [WARNING] Login failure: User 'sdljhksjhds' not found
+2026-03-14 02:18:59,248 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 02:19:04,044 [INFO] [SUCCESS] ML model loaded
+2026-03-14 02:19:04,068 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 02:19:04,130 [INFO] [SUCCESS] Database initialized
+2026-03-14 02:19:04,130 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 02:19:06,392 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:08,999 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:13,917 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:15,287 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:27,051 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:35,528 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:38,377 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:40,381 [WARNING] Login failure: User 'user_demo' not found
+2026-03-14 02:19:50,347 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-14 02:22:03,181 [INFO] [SHUTDOWN] Shutting down...
+2026-03-14 02:22:06,655 [INFO] [SUCCESS] ML model loaded
+2026-03-14 02:22:06,682 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-14 02:22:06,742 [INFO] [SUCCESS] Database initialized
+2026-03-14 02:22:06,744 [INFO] [SUCCESS] Simulation thread started
+2026-03-14 02:23:27,615 [INFO] [SHUTDOWN] Shutting down...

@@ -184,6 +184,13 @@ class SimulationSession(Base):
     abnormalities_detected = Column(JSON, default=[])  # List of abnormalities
     notes = Column(Text)  # Clinical notes or observations
 
+    # Advanced Phase 2 Analytics
+    peak_hr = Column(Float)
+    peak_sbp = Column(Float)
+    rest_duration = Column(Integer)     # Time spent in rest phase (seconds)
+    exercise_duration = Column(Integer) # Time spent in exercise phase (seconds)
+    recovery_duration = Column(Integer) # Time spent in recovery phase (seconds)
+    
     # Relationship with user
     user = relationship("User", back_populates="sessions")
 

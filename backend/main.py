@@ -11,7 +11,9 @@ from typing import Optional, List, Dict, Any
 from enum import Enum
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi import FastAPI, HTTPException, status, Depends, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import logging
@@ -24,16 +26,21 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 # Configure logging
-logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("kardiatwin")
 logger.setLevel(logging.INFO)
 
+# Clear existing handlers
+if logger.hasHandlers():
+    logger.handlers.clear()
+
 # File Handler
-file_handler = logging.FileHandler("backend_logs.txt", mode="a")
+file_handler = logging.FileHandler("backend_logs.txt", mode="a", encoding="utf-8")
 file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(file_handler)
 
-# Stream Handler (ensure it shows in uvicorn too)
-stream_handler = logging.StreamHandler()
+# Stream Handler
+stream_handler = logging.StreamHandler() # No custom flush, let standard library handle it
 stream_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(stream_handler)
 
@@ -223,6 +230,13 @@ class PhysiologySimulationEngine:
             "medium": 0.4
         }
         self.previous_risk_level = None
+
+        # Phase 2: Analytics Tracking
+        self.peak_hr = 0.0
+        self.peak_sbp = 0.0
+        self.rest_duration_actual = 0.0
+        self.exercise_duration_actual = 0.0
+        self.recovery_duration_actual = 0.0
 
     def pause(self):
         if not self.paused:
@@ -513,14 +527,23 @@ class PhysiologySimulationEngine:
         self.total_duration_s += dt
 
         if self.phase == "rest":
+            self.rest_duration_actual += dt
             if self.phase_elapsed_s >= self.config["rest_duration_s"]:
                 self.phase = "exercise"
                 self.phase_elapsed_s = 0.0
                 self.stage = 0
                 self.stage_time = 0.0
         elif self.phase == "exercise":
+            self.exercise_duration_actual += dt
+            # Track peaks
+            if self.hr > self.peak_hr: self.peak_hr = self.hr
+            if self.sbp > self.peak_sbp: self.peak_sbp = self.sbp
+            
+            # Determine if exercise should end (protocol finished or override duration reached)
             current_config = self._get_current_stage_config()
-            if current_config is None:
+            target_duration = self.config.get("exercise_duration_s")
+            
+            if (target_duration and self.phase_elapsed_s >= target_duration) or current_config is None:
                 self.phase = "recovery"
                 self.phase_elapsed_s = 0.0
                 return
@@ -543,6 +566,7 @@ class PhysiologySimulationEngine:
                 self._advance_stage()
 
         elif self.phase == "recovery":
+            self.recovery_duration_actual += dt
             recovery_rate = self.recovery_rate_per_min * (dt / 60.0)
             
             # Clinical Rule: SBP normalizes at ~0.8x of HRR speed
@@ -552,8 +576,15 @@ class PhysiologySimulationEngine:
             self.hr = max(self.baseline_hr, self.hr - recovery_rate)
             self.sbp = max(self.baseline_sbp, self.sbp - sbp_recovery)
 
-            if self.phase_elapsed_s >= self.config["recovery_duration_s"]:
+            # Dynamic Recovery Logic: 
+            # End when vitals return to personal baseline (+/- 2 BPM / 5 mmHg)
+            # OR if we hit an absolute safety timeout (e.g., 10 mins)
+            hr_recovered = self.hr <= (self.baseline_hr + 2.0)
+            sbp_recovered = self.sbp <= (self.baseline_sbp + 5.0)
+            
+            if (hr_recovered and sbp_recovered) or self.phase_elapsed_s >= 600:
                 self.protocol_finished = True
+                self.phase = "idle"
 
     def _get_current_stage_config(self):
         # Validate protocol exists
@@ -736,6 +767,15 @@ def background_simulation():
 
                     state.engine.update(dt)
 
+                    if state.engine.protocol_finished and state.running:
+                        logger.info("✨ Simulation protocol finished naturally. Triggering auto-stop.")
+                        # We can't call stop() directly from thread easily if it's an async route, 
+                        # but we can set state.running = False and run the stop logic
+                        state.running = False
+                        # Trigger the same logic as /stop_simulation but within this thread
+                        trigger_stop_logic()
+                        continue
+
                     try:
                         state.latest_data = state.engine.to_latest_data()
                         # Run the Alert Watchdog
@@ -819,6 +859,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    error_details = exc.errors()
+    logger.error(f"❌ [422 VALIDATION ERROR] {error_details}")
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": error_details},
+    )
 
 # ==================== ENDPOINTS ====================
 
@@ -1071,6 +1120,13 @@ async def list_user_simulations(
             summary.diabetes_history = s.diabetes_history
             summary.alcohol_consumption = s.alcohol_consumption
             summary.activity_level = s.activity_level
+            
+            # Phase 2 Analytics mapping
+            summary.peak_hr = s.peak_hr
+            summary.peak_sbp = s.peak_sbp
+            summary.rest_duration = s.rest_duration
+            summary.exercise_duration = s.exercise_duration
+            summary.recovery_duration = s.recovery_duration
 
             # Get latest heart age for this session
             from models import HeartAgeDataPoint
@@ -1084,6 +1140,37 @@ async def list_user_simulations(
             "total": total,
             "limit": limit,
             "offset": offset
+        }
+    finally:
+        close_db_session(db)
+
+
+@app.get("/api/simulations/{session_id}/data")
+async def get_simulation_data(
+    session_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all high-resolution data points for a simulation session"""
+    db = get_db_session()
+    try:
+        # Verify ownership
+        session = db.query(SimulationSession).filter(
+            (SimulationSession.id == session_id) & (SimulationSession.user_id == current_user.id)
+        ).first()
+
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Simulation not found or not authorized"
+            )
+
+        data_points = db.query(StressTestDataPoint).filter(
+            StressTestDataPoint.session_id == session_id
+        ).order_by(StressTestDataPoint.timestamp.asc()).all()
+
+        return {
+            "session_id": session_id,
+            "data_points": [dp.to_dict() for dp in data_points]
         }
     finally:
         close_db_session(db)
@@ -1347,12 +1434,8 @@ async def get_prediction():
         logger.error(f"Error in /prediction endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Simulation error: {str(e)}")
 
-@app.post("/stop_simulation")
-async def stop():
-    """Stop the simulation and save final metrics to database"""
-    state.running = False
-
-    # Save final simulation metrics if this was an authenticated user's session
+def trigger_stop_logic():
+    """Helper to stop simulation and save final metrics. Reused by auto-stop and manual-stop."""
     if state.session_id and state.start_time:
         try:
             db = get_db_session()
@@ -1375,17 +1458,31 @@ async def stop():
             if session:
                 session.duration = int(duration)
                 session.risk_score = float(risk_score) if risk_score is not None else None
+                
+                # Save Phase 2 Analytics
+                if state.engine:
+                    session.peak_hr = float(state.engine.peak_hr)
+                    session.peak_sbp = float(state.engine.peak_sbp)
+                    session.rest_duration = int(state.engine.rest_duration_actual)
+                    session.exercise_duration = int(state.engine.exercise_duration_actual)
+                    session.recovery_duration = int(state.engine.recovery_duration_actual)
+
                 db.commit()
-                logger.info(f"[SUCCESS] Saved simulation {state.session_id}: duration={duration:.1f}s, risk_score={risk_score}")
+                logger.info(f"[SUCCESS] Saved final simulation {state.session_id}: duration={duration:.1f}s, risk_score={risk_score}")
 
             close_db_session(db)
         except Exception as e:
-            logger.error(f"[ERROR] Error saving simulation metrics: {e}")
+            logger.error(f"[ERROR] Error in trigger_stop_logic: {e}")
 
     # Reset simulation state
     state.session_id = None
     state.start_time = None
 
+@app.post("/stop_simulation")
+async def stop():
+    """Stop the simulation and save final metrics to database"""
+    state.running = False
+    trigger_stop_logic()
     return {"message": "Stopped"}
 
 @app.post("/pause_simulation")

@@ -14,6 +14,7 @@ class UserRegister(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
     password: str = Field(..., min_length=8)
+    profile_name: Optional[str] = None
 
 
 class UserLogin(BaseModel):
@@ -27,6 +28,7 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str
+    profile_name: Optional[str] = None
     created_at: datetime
 
     class Config:
@@ -89,6 +91,13 @@ class SimulationSummary(BaseModel):
     alcohol_consumption: Optional[str] = None
     activity_level: Optional[str] = None
     pad_history: Optional[str] = None
+
+    # Advanced Phase 2 Analytics
+    peak_hr: Optional[float] = None
+    peak_sbp: Optional[float] = None
+    rest_duration: Optional[int] = None
+    exercise_duration: Optional[int] = None
+    recovery_duration: Optional[int] = None
 
     class Config:
         from_attributes = True

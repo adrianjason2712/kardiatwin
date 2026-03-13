@@ -404,7 +404,7 @@ export const SimulationPage: React.FC<SimulationPageProps> = ({
                       </label>
                       <div className="grid grid-cols-2 gap-2">
                         {[
-                          { value: 'none', label: 'No PAD' },
+                          { value: 'no_pad', label: 'No PAD' },
                           { value: 'pad', label: 'PAD Diagnosed' }
                         ].map((option) => (
                           <div
