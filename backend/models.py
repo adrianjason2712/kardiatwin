@@ -70,6 +70,7 @@ class User(Base):
     # Relationships
     sessions = relationship("SimulationSession", back_populates="user", cascade="all, delete-orphan")
     profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    chat_messages = relationship("ChatMessage", back_populates="user", cascade="all, delete-orphan")
 
     # Indexes for performance
     __table_args__ = (
@@ -457,6 +458,7 @@ class SimulationAlert(Base):
     # Relationship
     session = relationship("SimulationSession", back_populates="alerts")
 
+
     __table_args__ = (
         Index('idx_alert_session_severity', 'session_id', 'severity'),
         Index('idx_alert_type', 'alert_type'),
@@ -472,6 +474,29 @@ class SimulationAlert(Base):
             "value": self.value,
             "threshold": self.threshold,
             "phase": self.phase
+        }
+
+
+class ChatMessage(Base):
+    """Model for storing user chat history with the AI"""
+    __tablename__ = 'chat_messages'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
+    role = Column(String(50), nullable=False)  # 'user' | 'model'
+    content = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+    # Relationship
+    user = relationship("User", back_populates="chat_messages")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "role": self.role,
+            "content": self.content,
+            "timestamp": self.timestamp.isoformat()
         }
 
 

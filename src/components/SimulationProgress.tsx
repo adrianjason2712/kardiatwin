@@ -154,8 +154,8 @@ export const SimulationProgress: React.FC<SimulationProgressProps> = ({
       phaseHistory.includes('exercise') &&
       phaseHistory.includes('recovery');
 
-    // Check if we're back to rest phase after completing all phases
-    const isBackToRestAfterCompletion = phase === 'rest' &&
+    // Check if we're back to rest phase or in idle after completing all phases
+    const isBackToRestAfterCompletion = (phase === 'rest' || phase === 'idle') &&
       hasCompletedAllPhases &&
       phaseHistory.length >= 3;
 

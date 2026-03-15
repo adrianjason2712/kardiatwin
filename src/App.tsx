@@ -7,8 +7,10 @@ import { SimulationPage } from './pages/SimulationPage';
 import { HeartAgeCalculatorPage } from './pages/HeartAgeCalculatorPage';
 import { WhatIfCalculatorPage } from './pages/WhatIfCalculatorPage';
 import { SimulationHistoryPage } from './pages/SimulationHistoryPage';
+import SimulationAnalyticsPage from './pages/SimulationAnalyticsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { useAuth } from './contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -148,7 +150,7 @@ function App() {
     alcohol_consumption: userData.alcohol_consumption,
     activity_level: userData.activity_level
   });
-  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if' | 'history' | 'profile'>('simulation');
+  const [currentPage, setCurrentPage] = useState<'simulation' | 'heart-age' | 'what-if' | 'history' | 'profile' | 'analytics'>('simulation');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [thresholds, setThresholds] = useState({
@@ -158,6 +160,7 @@ function App() {
   });
   const [alerts, setAlerts] = useState<any[]>([]);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
 
   // Fetch profile when authenticated to prefill data
@@ -185,6 +188,17 @@ function App() {
         .catch(err => console.error('Failed to load thresholds', err));
     }
   }, [isAuthenticated]);
+
+  // Sync state with URL
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/simulation') setCurrentPage('simulation');
+    else if (path === '/heart-age') setCurrentPage('heart-age');
+    else if (path === '/what-if') setCurrentPage('what-if');
+    else if (path === '/history') setCurrentPage('history');
+    else if (path === '/profile') setCurrentPage('profile');
+    else if (path.startsWith('/analytics/')) setCurrentPage('analytics');
+  }, [location.pathname]);
 
   const handleUpdateThresholds = async (newThresholds: any) => {
     try {
@@ -827,6 +841,10 @@ function App() {
 
             {currentPage === 'history' && (
               <SimulationHistoryPage />
+            )}
+
+            {currentPage === 'analytics' && (
+              <SimulationAnalyticsPage />
             )}
 
             {currentPage === 'profile' && (

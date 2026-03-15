@@ -18,29 +18,32 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import logging
 
-from models import init_db, get_db_session, close_db_session, User, SimulationSession, StressTestDataPoint, UserProfile, SimulationAlert
+from models import (
+    Base, User, UserProfile, SimulationSession, StressTestDataPoint, 
+    SimulationAlert, init_db, get_db_session, close_db_session, ChatMessage
+)
 from auth import get_password_hash, verify_password, create_access_token, create_refresh_token, verify_token
-from schemas import UserRegister, UserLogin, UserResponse, Token, SimulationSummary, SimulationList, UserProfileResponse, UserProfileUpdate
+from schemas import (
+    UserRegister, UserLogin, UserResponse, Token, SimulationSummary, 
+    SimulationList, UserProfileResponse, UserProfileUpdate,
+    ChatRequest, ChatResponse, ChatMessageSchema
+)
+from ai_handler import kardia_ai
 from dependencies import get_current_user, get_current_user_optional
 from sqlalchemy.orm import Session
 from datetime import datetime
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("kardiatwin")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Clear existing handlers
-if logger.hasHandlers():
-    logger.handlers.clear()
-
 # File Handler
-file_handler = logging.FileHandler("backend_logs.txt", mode="a", encoding="utf-8")
+file_handler = logging.FileHandler("backend_logs.txt", mode="a")
 file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(file_handler)
 
-# Stream Handler
-stream_handler = logging.StreamHandler() # No custom flush, let standard library handle it
+# Stream Handler (ensure it shows in uvicorn too)
+stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(stream_handler)
 
@@ -82,9 +85,9 @@ class PADHistory(str, Enum):
 # ==================== PYDANTIC MODELS ====================
 
 class SimulationConfig(BaseModel):
-    rest_duration_s: Optional[int] = 60
-    exercise_duration_s: Optional[int] = 180
-    recovery_duration_s: Optional[int] = 120
+    rest_duration_s: Optional[int] = None
+    exercise_duration_s: Optional[int] = None
+    recovery_duration_s: Optional[int] = None
     max_workload_level: Optional[int] = 3
     protocol: Optional[str] = "standard"
 
@@ -98,8 +101,8 @@ class SimulationConfig(BaseModel):
     @field_validator('exercise_duration_s')
     @classmethod
     def validate_exercise(cls, v):
-        if v and (v < 60 or v > 600):
-            raise ValueError('exercise_duration_s: 60-600 seconds')
+        if v and (v < 60 or v > 1800):
+            raise ValueError('exercise_duration_s: 60-1800 seconds')
         return v
 
 class StartSimulationRequest(BaseModel):
@@ -186,9 +189,9 @@ class PhysiologySimulationEngine:
 
         # Config
         self.config = {
-            "rest_duration_s": 60,
-            "exercise_duration_s": 180,
-            "recovery_duration_s": 120,
+            "rest_duration_s": None,
+            "exercise_duration_s": None,
+            "recovery_duration_s": None,
             "max_workload_level": 3,
             "protocol": "standard"
         }
@@ -381,6 +384,10 @@ class PhysiologySimulationEngine:
         self.hr = self.baseline_hr
         self.sbp = self.baseline_sbp
         
+        # Initialize peaks to baseline values (Phase 2 hardening)
+        self.peak_hr = self.baseline_hr
+        self.peak_sbp = self.baseline_sbp
+        
         logger.info(f"[LOG] Digital Twin Calibrated: RR={self.recovery_rate_per_min:.1f} BPM/min, Rest={self.baseline_hr:.0f}/{self.baseline_sbp:.0f}")
 
     def calculate_adaptive_thresholds(self):
@@ -526,24 +533,28 @@ class PhysiologySimulationEngine:
         self.phase_elapsed_s += dt
         self.total_duration_s += dt
 
+        # Track peaks globally across all phases (Phase 2 fix)
+        if self.hr > self.peak_hr: self.peak_hr = self.hr
+        if self.sbp > self.peak_sbp: self.peak_sbp = self.sbp
+
         if self.phase == "rest":
             self.rest_duration_actual += dt
-            if self.phase_elapsed_s >= self.config["rest_duration_s"]:
+            rest_target = self.config.get("rest_duration_s") or 60  # Default to 60s rest if not set
+            if self.phase_elapsed_s >= rest_target:
                 self.phase = "exercise"
                 self.phase_elapsed_s = 0.0
                 self.stage = 0
                 self.stage_time = 0.0
         elif self.phase == "exercise":
             self.exercise_duration_actual += dt
-            # Track peaks
-            if self.hr > self.peak_hr: self.peak_hr = self.hr
-            if self.sbp > self.peak_sbp: self.peak_sbp = self.sbp
             
-            # Determine if exercise should end (protocol finished or override duration reached)
+            # Determine if exercise should end
             current_config = self._get_current_stage_config()
             target_duration = self.config.get("exercise_duration_s")
             
-            if (target_duration and self.phase_elapsed_s >= target_duration) or current_config is None:
+            # If target_duration provided (via What-If or Config Override), use it as a hard cap.
+            # Otherwise, ONLY end when current_config is None (all stages finished).
+            if (target_duration and self.phase_elapsed_s >= target_duration) or (not target_duration and current_config is None):
                 self.phase = "recovery"
                 self.phase_elapsed_s = 0.0
                 return
@@ -578,11 +589,11 @@ class PhysiologySimulationEngine:
 
             # Dynamic Recovery Logic: 
             # End when vitals return to personal baseline (+/- 2 BPM / 5 mmHg)
-            # OR if we hit an absolute safety timeout (e.g., 10 mins)
+            # OR if we hit the standard 2-minute recovery cap (matching UI)
             hr_recovered = self.hr <= (self.baseline_hr + 2.0)
             sbp_recovered = self.sbp <= (self.baseline_sbp + 5.0)
             
-            if (hr_recovered and sbp_recovered) or self.phase_elapsed_s >= 600:
+            if (hr_recovered and sbp_recovered) or self.phase_elapsed_s >= 120:
                 self.protocol_finished = True
                 self.phase = "idle"
 
@@ -791,9 +802,15 @@ def background_simulation():
                                     SimulationSession.id == state.session_id
                                 ).first()
                                 if session_record:
+                                    # Periodic Live Capture: Save progress every 2 seconds
                                     session_record.duration = int(state.engine.total_duration_s)
+                                    session_record.peak_hr = float(state.engine.peak_hr)
+                                    session_record.peak_sbp = float(state.engine.peak_sbp)
+                                    session_record.rest_duration = int(state.engine.rest_duration_actual)
+                                    session_record.exercise_duration = int(state.engine.exercise_duration_actual)
+                                    session_record.recovery_duration = int(state.engine.recovery_duration_actual)
                                 
-                                # Save data point every 2 seconds
+                                # Save telemetry data point every 2 seconds
                                 dp = StressTestDataPoint(
                                     session_id=state.session_id,
                                     timestamp=round(float(state.engine.total_duration_s)),
@@ -1145,6 +1162,52 @@ async def list_user_simulations(
         close_db_session(db)
 
 
+@app.get("/api/simulations/{session_id}", response_model=SimulationSummary)
+async def get_simulation_summary(
+    session_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Get metadata summary for a single simulation session"""
+    db = get_db_session()
+    try:
+        session = db.query(SimulationSession).filter(
+            (SimulationSession.id == session_id) & (SimulationSession.user_id == current_user.id)
+        ).first()
+
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Simulation not found or not authorized"
+            )
+
+        summary = SimulationSummary.model_validate(session)
+        
+        # Map snapshot/analytics fields
+        summary.patient_age = session.patient_age
+        summary.patient_gender = session.patient_gender
+        summary.smoking_status = session.smoking_status
+        summary.diabetes_history = session.diabetes_history
+        summary.alcohol_consumption = session.alcohol_consumption
+        summary.activity_level = session.activity_level
+        summary.pad_history = session.pad_history
+        
+        summary.peak_hr = session.peak_hr
+        summary.peak_sbp = session.peak_sbp
+        summary.rest_duration = session.rest_duration
+        summary.exercise_duration = session.exercise_duration
+        summary.recovery_duration = session.recovery_duration
+
+        # Get latest heart age
+        from models import HeartAgeDataPoint
+        ha_record = db.query(HeartAgeDataPoint).filter(HeartAgeDataPoint.session_id == session.id).first()
+        if ha_record:
+            summary.heart_age = ha_record.biological_age
+
+        return summary
+    finally:
+        close_db_session(db)
+
+
 @app.get("/api/simulations/{session_id}/data")
 async def get_simulation_data(
     session_id: int,
@@ -1436,12 +1499,13 @@ async def get_prediction():
 
 def trigger_stop_logic():
     """Helper to stop simulation and save final metrics. Reused by auto-stop and manual-stop."""
-    if state.session_id and state.start_time:
+    current_session_id = state.session_id
+    if current_session_id and state.start_time:
         try:
             db = get_db_session()
 
             # Calculate simulation duration in seconds
-            duration = state.engine.total_duration_s if state.engine else (time.time() - state.start_time)
+            actual_duration = state.engine.total_duration_s if state.engine else (time.time() - state.start_time)
 
             # Extract risk score from latest data
             risk_score = None
@@ -1452,29 +1516,35 @@ def trigger_stop_logic():
 
             # Update the simulation session with final values
             session = db.query(SimulationSession).filter(
-                SimulationSession.id == state.session_id
+                SimulationSession.id == current_session_id
             ).first()
 
             if session:
-                session.duration = int(duration)
-                session.risk_score = float(risk_score) if risk_score is not None else None
+                session.duration = int(actual_duration)
+                session.risk_score = float(risk_score) if risk_score is not None else session.risk_score
                 
-                # Save Phase 2 Analytics
+                # Save Phase 2 Analytics (Final Sync)
                 if state.engine:
                     session.peak_hr = float(state.engine.peak_hr)
                     session.peak_sbp = float(state.engine.peak_sbp)
                     session.rest_duration = int(state.engine.rest_duration_actual)
                     session.exercise_duration = int(state.engine.exercise_duration_actual)
                     session.recovery_duration = int(state.engine.recovery_duration_actual)
+                    
+                    # Ensure risk score is captured
+                    prediction = state.engine.predict_risk()
+                    session.risk_score = float(prediction["probability"])
+                    
+                    logger.info(f"[LOG] Finalizing Metrics for Session {current_session_id}: PeakHR={session.peak_hr:.1f}, ExDur={session.exercise_duration}s")
 
                 db.commit()
-                logger.info(f"[SUCCESS] Saved final simulation {state.session_id}: duration={duration:.1f}s, risk_score={risk_score}")
+                logger.info(f"[SUCCESS] Saved final simulation {current_session_id}: duration={actual_duration:.1f}s, risk_score={risk_score}")
 
             close_db_session(db)
         except Exception as e:
-            logger.error(f"[ERROR] Error in trigger_stop_logic: {e}")
+            logger.error(f"[ERROR] Error in trigger_stop_logic for session {current_session_id}: {e}", exc_info=True)
 
-    # Reset simulation state
+    # Reset simulation state ONLY after attempt
     state.session_id = None
     state.start_time = None
 
@@ -1797,6 +1867,73 @@ async def biological_age():
         "interpretation": interpretation,
         "impacts": impacts
     }
+
+
+# ==================== AI CHATBOT ENDPOINTS ====================
+
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat_with_advisor(
+    request: ChatRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Secure endpoint to chat with the AI Clinical Advisor"""
+    db = get_db_session()
+    try:
+        # Generate response using the RAG handler
+        ai_response = kardia_ai.generate_response(db, current_user.id, request.message)
+        logger.debug(f"AI handler returned: {ai_response[:50]}...")
+        
+        # Fetch updated history to return to UI
+        history_records = db.query(ChatMessage).filter(
+            ChatMessage.user_id == current_user.id
+        ).order_by(ChatMessage.timestamp.desc(), ChatMessage.id.desc()).limit(10).all()
+        
+        # Reverse to chronological for UI
+        history_records.reverse()
+        history_schemas = [ChatMessageSchema.model_validate(msg) for msg in history_records]
+        
+        return {
+            "response": ai_response,
+            "history": history_schemas
+        }
+    except Exception as e:
+        logger.error(f"Chat API error: {e}")
+        raise HTTPException(status_code=500, detail="AI Service currently unavailable")
+    finally:
+        close_db_session(db)
+
+@app.get("/api/chat/history", response_model=list[ChatMessageSchema])
+async def get_my_chat_history(
+    limit: int = 50,
+    current_user: User = Depends(get_current_user)
+):
+    """Retrieve personal chat history"""
+    db = get_db_session()
+    try:
+        messages = db.query(ChatMessage).filter(
+            ChatMessage.user_id == current_user.id
+        ).order_by(ChatMessage.timestamp.desc(), ChatMessage.id.desc()).limit(limit).all()
+        
+        messages.reverse()
+        return [ChatMessageSchema.model_validate(msg) for msg in messages]
+    finally:
+        close_db_session(db)
+
+@app.delete("/api/chat/history")
+async def clear_chat_history(
+    current_user: User = Depends(get_current_user)
+):
+    """Clear user's chat messages"""
+    db = get_db_session()
+    try:
+        db.query(ChatMessage).filter(ChatMessage.user_id == current_user.id).delete()
+        db.commit()
+        return {"status": "success", "message": "Chat history cleared"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not clear history")
+    finally:
+        close_db_session(db)
 
 if __name__ == "__main__":
     import uvicorn

@@ -13,7 +13,6 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import {
   Trash2,
   Calendar,
@@ -25,8 +24,7 @@ import {
   History,
   ShieldCheck,
   Clock,
-  Zap,
-  XCircle
+  Zap
 } from 'lucide-react';
 
 ChartJS.register(
@@ -82,33 +80,11 @@ export const SimulationHistoryPage: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [creatingTest, setCreatingTest] = useState(false);
   const [isClearingAll, setIsClearingAll] = useState(false);
-  const [selectedSim, setSelectedSim] = useState<SimulationSession | null>(null);
-  const [simDataPoints, setSimDataPoints] = useState<any[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(false);
 
   useEffect(() => {
     fetchSimulations();
   }, [refreshKey]);
 
-  useEffect(() => {
-    if (selectedSim) {
-      fetchSimDataPoints(selectedSim.id);
-    } else {
-      setSimDataPoints([]);
-    }
-  }, [selectedSim]);
-
-  const fetchSimDataPoints = async (id: number) => {
-    setIsLoadingData(true);
-    try {
-      const response = await API.get(`/api/simulations/${id}/data`);
-      setSimDataPoints(response.data.data_points || []);
-    } catch (err) {
-      console.error('Failed to fetch data points', err);
-    } finally {
-      setIsLoadingData(false);
-    }
-  };
 
   const createTestSimulation = async () => {
     setCreatingTest(true);
@@ -382,7 +358,7 @@ export const SimulationHistoryPage: React.FC = () => {
                     </button>
 
                     <button
-                      onClick={() => setSelectedSim(sim)}
+                      onClick={() => navigate(`/analytics/${sim.id}`)}
                       className="flex-grow md:flex-grow-0 flex items-center justify-center space-x-2 px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold text-sm tracking-wide shadow-xl shadow-gray-200 hover:translate-y-[-2px] active:translate-y-[0] transition-all"
                     >
                       <span>Analytics</span>
@@ -396,175 +372,6 @@ export const SimulationHistoryPage: React.FC = () => {
         )}
       </div>
 
-      {/* Analytics Modal */}
-      {selectedSim && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={() => setSelectedSim(null)}></div>
-          <div className="relative bg-white w-full max-w-4xl rounded-[3rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="bg-gradient-to-br from-[#1a1c2c] to-[#4a1942] p-10 text-white flex justify-between items-start">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Simulated Diagnostic Report</p>
-                <h2 className="text-4xl font-black mb-2">Session Summary</h2>
-                <p className="text-white/60 font-medium">Session ID: {selectedSim.id.toString().padStart(6, '0')}</p>
-              </div>
-              <button onClick={() => setSelectedSim(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                <XCircle size={32} className="text-white/20 hover:text-white" />
-              </button>
-            </div>
-
-            <div className="p-10 space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100">
-                  <p className="text-[10px] font-black uppercase text-emerald-600/60 mb-1">Cardiac Stress Profile</p>
-                  <p className="text-2xl font-black text-emerald-900 capitalize">{selectedSim.protocol.replace('_', ' ')}</p>
-                </div>
-                <div className="p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
-                  <p className="text-[10px] font-black uppercase text-indigo-600/60 mb-1">Session Duration</p>
-                  <p className="text-2xl font-black text-indigo-900">{selectedSim.duration ? `${Math.floor(selectedSim.duration / 60)}m ${selectedSim.duration % 60}s` : '0m 0s'}</p>
-                </div>
-                <div className="p-6 bg-rose-50 rounded-3xl border border-rose-100">
-                  <p className="text-[10px] font-black uppercase text-rose-600/60 mb-1">Final Risk Score</p>
-                  <p className="text-2xl font-black text-rose-900">{selectedSim.risk_score?.toFixed(1) || 'N/A'}%</p>
-                </div>
-              </div>
-
-              {/* Phase 2: Advanced Phase Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Phase Analytics (Duration)</h4>
-                  <div className="bg-white rounded-3xl p-6 border border-gray-100 space-y-4 shadow-sm">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-500 font-bold uppercase tracking-tight text-[10px]">Baseline Rest</span>
-                      <span className="font-black text-gray-800">{selectedSim.rest_duration ? `${Math.floor(selectedSim.rest_duration / 60)}m ${selectedSim.rest_duration % 60}s` : '--'}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-500 font-bold uppercase tracking-tight text-[10px]">Active Exercise</span>
-                      <span className="font-black text-orange-600">{selectedSim.exercise_duration ? `${Math.floor(selectedSim.exercise_duration / 60)}m ${selectedSim.exercise_duration % 60}s` : '--'}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-500 font-bold uppercase tracking-tight text-[10px]">Clinical Recovery</span>
-                      <span className="font-black text-emerald-600">{selectedSim.recovery_duration ? `${Math.floor(selectedSim.recovery_duration / 60)}m ${selectedSim.recovery_duration % 60}s` : '--'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Peak Physiological Stress</h4>
-                  <div className="bg-white rounded-3xl p-6 border border-gray-100 grid grid-cols-2 gap-4 shadow-sm">
-                    <div className="text-center p-3 bg-rose-50 rounded-2xl">
-                      <p className="text-[10px] font-black uppercase text-rose-600/40 mb-1">Peak HR</p>
-                      <p className="text-xl font-black text-rose-900">{selectedSim.peak_hr ? Math.round(selectedSim.peak_hr) : '--'} <span className="text-[10px]">BPM</span></p>
-                    </div>
-                    <div className="text-center p-3 bg-indigo-50 rounded-2xl">
-                      <p className="text-[10px] font-black uppercase text-indigo-600/40 mb-1">Peak SBP</p>
-                      <p className="text-xl font-black text-indigo-900">{selectedSim.peak_sbp ? Math.round(selectedSim.peak_sbp) : '--'} <span className="text-[10px]">mmHg</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Lifestyle Snapshot */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Clinical Context Snapshot (Test Time)</h4>
-                <div className="flex flex-wrap gap-3">
-                  <div className="px-4 py-2 bg-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-600 flex items-center space-x-2">
-                    <Clock size={12} className="text-gray-400" />
-                    <span>Age: {selectedSim.patient_age || '--'}</span>
-                  </div>
-                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center space-x-2 ${selectedSim.smoking_status === 'smoker' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
-                    <span>{selectedSim.smoking_status?.replace('_', ' ') || 'Non-Smoker'}</span>
-                  </div>
-                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center space-x-2 ${selectedSim.pad_history === 'pad' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>
-                    <span>{selectedSim.pad_history === 'pad' ? 'PAD Positive' : 'No PAD'}</span>
-                  </div>
-                  <div className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                    <span>{selectedSim.activity_level?.replace('_', ' ') || 'Active'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Diagnostic Commentary</h4>
-                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100">
-                  <p className="text-gray-700 leading-relaxed font-medium">
-                    This simulation highlights a biological heart age of <span className="text-rose-500 font-bold">{Math.round(selectedSim.heart_age || 0)} years</span>.
-                    Based on the treadmill metrics recorded, the digital twin suggests that cardiovascular resilience is
-                    <span className="text-emerald-600 font-bold"> {((selectedSim.risk_score || 0) < 30) ? 'High' : ((selectedSim.risk_score || 0) < 70) ? 'Moderate' : 'Strained'}</span>.
-                    Recommended follow-up includes maintaining consistent metabolic activity and monitoring systolic variations under load.
-                  </p>
-                </div>
-              </div>
-
-              {/* Chart Section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Telemetry Analysis</h4>
-                </div>
-                <div className="bg-white rounded-3xl p-6 border border-gray-100 h-64 shadow-inner">
-                  {isLoadingData ? (
-                    <div className="flex flex-col items-center justify-center h-full space-y-3">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8F87F1]"></div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Reconstructing Timeline...</p>
-                    </div>
-                  ) : simDataPoints.length > 0 ? (
-                    <Line
-                      data={{
-                        labels: simDataPoints.map(d => `${d.timestamp}s`),
-                        datasets: [
-                          {
-                            label: 'Heart Rate (BPM)',
-                            data: simDataPoints.map(d => d.heart_rate),
-                            borderColor: 'rgb(244, 63, 94)',
-                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                          },
-                          {
-                            label: 'Systolic BP (mmHg)',
-                            data: simDataPoints.map(d => d.blood_pressure_systolic),
-                            borderColor: 'rgb(167, 139, 250)',
-                            backgroundColor: 'transparent',
-                            tension: 0.4
-                          }
-                        ]
-                      }}
-                      options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                          mode: 'index',
-                          intersect: false,
-                        },
-                        scales: {
-                          y: { beginAtZero: false },
-                          x: { ticks: { maxTicksLimit: 10 } }
-                        },
-                        elements: {
-                          point: { radius: 0 }
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full">
-                      <Activity className="h-8 w-8 text-gray-300 mb-2" />
-                      <div className="text-gray-400 font-medium text-sm">No fine-grained telemetry data available for this legacy session.</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <button
-                  onClick={() => setSelectedSim(null)}
-                  className="px-10 py-5 bg-gray-900 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-black transition-all"
-                >
-                  Dismiss Report
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

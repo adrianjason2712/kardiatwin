@@ -21,6 +21,7 @@ function RootRoutes() {
       <Route path="/heart-age" element={<App />} />
       <Route path="/what-if" element={<App />} />
       <Route path="/history" element={<App />} />
+      <Route path="/analytics/:id" element={<App />} />
 
       {/* Default route - redirect based on authentication */}
       <Route

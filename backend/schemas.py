@@ -152,3 +152,25 @@ class UserProfileResponse(UserProfileBase):
     class Config:
         from_attributes = True
 
+
+# ==================== Chat Models ====================
+
+class ChatMessageSchema(BaseModel):
+    """Schema for a single chat message"""
+    id: Optional[int] = None
+    role: str # 'user' or 'model'
+    content: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        from_attributes = True
+
+class ChatRequest(BaseModel):
+    """Request for a new chat message"""
+    message: str
+
+class ChatResponse(BaseModel):
+    """Response from the AI chatbot"""
+    response: str
+    history: list[ChatMessageSchema]
+

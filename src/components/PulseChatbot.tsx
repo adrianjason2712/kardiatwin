@@ -1,11 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, Bot, User } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Send, Bot, X, Trash2, AlertCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import API from '../utils/axios';
 
 interface ChatMessage {
-  id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
+  id: number;
+  content: string;
+  role: 'user' | 'model';
+  timestamp: string;
 }
 
 interface PulseChatbotProps {
@@ -14,88 +16,104 @@ interface PulseChatbotProps {
 }
 
 const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      text: "Hello! I'm Pulse, your cardiac health assistant. How can I help you today?",
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryTimer, setRetryTimer] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
+
+  // 1. Fetch Chat History on Open
+  useEffect(() => {
+    if (isOpen) {
+      fetchHistory();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
-  const generateBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    // Simple keyword-based responses (replace with LLM later)
-    if (lowerMessage.includes('heart') || lowerMessage.includes('cardiac')) {
-      return "I can help you understand your cardiac health! What specific questions do you have about your heart?";
-    } else if (lowerMessage.includes('exercise') || lowerMessage.includes('workout')) {
-      return "Exercise is great for heart health! Based on your profile, I'd recommend starting with moderate activities like walking or swimming. Always consult your doctor first.";
-    } else if (lowerMessage.includes('symptoms') || lowerMessage.includes('pain')) {
-      return "If you're experiencing chest pain or other concerning symptoms, please seek immediate medical attention. I'm here to help with general information, but I can't provide medical diagnosis.";
-    } else if (lowerMessage.includes('blood pressure') || lowerMessage.includes('pressure')) {
-      return "Blood pressure is a key indicator of heart health. Normal range is typically 120/80 mmHg. Regular monitoring and lifestyle changes can help maintain healthy levels.";
-    } else if (lowerMessage.includes('cholesterol')) {
-      return "Cholesterol levels are important for heart health. Aim for total cholesterol under 200 mg/dL. Diet, exercise, and sometimes medication can help manage levels.";
-    } else if (lowerMessage.includes('risk') || lowerMessage.includes('assessment')) {
-      return "I can help assess your cardiac risk factors based on age, gender, and symptoms. Would you like me to explain how different factors affect your heart health?";
-    } else if (lowerMessage.includes('diet') || lowerMessage.includes('nutrition')) {
-      return "A heart-healthy diet includes plenty of fruits, vegetables, whole grains, and lean proteins. Limit saturated fats, sodium, and added sugars.";
-    } else if (lowerMessage.includes('stress') || lowerMessage.includes('anxiety')) {
-      return "Stress can impact heart health. Techniques like deep breathing, meditation, and regular exercise can help manage stress levels.";
-    } else if (lowerMessage.includes('medication') || lowerMessage.includes('drug')) {
-      return "I can't provide specific medication advice. Please consult your healthcare provider about any medications or treatments.";
-    } else if (lowerMessage.includes('family history') || lowerMessage.includes('genetic')) {
-      return "Family history is an important risk factor for heart disease. Share this information with your doctor for personalized risk assessment.";
-    } else {
-      const responses = [
-        "That's an interesting question! I'd be happy to help you learn more about cardiac health.",
-        "I'm here to support your heart health journey. Could you tell me more about what you'd like to know?",
-        "Great question! Let me help you understand how this relates to your cardiac health.",
-        "I'm Pulse, your cardiac health companion. I can help explain heart health concepts and answer your questions.",
-        "That's a good point! Understanding your heart health is important. What specific aspect would you like to explore?"
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
+  // 2. Cooldown Timer Logic
+  useEffect(() => {
+    let interval: any;
+    if (retryTimer > 0) {
+      interval = setInterval(() => {
+        setRetryTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [retryTimer]);
+
+  const fetchHistory = async () => {
+    try {
+      const response = await API.get('/api/chat/history');
+      // Ensure history is sorted by timestamp correctly
+      const sortedHistory = response.data.sort((a: any, b: any) => {
+        const timeDiff = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+        if (timeDiff !== 0) return timeDiff;
+        return a.id - b.id; // Tie-breaker
+      });
+      setMessages(sortedHistory);
+    } catch (err) {
+      console.error('Failed to fetch history', err);
     }
   };
 
   const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || isTyping || retryTimer > 0) return;
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: 'user',
-      timestamp: new Date()
+    const userMsgText = inputText;
+    const tempUserMsg: ChatMessage = {
+      id: Date.now(),
+      content: userMsgText,
+      role: 'user',
+      timestamp: new Date().toISOString()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    // Optimistically update
+    setMessages(prev => [...prev, tempUserMsg]);
     setInputText('');
     setIsTyping(true);
+    setError(null);
 
-    // Simulate typing delay
-    setTimeout(() => {
-      const botResponse = generateBotResponse(inputText);
-      const botMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: botResponse,
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMessage]);
+    try {
+      const response = await API.post('/api/chat', { message: userMsgText });
+      
+      // Server returns { response: string, history: ChatMessage[] }
+      // Sort the returned history to prevent ordering bugs
+      const newHistory = response.data.history.sort((a: any, b: any) => {
+        const timeDiff = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+        if (timeDiff !== 0) return timeDiff;
+        return a.id - b.id; // Tie-breaker
+      });
+      setMessages(newHistory);
+    } catch (err: any) {
+      if (err.response?.status === 429) {
+        setError('Quota exceeded for metric');
+        setRetryTimer(60); // Start the 60s cooldown
+      } else {
+        setError('I am having trouble connecting to the clinical engine. Please try again.');
+      }
+      console.error(err);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+    }
+  };
+
+  const handleClearHistory = async () => {
+    if (!window.confirm('Are you sure you want to clear your conversation history?')) return;
+    
+    try {
+      await API.delete('/api/chat/history');
+      setMessages([]);
+    } catch (err) {
+      console.error('Failed to clear history', err);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -108,45 +126,75 @@ const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50">
+    <div className="fixed bottom-4 right-4 w-96 h-[550px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] p-4 rounded-t-xl flex items-center justify-between">
+      <div className="bg-gradient-to-r from-[#8F87F1] to-[#C68EFD] p-4 flex items-center justify-between shadow-md">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-            <Bot className="w-5 h-5 text-[#8F87F1]" />
+          <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
+            <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-white font-semibold">Pulse</h3>
-            <p className="text-white text-sm opacity-90">Cardiac Health Assistant</p>
+            <h3 className="text-white font-semibold leading-tight">Pulse Advisor</h3>
+            <div className="flex items-center space-x-1">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <p className="text-white text-xs opacity-90">Personalized Clinical Engine</p>
+            </div>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          className="text-white hover:text-gray-200 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={handleClearHistory}
+            className="text-white/70 hover:text-white transition-colors p-1"
+            title="Clear Chat History"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onClose}
+            className="text-white hover:text-gray-200 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Medical Warning Banner */}
+      <div className="bg-amber-50 border-b border-amber-100 p-2 flex items-start space-x-2">
+        <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+        <p className="text-[10px] text-amber-800 leading-tight">
+          <strong>Medical Notice:</strong> Pulse uses AI simulation based on your history. 
+          Information is for educational visualization only. In an emergency, dial 911.
+        </p>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.map((message) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+        {messages.length === 0 && !isTyping && (
+          <div className="text-center mt-20 px-6">
+            <Bot className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">Hello! I'm Pulse. Ask me about your simulation results, recovery patterns, or physiological markers.</p>
+          </div>
+        )}
+
+        {messages.map((message, index) => (
           <div
-            key={message.id}
-            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            key={`${message.id}-${index}`}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] p-3 rounded-lg ${
-                message.sender === 'user'
-                  ? 'bg-[#8F87F1] text-white'
-                  : 'bg-white text-gray-800 border border-gray-200'
+              className={`max-w-[85%] p-3 rounded-2xl shadow-sm ${
+                message.role === 'user'
+                   ? 'bg-gradient-to-br from-[#8F87F1] to-[#7f75e8] text-white rounded-tr-none'
+                  : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none'
               }`}
             >
-              <p className="text-sm">{message.text}</p>
-              <p className={`text-xs mt-1 ${
-                message.sender === 'user' ? 'text-white opacity-70' : 'text-gray-500'
+              <div className="text-sm leading-relaxed prose prose-sm max-w-none">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
+              <p className={`text-[10px] mt-1 text-right ${
+                message.role === 'user' ? 'text-white/70' : 'text-gray-400'
               }`}>
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
@@ -154,12 +202,29 @@ const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="bg-white text-gray-800 border border-gray-200 p-4 rounded-2xl rounded-tl-none shadow-sm">
+              <div className="flex space-x-1.5">
+                <div className="w-1.5 h-1.5 bg-[#8F87F1] rounded-full animate-bounce"></div>
+                <div className="w-1.5 h-1.5 bg-[#8F87F1] rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
+                <div className="w-1.5 h-1.5 bg-[#8F87F1] rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {retryTimer > 0 && (
+          <div className="flex justify-center">
+            <div className="bg-amber-50 text-amber-700 text-[11px] px-4 py-2 rounded-xl border border-amber-100 flex items-center space-x-2 shadow-sm animate-fade-in">
+              <span className="w-2 h-2 bg-amber-400 rounded-full animate-ping"></span>
+              <span>Clinical Advisor is resting. Please wait **{retryTimer}s**...</span>
+            </div>
+          </div>
+        )}
+
+        {error && !retryTimer && (
+          <div className="flex justify-center">
+            <div className="bg-red-50 text-red-600 text-[11px] px-3 py-1 rounded-full border border-red-100">
+              {error}
             </div>
           </div>
         )}
@@ -168,28 +233,25 @@ const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200 bg-white rounded-b-xl">
-        <div className="flex space-x-2">
+      <div className="p-4 border-t border-gray-100 bg-white">
+        <div className="relative flex items-center">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask Pulse about your heart health..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8F87F1] focus:border-transparent"
-            disabled={isTyping}
+            placeholder={retryTimer > 0 ? `Resume in ${retryTimer}s...` : "Review my recovery..."}
+            className="w-full pl-4 pr-12 py-3 bg-gray-100 border-none rounded-2xl focus:ring-2 focus:ring-[#8F87F1]/50 text-sm transition-all"
+            disabled={isTyping || retryTimer > 0}
           />
           <button
             onClick={handleSendMessage}
-            disabled={!inputText.trim() || isTyping}
-            className="px-4 py-2 bg-[#8F87F1] text-white rounded-lg hover:bg-[#C68EFD] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!inputText.trim() || isTyping || retryTimer > 0}
+            className="absolute right-2 p-2 bg-[#8F87F1] text-white rounded-xl hover:bg-[#7f75e8] transition-all disabled:opacity-50 shadow-sm"
           >
             <Send className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          Pulse is an AI assistant. For medical emergencies, call emergency services immediately.
-        </p>
       </div>
     </div>
   );
