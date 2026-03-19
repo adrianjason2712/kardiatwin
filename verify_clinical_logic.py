@@ -1,10 +1,10 @@
 import sys
 import os
 
-# Add the project root to sys.path
-sys.path.append(os.getcwd())
+# Add the backend directory to the path
+sys.path.append(os.path.join(os.getcwd(), "backend"))
 
-from backend.main import PhysiologySimulationEngine
+from main import PhysiologySimulationEngine
 
 def run_vignette(name, age, sex, lifestyle):
     print(f"\n--- Vignette: {name} ---")

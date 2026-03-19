@@ -28,48 +28,91 @@ def get_clinical_grounding(matrix_path: str = "../unified_clinical_matrix.md") -
         logger.error(f"Error reading clinical matrix: {e}")
         return "Clinical matrix not available."
 
-def get_patient_summary(db: Session, user_id: int) -> str:
+def get_patient_summary(db: Session, user_id: int, session_id: Optional[int] = None) -> str:
     """
-    Builds a personalized context vignette for a specific user.
-    Retrieves Profile + Bio Age + What-If + Last 3 Sessions.
+    Builds a personalized context vignette. 
+    Priority: Simulation Session Data > User Profile Data.
+    Fixed Data: Height, Weight, Family History (Always from Profile).
     """
     try:
-        # 1. Fetch User Profile
+        # 1. Fetch User Profile (The primary source for fixed data)
         profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-        if not profile:
+        
+        # 2. Identify the active/selected Simulation Session for physiological markers
+        target_sim = None
+        if session_id:
+            target_sim = db.query(SimulationSession).filter(SimulationSession.id == session_id).first()
+        else:
+            # Fallback to the most recent session
+            target_sim = db.query(SimulationSession).filter(
+                SimulationSession.user_id == user_id
+            ).order_by(SimulationSession.created_at.desc()).first()
+
+        if not profile and not target_sim:
             return "Patient profile not found. User is a new patient with no recorded physiological data."
 
-        # 2. Fetch Latest Heart Age (Bio Age)
+        # 3. Resolve Physiological Markers (Priority: Session > Profile)
+        # We use simulation-specific markers if available to ensure the AI speaks to the current test state.
+        age = getattr(target_sim, 'patient_age', None) or getattr(profile, 'age', 0)
+        gender_raw = str(getattr(target_sim, 'patient_gender', None) or getattr(profile, 'sex', "unknown")).lower()
+        smoking = getattr(target_sim, 'smoking_status', None) or getattr(profile, 'smoking_status', "unknown")
+        diabetes = getattr(target_sim, 'diabetes_history', None) or getattr(profile, 'diabetes_history', "unknown")
+        alcohol = getattr(target_sim, 'alcohol_consumption', None) or getattr(profile, 'alcohol_consumption', "unknown")
+        activity = getattr(target_sim, 'activity_level', None) or getattr(profile, 'activity_level', "unknown")
+        pad = getattr(target_sim, 'pad_history', None) or getattr(profile, 'pad_history', "no_pad")
+
+        # Chest Pain Type mapping (Baseline clinical classification)
+        # Priority: Simulation user_data['cp'] > Profile.cp
+        u_data = target_sim.user_data if target_sim else {}
+        cp_raw = u_data.get('cp') if isinstance(u_data, dict) else None
+        if cp_raw is None:
+            cp_raw = getattr(profile, 'cp', "3") # Default to Asymptomatic
+            
+        cp_map = {
+            "0": "Typical Angina",
+            "1": "Atypical Angina",
+            "2": "Non-anginal Pain",
+            "3": "Asymptomatic"
+        }
+        cp_label = cp_map.get(str(cp_raw), "Asymptomatic")
+
+        # 4. Resolve Fixed Data (Always Profile)
+        height = getattr(profile, 'height', 175.0)
+        weight = getattr(profile, 'weight', 75.0)
+        family_history = getattr(profile, 'family_history', 'None recorded')
+        allergies = getattr(profile, 'allergies', 'None recorded')
+
+        # Robust Mapping for M/F, 1/0, and Full Strings
+        if gender_raw in ["1", "male", "m", "man"]:
+            gender_str = "Male"
+        elif gender_raw in ["0", "female", "f", "woman"]:
+            gender_str = "Female"
+        else:
+            gender_str = "Unknown"
+        
+        narrative = f"### Current Simulation Physiological Profile\n"
+        if target_sim:
+            narrative += f"*Note: This context is grounded in Simulation Session #{target_sim.id} ({target_sim.name}).*\n"
+        
+        narrative += f"- **Age**: {age}\n"
+        narrative += f"- **Gender**: {gender_str}\n"
+        narrative += f"- **Height/Weight**: {height}cm / {weight}kg (Fixed Profile Data)\n"
+        narrative += f"- **Baseline Clinical Markers**: CP Type: {cp_label}, PAD: {pad}, Smoker: {smoking}, Diabetes: {diabetes}\n"
+        narrative += f"- **Activity**: {activity}, Alcohol: {alcohol}\n"
+        narrative += f"- **Family History**: {family_history}\n"
+        narrative += f"- **Allergies/Notes**: {allergies}\n"
+        
+        # 5. Biological & Historical Context (Recent Trends)
         heart_age = db.query(HeartAgeDataPoint).join(SimulationSession).filter(
             SimulationSession.user_id == user_id
         ).order_by(HeartAgeDataPoint.timestamp.desc()).first()
 
-        # 3. Fetch Latest What-If Analyses
         what_if_scenarios = db.query(WhatIfScenarioDataPoint).join(SimulationSession).filter(
             SimulationSession.user_id == user_id
         ).order_by(WhatIfScenarioDataPoint.timestamp.desc()).limit(3).all()
 
-        # 4. Fetch Last 3 Stress Test Sessions
-        sessions = db.query(SimulationSession).filter(
-            SimulationSession.user_id == user_id,
-            SimulationSession.simulation_type == "stress_test"
-        ).order_by(SimulationSession.created_at.desc()).limit(3).all()
-
-        # 5. Build Narrative
-        gender = str(profile.sex).lower()
-        gender_str = "Male" if gender in ["1", "male", "m"] else "Female" if gender in ["0", "female", "f"] else "Unknown"
-        
-        narrative = f"### Patient Physiological Profile\n"
-        narrative += f"- **Age**: {profile.age}\n"
-        narrative += f"- **Gender**: {gender_str}\n"
-        narrative += f"- **Height/Weight**: {profile.height}cm / {profile.weight}kg\n"
-        narrative += f"- **Clinical Markers**: PAD: {profile.pad_history}, Smoker: {profile.smoking_status}, Diabetes: {profile.diabetes_history}\n"
-        narrative += f"- **Activity**: {profile.activity_level}, Alcohol: {profile.alcohol_consumption}\n"
-        narrative += f"- **Family History**: {profile.family_history or 'None recorded'}\n"
-        narrative += f"- **Allergies/Notes**: {profile.allergies or 'None recorded'}\n"
-        
         if heart_age:
-            narrative += f"\n### Biological Analysis (Heart Age)\n"
+            narrative += f"\n### Biological Analysis (Heart Age History)\n"
             narrative += f"- **Calculated Bio Age**: {heart_age.biological_age} (Difference: {heart_age.age_difference} years)\n"
             narrative += f"- **Interpretation**: {heart_age.interpretation}\n"
 
@@ -80,29 +123,22 @@ def get_patient_summary(db: Session, user_id: int) -> str:
                 narrative += f"  - Improvement: {scenario.improvement}%\n"
                 narrative += f"  - Risk Reduction: {scenario.risk_reduction}%\n"
 
-        if sessions:
-            narrative += "\n### Recent Stress Test History & Analytics\n"
-            for i, sim in enumerate(sessions):
-                date_str = sim.created_at.strftime("%Y-%m-%d")
-                narrative += f"**Session {i+1} ({date_str})**:\n"
-                narrative += f" - Peak HR: {sim.peak_hr}, Peak SBP: {sim.peak_sbp}\n"
-                
-                # Pull Transient Simulation Data from user_data
-                u_data = sim.user_data or {}
-                chest_pain = u_data.get('chestPain', 'None reported')
-                ecg_findings = u_data.get('ecgFindings', 'Normal')
-                narrative += f" - Transient Inputs: Chest Pain: {chest_pain}, ECG: {ecg_findings}\n"
-                
-                # High-Resolution Analytics Summary (Chart Interpretation)
-                if sim.peak_hr and sim.recovery_duration:
-                    # Logic: If recovery is fast (Phase 2 matrix), summarize efficiency
-                    eff = "High" if sim.recovery_duration < 180 else "Normal" if sim.recovery_duration < 300 else "Delayed"
-                    narrative += f" - Analytics Chart: Recovery Efficiency is {eff} ({sim.recovery_duration}s to baseline)\n"
-                
-                if sim.abnormalities_detected:
-                    narrative += f" - Clinical Findings: {', '.join(sim.abnormalities_detected)}\n"
-        else:
-            narrative += "\nNo stress test simulations recorded yet.\n"
+        # 6. Session-Specific Analytics (If viewing a session)
+        if target_sim:
+            narrative += f"\n### Active Session Analytics (#{target_sim.id})\n"
+            narrative += f" - Peak HR: {target_sim.peak_hr}, Peak SBP: {target_sim.peak_sbp}\n"
+            
+            # Live Symptom Observations (Transients during the test)
+            live_cp = u_data.get('chestPain', 'None reported') if isinstance(u_data, dict) else 'None reported'
+            ecg_findings = u_data.get('ecgFindings', 'Normal') if isinstance(u_data, dict) else 'Normal'
+            narrative += f" - Live Symptom Observations: Current Chest Pain: {live_cp}, ECG: {ecg_findings}\n"
+            
+            if target_sim.peak_hr and target_sim.recovery_duration:
+                eff = "High" if target_sim.recovery_duration < 180 else "Normal" if target_sim.recovery_duration < 300 else "Delayed"
+                narrative += f" - Analysis: Recovery Efficiency is {eff} ({target_sim.recovery_duration}s)\n"
+            
+            if target_sim.abnormalities_detected:
+                narrative += f" - Clinical Findings: {', '.join(target_sim.abnormalities_detected)}\n"
 
         return narrative
 

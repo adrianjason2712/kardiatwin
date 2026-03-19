@@ -119,6 +119,8 @@ class StartSimulationRequest(BaseModel):
     alcohol_consumption: AlcoholConsumption = AlcoholConsumption.NONE
     activity_level: ActivityLevel = ActivityLevel.ACTIVE
     pad_history: PADHistory = PADHistory.NO_PAD
+    height: Optional[float] = None
+    weight: Optional[float] = None
     simulation: Optional[SimulationConfig] = None
     session_name: Optional[str] = None
 
@@ -128,6 +130,8 @@ class WhatIfInput(BaseModel):
     alcohol_consumption: Optional[AlcoholConsumption] = None
     activity_level: Optional[ActivityLevel] = None
     pad_history: Optional[PADHistory] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
 
 class ThresholdUpdate(BaseModel):
     heart_rate_high: Optional[float] = None
@@ -142,10 +146,19 @@ class PhysiologySimulationEngine:
     """Cardiac stress test simulator"""
 
     def __init__(self, config=None):
-        # Clinical Baselines (Phase 1)
+        # Clinical Baselines (Phase 1) - INITIAL DEFAULTS
         self.sex = "1"  # "1"=Male, "0"=Female
         self.age = 50
-        
+        self.height = 175.0 
+        self.weight = 75.0  
+        self.bmi = 24.5
+        self.smoking_status = "non_smoker"
+        self.diabetes_history = "none"
+        self.alcohol_consumption = "none"
+        self.activity_level = "active"
+        self.pad_history = "no_pad"
+        self.protocol = "standard"
+
         # Reference Constants (Healthy Adult <50)
         self.male_ref = {"hr": 71.0, "sbp": 115.0, "recovery": 19.0, "peak_sbp": 220.0}
         self.female_ref = {"hr": 78.0, "sbp": 110.0, "recovery": 17.0, "peak_sbp": 200.0}
@@ -163,7 +176,6 @@ class PhysiologySimulationEngine:
         self.exang = 0
         self.phase = "rest"
         self.workload_level = 0
-        self.protocol = "standard"
         self.stage = 0
         self.stage_time = 0
         self.protocol_finished = False
@@ -187,7 +199,7 @@ class PhysiologySimulationEngine:
             }
         }
 
-        # Config
+        # Config & property mapping from incoming config
         self.config = {
             "rest_duration_s": None,
             "exercise_duration_s": None,
@@ -195,25 +207,27 @@ class PhysiologySimulationEngine:
             "max_workload_level": 3,
             "protocol": "standard"
         }
+        
         if config:
             self.config.update(config)
-            self.protocol = config.get("protocol", "standard")
+            self.sex = str(config.get("sex", self.sex))
+            self.age = int(config.get("age", self.age))
+            self.height = float(config.get("height", self.height))
+            self.weight = float(config.get("weight", self.weight))
+            self.smoking_status = config.get("smoking_status", self.smoking_status)
+            self.diabetes_history = config.get("diabetes_history", self.diabetes_history)
+            self.alcohol_consumption = config.get("alcohol_consumption", self.alcohol_consumption)
+            self.activity_level = config.get("activity_level", self.activity_level)
+            self.pad_history = config.get("pad_history", self.pad_history)
+            self.protocol = config.get("protocol", self.protocol)
 
-        # Timers
+        # Timers & Modifiers
         self.phase_elapsed_s = 0.0
         self.total_duration_s = 0.0
         self.hr_increase_rate_per_min = 11.0
         self.sbp_increase_per_level = 12.0
         self.recovery_rate_per_min = 15.0
-
-        # User info
-        self.age = 50
         self.age_modifier = 1.0
-        self.smoking_status = "non_smoker"
-        self.diabetes_history = "none"
-        self.alcohol_consumption = "none"
-        self.activity_level = "active"
-        self.pad_history = "no_pad"
 
         # Modifiers
         self.sbp_modifier = 1.0
@@ -253,29 +267,62 @@ class PhysiologySimulationEngine:
             self.pause_start_time = None
 
     def apply_modifiers(self):
-        """Standardized Physiology Matrix (Phase 2)"""
+        """Finalized Unified Clinical Matrix Implementation (V1.4)"""
         # 1. Select Sex Baseline
         ref = self.male_ref if self.sex == "1" else self.female_ref
         
+        # Initialize Offsets and Multipliers
         self.hr_offset = 0.0
         self.sbp_offset = 0.0
         self.exercise_hr_mult = 1.0
         self.exercise_sbp_mult = 1.0
-        self.recovery_efficiency = 1.0 if self.sex == "1" else 0.85 # 0.85x Default Lag for Females
+        # Default female recovery lag (0.85x)
+        self.recovery_efficiency = 1.0 if self.sex == "1" else 0.85
         
-        # 2. Apply Age Modifiers (>40y)
-        if self.age > 40:
-            years_over = self.age - 40
-            self.sbp_offset += years_over * 0.6
-            self.recovery_efficiency *= (1.0 - (years_over * 0.01))
+        # ── 2. AGE DYNAMICS (The Aging Curve) ──────────────────
+        if 18 <= self.age <= 40:
+            pass # Baseline cohort - Reference state
+        elif 41 <= self.age <= 64:
+            years_over_40 = self.age - 40
+            # Linear Decay: +0.6 mmHg SBP per year / -1% HRR per year
+            self.sbp_offset += years_over_40 * 0.6
+            self.recovery_efficiency *= (1.0 - (years_over_40 * 0.01))
+        elif self.age >= 65:
+            years_over_40 = self.age - 40
+            # Senior Pivot: Cumulative linear decay + Mandatory Stiffness
+            self.sbp_offset += years_over_40 * 0.6
+            self.recovery_efficiency *= (1.0 - (years_over_40 * 0.01))
             
-            # Post-65 Vascular Stiffness (ESBPR)
-            if self.age >= 65:
-                # Women over 65 have significantly higher vascular resistance
-                stiffness_mult = 1.25 if self.sex == "0" else 1.10
-                self.exercise_sbp_mult *= stiffness_mult
+            # Mandatory Stiffness Multiplier (Compound)
+            stiffness_mult = 1.25 if self.sex == "0" else 1.10
+            self.exercise_sbp_mult *= stiffness_mult
+        
+        if self.height > 0:
+            self.bmi = self.weight / ((self.height / 100) ** 2)
             
-        # 3. Apply Activity Level
+        # ── 3. BMI INFLUENCE (The "Tissue Tax") ────────────────
+        if self.bmi < 18.5: # Underweight
+            self.hr_offset += 2.0
+            self.sbp_offset -= 5.0
+        elif self.bmi > 25:
+            # SBP Offset: +1.6 mmHg per BMI point > 25 (Linear Scaling)
+            bmi_excess = self.bmi - 25
+            self.sbp_offset += bmi_excess * 1.6
+            
+            if self.bmi >= 35: # Morbidly Obese
+                self.hr_offset += 12.0
+                self.exercise_sbp_mult *= 1.40
+                self.recovery_efficiency *= 0.60
+            elif self.bmi >= 30: # Obese
+                self.hr_offset += 8.0 # Standard offset for all genders
+                self.exercise_sbp_mult *= 1.25
+                self.recovery_efficiency *= 0.80
+            else: # Overweight (25-29.9)
+                self.exercise_sbp_mult *= 1.10
+                self.recovery_efficiency *= 0.90
+
+        # ── 4. LIFESTYLE FACTORS ──────────────────────────────
+        # Activity Level
         if self.activity_level == "athlete":
             self.hr_offset -= 15.0 if self.sex == "1" else 12.0
             self.sbp_offset -= 5.0
@@ -287,108 +334,90 @@ class PhysiologySimulationEngine:
             self.exercise_hr_mult *= 1.20 if self.sex == "1" else 1.25
             self.exercise_sbp_mult *= 1.15 if self.sex == "1" else 1.25
             self.recovery_efficiency *= 0.85 if self.sex == "1" else 0.80
-            
-        # 4. Apply Smoking
+
+        # Smoking Status
         if self.smoking_status == "smoker":
-            self.hr_offset += 8.0 if self.sex == "1" else 11.0
+            self.hr_offset += 11.0 if self.sex == "0" else 8.0
             self.sbp_offset += 10.0
-            self.exercise_hr_mult *= 0.90 if self.sex == "1" else 0.82
-            self.recovery_efficiency *= 0.80 if self.sex == "1" else 0.70
+            self.exercise_hr_mult *= 0.82 if self.sex == "0" else 0.90
+            self.recovery_efficiency *= 0.70 if self.sex == "0" else 0.80
         elif self.smoking_status == "ex_smoker":
-            self.hr_offset += 2.0 if self.sex == "1" else 4.0
+            self.hr_offset += 4.0 if self.sex == "0" else 2.0
             self.sbp_offset += 2.0
-            self.exercise_hr_mult *= 0.97 if self.sex == "1" else 0.92
-            self.recovery_efficiency *= 0.95 if self.sex == "1" else 0.90
-            
-        # 5. Apply Diabetes
-        if "type" in str(self.diabetes_history):
-            if self.diabetes_history == "type_1":
-                self.hr_offset += 8.0 if self.sex == "1" else 10.0
-                self.sbp_offset += 12.0 if self.sex == "1" else 15.0
-                self.exercise_sbp_mult *= 1.25 if self.sex == "1" else 1.45
-                self.recovery_efficiency *= 0.70 if self.sex == "1" else 0.65
-            elif self.diabetes_history == "type_2":
-                self.hr_offset += 6.0 if self.sex == "1" else 9.0
-                self.sbp_offset += 10.0 if self.sex == "1" else 12.0
-                self.exercise_sbp_mult *= 1.15 if self.sex == "1" else 1.35
-                self.recovery_efficiency *= 0.80 if self.sex == "1" else 0.75
-                
-        # 6. Apply Alcohol
+            self.exercise_hr_mult *= 0.92 if self.sex == "0" else 0.97
+            self.recovery_efficiency *= 0.90 if self.sex == "0" else 0.95
+
+        # Alcohol Consumption
         if self.alcohol_consumption == "heavy":
-            self.hr_offset += 8.0 if self.sex == "1" else 12.0
+            self.hr_offset += 12.0 if self.sex == "0" else 8.0
             self.sbp_offset += 8.0
-            self.exercise_hr_mult *= 1.15 if self.sex == "1" else 1.25
-            self.exercise_sbp_mult *= 1.15 if self.sex == "1" else 1.25
-            self.recovery_efficiency *= 0.80 if self.sex == "1" else 0.75
+            self.exercise_hr_mult *= 1.25 if self.sex == "0" else 1.15
+            self.exercise_sbp_mult *= 1.25 if self.sex == "0" else 1.15
+            self.recovery_efficiency *= 0.75 if self.sex == "0" else 0.80
         elif self.alcohol_consumption == "moderate":
-            self.hr_offset += 2.0 if self.sex == "1" else 4.0
+            self.hr_offset += 4.0 if self.sex == "0" else 2.0
             self.sbp_offset += 2.0
             self.exercise_hr_mult *= 1.05
             self.exercise_sbp_mult *= 1.05
-            self.recovery_efficiency *= 0.98 if self.sex == "1" else 0.95
+            self.recovery_efficiency *= 0.95 if self.sex == "0" else 0.98
 
-        # ── 7. PATHOLOGY: PAD (Peripheral Artery Disease) ──────────────
+        # ── 5. CLINICAL PATHOLOGIES ───────────────────────────
+        # Diabetes
+        if "type" in str(self.diabetes_history):
+            if self.diabetes_history == "type_1":
+                self.hr_offset += 10.0 if self.sex == "0" else 8.0
+                self.sbp_offset += 15.0 if self.sex == "0" else 12.0
+                self.exercise_sbp_mult *= 1.45 if self.sex == "0" else 1.25
+                self.recovery_efficiency *= 0.65 if self.sex == "0" else 0.70
+            elif self.diabetes_history == "type_2":
+                self.hr_offset += 9.0 if self.sex == "0" else 6.0
+                self.sbp_offset += 12.0 if self.sex == "0" else 10.0
+                self.exercise_sbp_mult *= 1.35 if self.sex == "0" else 1.15
+                self.recovery_efficiency *= 0.75 if self.sex == "0" else 0.80
+
+        # PAD (Peripheral Artery Disease)
         if self.pad_history == "pad":
-            # Sympathetic & Vascular rest overload
             self.hr_offset += 5.0
             self.sbp_offset += 15.0
-            
-            # Exaggerated Pressor/Chronotropic Reflex
-            self.exercise_hr_mult *= 1.20 if self.sex == "1" else 1.35
+            self.exercise_hr_mult *= 1.35 if self.sex == "0" else 1.20
             self.exercise_sbp_mult *= 1.50
-            
-            # Ischemic Plateau (Massive oxygen debt & autonomic lag)
             if self.sex == "0":
-                self.recovery_efficiency *= 0.40  # Constant high lag for PAD females
+                self.recovery_efficiency *= 0.40
             else:
                 self.recovery_efficiency *= 0.42 if self.age >= 65 else 0.50
 
-        # ── 8. INTERACTION EFFECTS (clinically mandatory) ──────────────
-        # Heavy alcohol destroys athletic cardiac adaptation.
-        # A heavy drinker CANNOT physiologically maintain athlete-level
-        # resting HR (alcoholic cardiomyopathy, reduced VO2max, afib risk).
+        # ── 6. INTERACTION EFFECTS (Safety Overrides) ─────────
+        # Alcohol destroys athletic conditioning benefit
         if self.alcohol_consumption == "heavy" and self.activity_level == "athlete":
-            # Claw back ~70% of the athlete HR benefit
-            self.hr_offset += 10.0         # Partial reversal of -15 athlete bonus
-            self.recovery_efficiency *= 0.75  # Massively impaired recovery
+            self.hr_offset += 10.0
+            self.recovery_efficiency *= 0.75
 
-        # Diabetes + Athlete: autonomic neuropathy blunts HR response
-        if "type" in str(self.diabetes_history) and self.activity_level == "athlete":
-            self.hr_offset += 4.0          # Diabetic neuropathy reduces conditioning benefit
-            self.recovery_efficiency *= 0.85
-
-        # Heavy alcohol + diabetes: worst combination for cardiac stress
-        if self.alcohol_consumption == "heavy" and "type" in str(self.diabetes_history):
-            self.sbp_offset += 5.0
-            self.exercise_sbp_mult *= 1.10
-
-        # 7. Finalize Internal Constants
+        # Finalize Vital States
         self.baseline_hr = ref["hr"] + self.hr_offset
         self.baseline_sbp = ref["sbp"] + self.sbp_offset
+        
         if self.sex == "0":  # Female (Gulati formula)
             self.max_hr = 206 - (0.88 * self.age)
         else:                # Male (Fox formula)
             self.max_hr = 220 - self.age
+            
         self.peak_sbp_cap = ref["peak_sbp"] + (self.sbp_offset if self.sbp_offset > 0 else 0)
         
         self.hr_increase_rate_per_min = 11.0 * self.exercise_hr_mult
         self.sbp_increase_per_level = 12.0 * self.exercise_sbp_mult
         self.recovery_rate_per_min = ref["recovery"] * self.recovery_efficiency
         
-        # Compatibility Fields for UI/Analysis
+        # Sync compatibility fields
         self.hr_modifier = self.exercise_hr_mult
         self.sbp_modifier = self.exercise_sbp_mult
         self.recovery_modifier = self.recovery_efficiency
         
-        # Reset state to new baseline
         self.hr = self.baseline_hr
         self.sbp = self.baseline_sbp
-        
-        # Initialize peaks to baseline values (Phase 2 hardening)
         self.peak_hr = self.baseline_hr
         self.peak_sbp = self.baseline_sbp
         
-        logger.info(f"[LOG] Digital Twin Calibrated: RR={self.recovery_rate_per_min:.1f} BPM/min, Rest={self.baseline_hr:.0f}/{self.baseline_sbp:.0f}")
+        logger.info(f"[LOG] Digital Twin Calibrated: RR={self.recovery_rate_per_min:.1f} BPM/min, Rest={self.baseline_hr:.1f}/{self.baseline_sbp:.1f}")
 
     def calculate_adaptive_thresholds(self):
         """Calculate personalized risk thresholds based on user profile"""
@@ -1421,6 +1450,26 @@ async def start_simulation(
         state.engine.alcohol_consumption = req.alcohol_consumption.value
         state.engine.activity_level = req.activity_level.value
         state.engine.pad_history = req.pad_history.value
+        
+        # Pull height/weight from profile if not provided in req
+        try:
+            if req.height:
+                state.engine.height = req.height
+            elif current_user and current_user.profile:
+                state.engine.height = current_user.profile.height or 175.0
+            else:
+                state.engine.height = 175.0
+                
+            if req.weight:
+                state.engine.weight = req.weight
+            elif current_user and current_user.profile:
+                state.engine.weight = current_user.profile.weight or 75.0
+            else:
+                state.engine.weight = 75.0
+        except Exception as profile_err:
+            logger.warning(f"Warning: Could not load user profile details ({profile_err}). Using defaults.")
+            state.engine.height = 175.0
+            state.engine.weight = 75.0
 
         state.engine.apply_modifiers()
 
@@ -1661,6 +1710,8 @@ async def what_if(
                     current_engine.alcohol_consumption = profile.alcohol_consumption if profile.alcohol_consumption else "none"
                     current_engine.activity_level = profile.activity_level if profile.activity_level else "active"
                     current_engine.pad_history = profile.pad_history if profile.pad_history else "no_pad"
+                    current_engine.height = profile.height if profile.height else 175.0
+                    current_engine.weight = profile.weight if profile.weight else 75.0
                 
                 current_engine.apply_modifiers()
                 source = "Saved History"
@@ -1688,6 +1739,8 @@ async def what_if(
     hyp.alcohol_consumption = (req.alcohol_consumption.value if req.alcohol_consumption and req.alcohol_consumption != "" else current_engine.alcohol_consumption)
     hyp.activity_level = (req.activity_level.value if req.activity_level and req.activity_level != "" else current_engine.activity_level)
     hyp.pad_history = (req.pad_history.value if req.pad_history and req.pad_history != "" else current_engine.pad_history)
+    hyp.height = (req.height if req.height else current_engine.height)
+    hyp.weight = (req.weight if req.weight else current_engine.weight)
     
     # Re-apply all modifiers to the clone
     hyp.apply_modifiers()
@@ -1879,8 +1932,8 @@ async def chat_with_advisor(
     """Secure endpoint to chat with the AI Clinical Advisor"""
     db = get_db_session()
     try:
-        # Generate response using the RAG handler
-        ai_response = kardia_ai.generate_response(db, current_user.id, request.message)
+        # Generate response using the RAG handler with simulation-specific context
+        ai_response = kardia_ai.generate_response(db, current_user.id, request.message, session_id=request.session_id)
         logger.debug(f"AI handler returned: {ai_response[:50]}...")
         
         # Fetch updated history to return to UI

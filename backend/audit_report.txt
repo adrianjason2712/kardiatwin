@@ -1,0 +1,63 @@
+2026-03-19 17:04:25,052 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 17:04:25,105 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 17:04:25,105 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=76.0/148.0
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=78.0/126.8
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=71.0/131.8
+=== KardiaTwin: EXHAUSTIVE CLINICAL AUDIT (V1.5) ===
+
+[PASS] MALE HEALTHY BASE
+  PASSED HR Offset: 0.0
+  PASSED SBP Offset: 0.0
+[PASS] FEMALE HEALTHY BASE
+  PASSED HR Offset: 0.0
+  PASSED SBP Offset: 0.0
+[PASS] SMOKER MALE REST
+  PASSED HR Offset: 8.0
+  PASSED SBP Offset: 10.0
+[PASS] SMOKER FEMALE REST
+  PASSED HR Offset: 11.0
+  PASSED SBP Offset: 10.0
+[PASS] DIABETES T1 FEMALE REST
+  PASSED HR Offset: 10.0
+  PASSED SBP Offset: 15.0
+[PASS] DIABETES T2 MALE REST
+  PASSED HR Offset: 6.0
+  PASSED SBP Offset: 10.0
+[PASS] DIABETES T1 FEMALE RISE
+  PASSED SBP Rise Mult: 1.45
+[PASS] ATHLETE MALE RISE
+  PASSED HR Rise Mult: 0.8
+[PASS] PAD MALE SBP RISE
+  PASSED SBP Rise Mult: 1.5
+[PASS] FEMALE BASE RECOV
+  PASSED Recovery Eff: 0.85
+[PASS] SMOKER FEMALE RECOV
+  PASSED Recovery Eff: 0.59
+[PASS] ATHLETE MALE RECOV
+  PASSED Recovery Eff: 2.0
+[PASS] PAD SENIOR MALE RECOV
+  PASSED Recovery Eff: 0.29
+[PASS] OBESE MALE (BMI 32)
+  PASSED HR Offset: 8.0
+  PASSED SBP Rise Mult: 1.25
+[FAIL] MORBID OBESE SBP OFFSET
+  FAILED SBP Offset: Got 20.89965397923876, Expected 20.8
+[PASS] SENIOR FEMALE STIFFNESS
+  PASSED SBP Rise Mult: 1.25
+[PASS] SENIOR MALE STIFFNESS
+  PASSED SBP Rise Mult: 1.1
+
+[CONCLUSION] Mismatches detected. Engine requires calibration.

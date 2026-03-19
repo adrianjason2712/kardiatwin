@@ -1,7 +1,7 @@
 import google.generativeai as genai
 import os
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from models import ChatMessage
 from ai_context import get_clinical_grounding, get_patient_summary, get_chat_history
@@ -24,15 +24,12 @@ class KardiaAIHandler:
     
     def __init__(self, model_name: str = "gemini-2.5-flash"):
         self.model_name = model_name
-        self._grounding_cache = None
 
     def get_grounding(self) -> str:
-        """Simple in-memory caching of the clinical matrix."""
-        if not self._grounding_cache:
-            self._grounding_cache = get_clinical_grounding()
-        return self._grounding_cache
+        """Reads the clinical matrix fresh from disk to stay in sync with user edits."""
+        return get_clinical_grounding()
 
-    def generate_response(self, db: Session, user_id: int, user_message: str) -> str:
+    def generate_response(self, db: Session, user_id: int, user_message: str, session_id: Optional[int] = None) -> str:
         """
         Orchestrates the RAG workflow via Direct SDK:
         1. Gathers context (SQL + File)
@@ -43,7 +40,7 @@ class KardiaAIHandler:
         try:
             # 1. PREPARE CONTEXT (THE 'AUGMENT' IN RAG)
             grounding = self.get_grounding()
-            patient_summary = get_patient_summary(db, user_id)
+            patient_summary = get_patient_summary(db, user_id, session_id=session_id)
             history = get_chat_history(db, user_id)
 
             # 2. DEFINE SYSTEM INSTRUCTION
@@ -57,7 +54,7 @@ class KardiaAIHandler:
                 "### YOUR MANDATORY RULES:\n"
                 "1. Always use the Clinical Matrix logic (e.g., SBP multipliers for PAD) when explaining data.\n"
                 "2. Reference the patient's Bio Age and 'What If' scenarios to illustrate health trajectories.\n"
-                "3. Explain findings through the lens of their specific markers (PAD, Smoking, Diabetes).\n"
+                "3. IMPORTANT: Prioritize the 'Simulation Physiological Profile' markers (Age, Sex, Smoking, PAD, etc.) over the user's general profile history if any conflicts exist.\n"
                 "4. STRICT MEDICAL DISCLAIMER: End every response with: '*Insight provided based on physiological simulation. Consult a physician for medical diagnosis.*'\n"
                 "5. Provide actionable, data-driven insights based on their simulation history and projected improvements."
             )

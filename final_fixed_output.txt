@@ -1,0 +1,14 @@
+2026-03-19 02:39:51,327 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:39:51,327 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:39:51,347 [INFO] 
+--- Testing Profile: Healthy Athlete ---
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\verify_matrix_physics.py", line 73, in <module>
+    athlete_time = run_test_case("Healthy Athlete", athlete_data)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\verify_matrix_physics.py", line 29, in run_test_case
+    engine.apply_modifiers()
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 396, in apply_modifiers
+    self.hr_increase_rate_per_min = 11.0 * self.exercise_hr_mult
+                                           ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PhysiologySimulationEngine' object has no attribute 'exercise_hr_mult'

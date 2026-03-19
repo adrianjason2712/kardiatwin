@@ -1,0 +1,31 @@
+2026-03-17 01:09:14,142 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-17 01:09:14,186 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+
+--- Testing Scenario: Optimized Athlete ---
+Resting Vitals: 56.0 BPM / 110.0 mmHg
+Max HR (Target): 195.0 BPM
+Exercise HR Multiplier: 0.80x
+Exercise SBP Multiplier: 1.00x
+HR Increase Rate: 8.8 BPM/min
+Recovery Efficiency: 2.00x
+Recovery Rate: 38.0 BPM/min
+
+--- Testing Scenario: Sedentary Senior ---
+Resting Vitals: 111.0 BPM / 153.0 mmHg
+Max HR (Target): 148.8 BPM
+Exercise HR Multiplier: 1.23x
+Exercise SBP Multiplier: 1.95x
+HR Increase Rate: 13.5 BPM/min
+Recovery Efficiency: 0.29x
+Recovery Rate: 4.9 BPM/min
+
+--- Testing Scenario: Vascular Crisis ---
+Resting Vitals: 116.0 BPM / 189.9 mmHg
+Max HR (Target): 160.0 BPM
+Exercise HR Multiplier: 1.71x
+Exercise SBP Multiplier: 2.85x
+HR Increase Rate: 18.9 BPM/min
+Recovery Efficiency: 0.14x
+Recovery Rate: 2.6 BPM/min
+2026-03-17 01:09:14,186 [INFO] [LOG] Digital Twin Calibrated: RR=4.9 BPM/min, Rest=111.0/153.0
+2026-03-17 01:09:14,186 [INFO] [LOG] Digital Twin Calibrated: RR=2.6 BPM/min, Rest=116.0/189.9

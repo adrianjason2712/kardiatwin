@@ -11,3 +11,329 @@
 2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=3.7 BPM/min, Rest=120/173
 2026-03-13 02:27:02,973 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=53/115
 2026-03-13 02:27:02,977 [INFO] [LOG] Digital Twin Calibrated: RR=28.9 BPM/min, Rest=63/110
+2026-03-16 19:41:40,569 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-16 19:41:40,597 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-16 19:41:40,598 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=71/127
+2026-03-16 19:41:40,599 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=78/126
+2026-03-16 19:49:24,315 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-16 19:49:24,346 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71/115
+2026-03-16 19:49:24,346 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=71/127
+2026-03-16 19:49:24,346 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=78/126
+2026-03-17 01:09:14,142 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-17 01:09:14,186 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-17 01:09:14,186 [INFO] [LOG] Digital Twin Calibrated: RR=4.9 BPM/min, Rest=111.0/153.0
+2026-03-17 01:09:14,186 [INFO] [LOG] Digital Twin Calibrated: RR=2.6 BPM/min, Rest=116.0/189.9
+2026-03-17 03:04:01,915 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-17 03:04:01,989 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=80.0/105.0
+2026-03-17 03:04:01,991 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/119.4
+2026-03-17 03:04:01,991 [INFO] [LOG] Digital Twin Calibrated: RR=8.2 BPM/min, Rest=90.0/132.4
+2026-03-17 03:04:01,992 [INFO] [LOG] Digital Twin Calibrated: RR=2.6 BPM/min, Rest=116.0/189.9
+2026-03-18 22:00:31,916 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:11:52,097 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:11:52,141 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:11:52,142 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:11:52,142 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:12:32,793 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:12:32,827 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:12:32,828 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:12:32,829 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:15:54,778 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:15:54,816 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:15:54,817 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:15:54,818 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:16:44,324 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:16:44,371 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:16:44,373 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:16:44,374 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:18:06,568 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:18:06,594 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:18:06,599 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:18:06,600 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:24:24,129 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:24:24,168 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:24:24,168 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:24:24,168 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:25:16,725 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:25:16,752 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:25:16,753 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:25:16,753 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 22:26:24,101 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:26:24,133 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:26:24,134 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:26:24,134 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+2026-03-18 23:53:53,113 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 23:53:53,140 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-18 23:53:53,140 [INFO] [LOG] Digital Twin Calibrated: RR=5.0 BPM/min, Rest=115.0/164.8
+2026-03-18 23:53:53,140 [INFO] [LOG] Recovery achieved in 136.0s. Finalizing session.
+2026-03-19 02:15:34,297 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:15:34,329 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 02:15:34,331 [INFO] [LOG] Digital Twin Calibrated: RR=8.8 BPM/min, Rest=97.0/153.9
+2026-03-19 02:15:34,331 [INFO] [LOG] Target HR 140.2 reached. Ending exercise.
+2026-03-19 02:36:37,133 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:39:51,327 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:42:21,005 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:42:21,042 [INFO] [LOG] Matrix Calibrated: Rise=8.0/10.0, Recov=38.0, Rest=56.0/110.0
+2026-03-19 02:42:21,043 [INFO] [LOG] Matrix Calibrated: Rise=14.0/16.0, Recov=8.8, Rest=97.0/153.9
+2026-03-19 02:42:21,043 [INFO] [LOG] Target HR 140.2 reached. Ending exercise.
+2026-03-19 02:42:41,936 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:42:41,966 [INFO] [LOG] Matrix Calibrated: Rise=8.0/10.0, Recov=38.0, Rest=56.0/110.0
+2026-03-19 02:42:41,968 [INFO] [LOG] Matrix Calibrated: Rise=14.0/16.0, Recov=8.8, Rest=97.0/153.9
+2026-03-19 02:42:41,970 [INFO] [LOG] Target HR 140.2 reached. Ending exercise.
+2026-03-19 02:52:36,151 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:52:36,181 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/115.0
+2026-03-19 02:52:36,183 [INFO] [CLINICAL] Pathophysiological recovery complete: 68.0s
+2026-03-19 02:52:36,183 [INFO] [LOG] Digital Twin Calibrated: RR=8.8 BPM/min, Rest=97.0/148.9
+2026-03-19 02:52:36,185 [INFO] [CLINICAL] Diagnostic target reached (140.3 BPM). Entering recovery.
+2026-03-19 02:52:36,187 [INFO] [CLINICAL] Pathophysiological recovery complete: 316.0s
+2026-03-19 02:52:51,655 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 02:52:51,685 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/115.0
+2026-03-19 02:52:51,686 [INFO] [CLINICAL] Pathophysiological recovery complete: 68.0s
+2026-03-19 02:52:51,686 [INFO] [LOG] Digital Twin Calibrated: RR=8.8 BPM/min, Rest=97.0/148.9
+2026-03-19 02:52:51,688 [INFO] [CLINICAL] Diagnostic target reached (140.5 BPM). Entering recovery.
+2026-03-19 02:52:51,688 [INFO] [CLINICAL] Pathophysiological recovery complete: 312.0s
+2026-03-19 03:32:37,320 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 03:32:37,350 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/115.0
+2026-03-19 03:32:37,351 [INFO] [CLINICAL] Pathophysiological Recovery Complete: 68.0s
+2026-03-19 03:32:37,351 [INFO] [LOG] Digital Twin Calibrated: RR=8.8 BPM/min, Rest=97.0/148.9
+2026-03-19 03:32:37,352 [INFO] [CLINICAL] Target HR Reached - Success (140.4 BPM). Entering recovery.
+2026-03-19 03:32:37,352 [INFO] [CLINICAL] Pathophysiological Recovery Complete: 313.0s
+2026-03-19 03:32:37,352 [INFO] [LOG] Digital Twin Calibrated: RR=0.9 BPM/min, Rest=113.0/195.5
+2026-03-19 03:32:37,352 [INFO] [CLINICAL] Target HR Reached - Success (124.2 BPM). Entering recovery.
+2026-03-19 03:32:37,353 [INFO] [CLINICAL] Pathophysiological Recovery Complete: 600.0s
+2026-03-19 16:44:05,772 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 16:44:05,832 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:05,832 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:05,832 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:05,835 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:05,836 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:05,836 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:05,836 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,653 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 16:44:29,694 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,699 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,699 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,699 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,699 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,702 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:44:29,702 [INFO] [LOG] Digital Twin Calibrated: RR=17.1 BPM/min, Rest=71.0/121.0
+2026-03-19 16:45:17,153 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 16:46:06,291 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 16:46:06,357 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 16:46:06,357 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 16:46:06,357 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 16:46:06,361 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 16:46:06,361 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=76.0/148.0
+2026-03-19 16:46:06,362 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/127.6
+2026-03-19 16:46:06,363 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=71.0/127.0
+2026-03-19 16:57:07,311 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 16:57:07,355 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 16:57:07,357 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 16:57:07,358 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 16:57:07,358 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 16:57:07,358 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 16:57:07,358 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 16:57:07,358 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 16:57:07,358 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 16:57:07,364 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 16:57:07,364 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 16:57:07,364 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 16:57:07,366 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 16:57:07,366 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=76.0/148.0
+2026-03-19 16:57:07,367 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 16:57:07,367 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 16:57:07,368 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=78.0/126.8
+2026-03-19 16:57:07,368 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=71.0/131.8
+2026-03-19 17:04:25,052 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 17:04:25,105 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 17:04:25,105 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:04:25,107 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=76.0/148.0
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=78.0/126.8
+2026-03-19 17:04:25,109 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=71.0/131.8
+2026-03-19 17:05:08,647 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=76.0/148.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=78.0/126.8
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=71.0/131.8
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 17:05:08,710 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 17:25:37,711 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=86.0/148.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=87.0/126.8
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=80.0/131.8
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 17:25:37,753 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=64.0/125.6
+2026-03-19 17:45:17,665 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=86.0/148.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=87.0/126.8
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=80.0/131.8
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=64.0/125.6
+2026-03-19 17:45:17,715 [INFO] [LOG] Digital Twin Calibrated: RR=2.5 BPM/min, Rest=110.0/181.2
+2026-03-19 18:10:30,545 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:10:30,651 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:10:30,655 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:10:30,657 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=71.0/133.0
+2026-03-19 18:10:30,657 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=78.0/128.0
+2026-03-19 18:10:30,662 [INFO] [LOG] Digital Twin Calibrated: RR=5.8 BPM/min, Rest=105.0/162.0
+2026-03-19 18:10:30,662 [INFO] [LOG] Digital Twin Calibrated: RR=3.2 BPM/min, Rest=123.0/163.0
+2026-03-19 18:10:30,665 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:10:30,667 [INFO] [LOG] Digital Twin Calibrated: RR=24.6 BPM/min, Rest=66.0/105.0
+2026-03-19 18:11:54,746 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=71.0/133.0
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=78.0/128.0
+2026-03-19 18:11:54,840 [INFO] [LOG] Digital Twin Calibrated: RR=5.8 BPM/min, Rest=105.0/162.0
+2026-03-19 18:11:54,840 [INFO] [LOG] Digital Twin Calibrated: RR=3.2 BPM/min, Rest=123.0/163.0
+2026-03-19 18:11:54,840 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:11:54,841 [INFO] [LOG] Digital Twin Calibrated: RR=24.6 BPM/min, Rest=66.0/105.0
+2026-03-19 18:15:23,469 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:15:23,556 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:15:23,557 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:15:23,557 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=79.0/133.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=94.0/148.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=94.8/126.8
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=87.8/131.8
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=71.6/125.6
+2026-03-19 18:15:23,558 [INFO] [LOG] Digital Twin Calibrated: RR=2.5 BPM/min, Rest=118.0/181.2
+2026-03-19 18:16:23,096 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:16:23,168 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:16:23,168 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:16:23,168 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 18:16:23,168 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=79.0/133.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=94.0/148.0
+2026-03-19 18:16:23,175 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 18:16:23,177 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=94.8/126.8
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=87.8/131.8
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=71.6/125.6
+2026-03-19 18:16:23,178 [INFO] [LOG] Digital Twin Calibrated: RR=2.5 BPM/min, Rest=118.0/181.2
+2026-03-19 18:21:33,465 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=79.0/133.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=94.0/148.0
+2026-03-19 18:21:33,527 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=94.8/126.8
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=87.8/131.8
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=71.6/125.6
+2026-03-19 18:21:33,531 [INFO] [LOG] Digital Twin Calibrated: RR=2.5 BPM/min, Rest=118.0/181.2
+2026-03-19 18:22:56,818 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:22:56,887 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/125.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=77.0/125.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=88.0/125.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=9.0 BPM/min, Rest=76.0/133.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=89.0/120.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=5.6 BPM/min, Rest=76.0/148.0
+2026-03-19 18:22:56,888 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=73.0/110.0
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=15.2 BPM/min, Rest=79.0/126.2
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=11.4 BPM/min, Rest=83.0/135.9
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=10.4 BPM/min, Rest=78.0/126.8
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=13.7 BPM/min, Rest=71.0/131.8
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=10.8 BPM/min, Rest=90.0/118.0
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=11.6 BPM/min, Rest=90.0/118.0
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/125.6
+2026-03-19 18:22:56,891 [INFO] [LOG] Digital Twin Calibrated: RR=2.5 BPM/min, Rest=100.0/181.2

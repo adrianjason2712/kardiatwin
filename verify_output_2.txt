@@ -1,0 +1,73 @@
+2026-03-19 18:11:54,746 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=14.4 BPM/min, Rest=78.0/110.0
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=13.3 BPM/min, Rest=71.0/133.0
+2026-03-19 18:11:54,837 [INFO] [LOG] Digital Twin Calibrated: RR=10.1 BPM/min, Rest=78.0/128.0
+2026-03-19 18:11:54,840 [INFO] [LOG] Digital Twin Calibrated: RR=5.8 BPM/min, Rest=105.0/162.0
+2026-03-19 18:11:54,840 [INFO] [LOG] Digital Twin Calibrated: RR=3.2 BPM/min, Rest=123.0/163.0
+2026-03-19 18:11:54,840 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 18:11:54,841 [INFO] [LOG] Digital Twin Calibrated: RR=24.6 BPM/min, Rest=66.0/105.0
+
+--- Vignette: Healthy Male (40y) ---
+Demographics: 40y, Male
+Lifestyle: {}
+Resting Baseline: 71.0 HR / 115.0 SBP
+Max HR (Ceiling): 180.0 (Fox)
+Exercise Multipliers: HR=1.00x, SBP=1.00x
+Recovery Efficiency: 1.00
+
+--- Vignette: Healthy Female (40y) ---
+Demographics: 40y, Female
+Lifestyle: {}
+Resting Baseline: 78.0 HR / 110.0 SBP
+Max HR (Ceiling): 170.8 (Gulati)
+Exercise Multipliers: HR=1.00x, SBP=1.00x
+Recovery Efficiency: 0.85
+
+--- Vignette: Senior Male (70y) ---
+Demographics: 70y, Male
+Lifestyle: {}
+Resting Baseline: 71.0 HR / 133.0 SBP
+Max HR (Ceiling): 150.0 (Fox)
+Exercise Multipliers: HR=1.00x, SBP=1.10x
+Recovery Efficiency: 0.70
+
+--- Vignette: Senior Female (70y) ---
+Demographics: 70y, Female
+Lifestyle: {}
+Resting Baseline: 78.0 HR / 128.0 SBP
+Max HR (Ceiling): 144.4 (Gulati)
+Exercise Multipliers: HR=1.00x, SBP=1.25x
+Recovery Efficiency: 0.59
+
+--- Vignette: High Risk Male (60y) ---
+Demographics: 60y, Male
+Lifestyle: {'smoking': 'smoker', 'diabetes': 'type_1', 'alcohol': 'heavy', 'activity': 'sedentary'}
+Resting Baseline: 105.0 HR / 162.0 SBP
+Max HR (Ceiling): 160.0 (Fox)
+Exercise Multipliers: HR=1.24x, SBP=1.65x
+Recovery Efficiency: 0.30
+
+--- Vignette: High Risk Female (60y) ---
+Demographics: 60y, Female
+Lifestyle: {'smoking': 'smoker', 'diabetes': 'type_1', 'alcohol': 'heavy', 'activity': 'sedentary'}
+Resting Baseline: 123.0 HR / 163.0 SBP
+Max HR (Ceiling): 153.2 (Gulati)
+Exercise Multipliers: HR=1.28x, SBP=2.27x
+Recovery Efficiency: 0.19
+
+--- Vignette: Athlete Male (30y) ---
+Demographics: 30y, Male
+Lifestyle: {'activity': 'athlete'}
+Resting Baseline: 56.0 HR / 110.0 SBP
+Max HR (Ceiling): 190.0 (Fox)
+Exercise Multipliers: HR=0.80x, SBP=1.00x
+Recovery Efficiency: 2.00
+
+--- Vignette: Athlete Female (30y) ---
+Demographics: 30y, Female
+Lifestyle: {'activity': 'athlete'}
+Resting Baseline: 66.0 HR / 105.0 SBP
+Max HR (Ceiling): 179.6 (Gulati)
+Exercise Multipliers: HR=0.85x, SBP=1.00x
+Recovery Efficiency: 1.44

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Bot, X, Trash2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import API from '../utils/axios';
+import { useLocation } from 'react-router-dom';
 
 interface ChatMessage {
   id: number;
@@ -16,12 +17,19 @@ interface PulseChatbotProps {
 }
 
 const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
+  const location = useLocation();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryTimer, setRetryTimer] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Helper to extract session ID from URL (e.g., /analytics/164)
+  const getActiveSessionId = useCallback(() => {
+    const match = location.pathname.match(/\/analytics\/(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  }, [location.pathname]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -82,7 +90,13 @@ const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      const response = await API.post('/api/chat', { message: userMsgText });
+      // Determine active context
+      const currentSessionId = getActiveSessionId();
+      
+      const response = await API.post('/api/chat', { 
+        message: userMsgText,
+        session_id: currentSessionId 
+      });
       
       // Server returns { response: string, history: ChatMessage[] }
       // Sort the returned history to prevent ordering bugs
@@ -137,7 +151,11 @@ const PulseChatbot: React.FC<PulseChatbotProps> = ({ isOpen, onClose }) => {
             <h3 className="text-white font-semibold leading-tight">Pulse Advisor</h3>
             <div className="flex items-center space-x-1">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <p className="text-white text-xs opacity-90">Personalized Clinical Engine</p>
+              <p className="text-white text-xs opacity-90">
+                {getActiveSessionId() 
+                  ? `Grounded in Session #${getActiveSessionId()}` 
+                  : 'Personalized Clinical Engine'}
+              </p>
             </div>
           </div>
         </div>

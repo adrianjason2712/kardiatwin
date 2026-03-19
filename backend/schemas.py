@@ -168,6 +168,7 @@ class ChatMessageSchema(BaseModel):
 class ChatRequest(BaseModel):
     """Request for a new chat message"""
     message: str
+    session_id: Optional[int] = None
 
 class ChatResponse(BaseModel):
     """Response from the AI chatbot"""

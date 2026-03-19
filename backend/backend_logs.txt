@@ -1961,3 +1961,845 @@ DETAIL:  Key (session_id)=(151) is not present in table "simulation_sessions".
 2026-03-16 01:56:34,458 [INFO] [SUCCESS] Saved Heart Age (20.0) for session 163
 2026-03-16 01:56:44,047 [INFO] [LOG] Finalizing Metrics for Session 163: PeakHR=71.0, ExDur=0s
 2026-03-16 01:56:44,052 [INFO] [SUCCESS] Saved final simulation 163: duration=9.8s, risk_score=66.0
+2026-03-16 17:07:24,115 [INFO] [SUCCESS] ML model loaded
+2026-03-16 17:07:24,165 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-16 17:07:24,420 [INFO] [SUCCESS] Database initialized
+2026-03-16 17:07:24,420 [INFO] [SUCCESS] Simulation thread started
+2026-03-16 17:11:17,627 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-16 19:40:35,446 [INFO] [SHUTDOWN] Shutting down...
+2026-03-16 19:40:57,049 [INFO] [SUCCESS] ML model loaded
+2026-03-16 19:40:57,097 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-16 19:40:57,311 [INFO] [SUCCESS] Database initialized
+2026-03-16 19:40:57,311 [INFO] [SUCCESS] Simulation thread started
+2026-03-16 19:41:02,515 [INFO] [SUCCESS] ML model loaded
+2026-03-16 19:41:02,547 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-16 19:41:02,611 [INFO] [SUCCESS] Database initialized
+2026-03-16 19:41:02,616 [INFO] [SUCCESS] Simulation thread started
+2026-03-16 19:41:17,439 [INFO] [SHUTDOWN] Shutting down...
+2026-03-16 19:41:23,202 [INFO] [SUCCESS] ML model loaded
+2026-03-16 19:41:23,240 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-16 19:41:23,306 [INFO] [SUCCESS] Database initialized
+2026-03-16 19:41:23,307 [INFO] [SUCCESS] Simulation thread started
+2026-03-16 19:41:33,150 [INFO] [SHUTDOWN] Shutting down...
+2026-03-16 19:41:38,570 [INFO] [SUCCESS] ML model loaded
+2026-03-16 19:41:38,614 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-16 19:41:38,681 [INFO] [SUCCESS] Database initialized
+2026-03-16 19:41:38,686 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 01:08:33,692 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 01:08:48,118 [INFO] [SUCCESS] ML model loaded
+2026-03-17 01:08:48,184 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 01:08:48,468 [INFO] [SUCCESS] Database initialized
+2026-03-17 01:08:48,470 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 01:08:56,351 [INFO] [SUCCESS] ML model loaded
+2026-03-17 01:08:56,419 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 01:08:56,512 [INFO] [SUCCESS] Database initialized
+2026-03-17 01:08:56,512 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 02:39:53,456 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 02:40:23,174 [INFO] [SUCCESS] ML model loaded
+2026-03-17 02:40:23,235 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 02:40:23,423 [INFO] [SUCCESS] Database initialized
+2026-03-17 02:40:23,427 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 02:40:32,676 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 02:40:41,636 [INFO] [SUCCESS] ML model loaded
+2026-03-17 02:40:41,691 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 02:40:41,799 [INFO] [SUCCESS] Database initialized
+2026-03-17 02:40:41,801 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 03:01:45,567 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 03:01:57,690 [INFO] [SUCCESS] ML model loaded
+2026-03-17 03:01:57,774 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 03:01:57,886 [INFO] [SUCCESS] Database initialized
+2026-03-17 03:01:57,889 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 03:03:09,832 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 03:03:20,908 [INFO] [SUCCESS] ML model loaded
+2026-03-17 03:03:20,991 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 03:03:21,108 [INFO] [SUCCESS] Database initialized
+2026-03-17 03:03:21,108 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 03:03:29,757 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 03:03:41,010 [INFO] [SUCCESS] ML model loaded
+2026-03-17 03:03:41,093 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 03:03:41,207 [INFO] [SUCCESS] Database initialized
+2026-03-17 03:03:41,208 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 16:59:17,202 [INFO] [SUCCESS] ML model loaded
+2026-03-17 16:59:17,272 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 16:59:17,514 [INFO] [SUCCESS] Database initialized
+2026-03-17 16:59:17,514 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 16:59:29,814 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-17 16:59:47,966 [INFO] [LOG] /start endpoint called
+2026-03-17 16:59:47,966 [INFO] [LOG] Request received: age=26, sex=1
+2026-03-17 16:59:47,969 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-17 16:59:47,970 [INFO] [SUCCESS] Engine created successfully
+2026-03-17 16:59:47,970 [ERROR] Error: Parent instance <User at 0x1ccf2624350> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-17 17:04:54,413 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 17:05:04,052 [INFO] [SUCCESS] ML model loaded
+2026-03-17 17:05:04,231 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 17:05:04,347 [INFO] [SUCCESS] Database initialized
+2026-03-17 17:05:04,348 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 17:05:06,665 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 17:05:14,873 [INFO] [SUCCESS] ML model loaded
+2026-03-17 17:05:14,944 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 17:05:15,036 [INFO] [SUCCESS] Database initialized
+2026-03-17 17:05:15,039 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 17:24:17,902 [INFO] [LOG] /start endpoint called
+2026-03-17 17:24:17,903 [INFO] [LOG] Request received: age=26, sex=1
+2026-03-17 17:24:17,905 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-17 17:24:17,906 [INFO] [SUCCESS] Engine created successfully
+2026-03-17 17:24:17,907 [INFO] [LOG] Digital Twin Calibrated: RR=9.5 BPM/min, Rest=76.0/130.0
+2026-03-17 17:24:18,048 [INFO] [SUCCESS] Created simulation session 164 for user adrianjason
+2026-03-17 17:24:18,048 [INFO] [SUCCESS] Simulation started: Age 26, non_smoker
+2026-03-17 17:24:18,212 [INFO] [SUCCESS] Saved Heart Age (41.0) for session 164
+2026-03-17 17:36:18,613 [INFO] [LOG] Finalizing Metrics for Session 164: PeakHR=184.3, ExDur=540s
+2026-03-17 17:36:18,622 [INFO] [SUCCESS] Saved final simulation 164: duration=720.2s, risk_score=73.0
+2026-03-17 18:07:20,396 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:07:32,527 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:07:32,596 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:07:32,696 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:07:32,697 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:12:13,503 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:12:26,350 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:12:26,425 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:12:26,649 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:12:26,650 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:12:31,517 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:12:42,224 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:12:42,310 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:12:42,426 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:12:42,436 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:15:19,760 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:15:30,557 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:15:30,628 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:15:30,749 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:15:30,753 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:30:01,614 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:30:18,782 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:30:18,864 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:30:19,024 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:30:19,027 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:36:03,093 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:36:18,631 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:36:18,699 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:36:18,849 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:36:18,851 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:36:29,730 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:36:29,865 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:36:30,000 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:36:30,002 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:39:39,568 [INFO] [LOG] /start endpoint called
+2026-03-17 18:39:39,568 [INFO] [LOG] Request received: Age=18, Sex=1, CP=0, PAD=pad, Smoking=non_smoker, Diabetes=none
+2026-03-17 18:39:39,570 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-17 18:39:39,571 [INFO] [SUCCESS] Engine created successfully
+2026-03-17 18:39:39,572 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-17 18:39:39,620 [INFO] [SUCCESS] Created simulation session 165 for user adrianjason
+2026-03-17 18:39:39,620 [INFO] [SUCCESS] Simulation started: Age 18, non_smoker
+2026-03-17 18:39:39,707 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 165
+2026-03-17 18:39:52,178 [INFO] [LOG] Finalizing Metrics for Session 165: PeakHR=63.0, ExDur=0s
+2026-03-17 18:39:52,187 [INFO] [SUCCESS] Saved final simulation 165: duration=12.4s, risk_score=38.0
+2026-03-17 18:43:00,693 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:43:13,723 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:43:13,811 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:43:13,933 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:43:13,935 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:43:21,934 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:43:32,529 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:43:32,614 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:43:32,728 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:43:32,728 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:46:21,130 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:46:32,295 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:46:32,347 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:46:32,550 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:46:32,557 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:51:37,780 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:51:46,460 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:51:46,488 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:51:46,668 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:51:46,669 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:54:52,035 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:54:57,896 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:54:57,937 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:54:57,996 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:54:57,996 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 18:55:04,025 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 18:56:37,965 [INFO] [SUCCESS] ML model loaded
+2026-03-17 18:56:37,993 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 18:56:38,057 [INFO] [SUCCESS] Database initialized
+2026-03-17 18:56:38,057 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 19:00:06,887 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 19:00:12,440 [INFO] [SUCCESS] ML model loaded
+2026-03-17 19:00:12,469 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 19:00:12,529 [INFO] [SUCCESS] Database initialized
+2026-03-17 19:00:12,529 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 19:14:30,058 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 19:14:39,382 [INFO] [SUCCESS] ML model loaded
+2026-03-17 19:14:39,411 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 19:14:39,478 [INFO] [SUCCESS] Database initialized
+2026-03-17 19:14:39,478 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 19:15:31,620 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 19:15:37,869 [INFO] [SUCCESS] ML model loaded
+2026-03-17 19:15:37,903 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 19:15:37,964 [INFO] [SUCCESS] Database initialized
+2026-03-17 19:15:37,964 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 19:15:48,357 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 19:15:54,250 [INFO] [SUCCESS] ML model loaded
+2026-03-17 19:15:54,288 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 19:15:54,353 [INFO] [SUCCESS] Database initialized
+2026-03-17 19:15:54,355 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 19:56:47,911 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 19:56:59,656 [INFO] [SUCCESS] ML model loaded
+2026-03-17 19:56:59,692 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 19:56:59,766 [INFO] [SUCCESS] Database initialized
+2026-03-17 19:56:59,767 [INFO] [SUCCESS] Simulation thread started
+2026-03-17 19:57:49,671 [INFO] [SHUTDOWN] Shutting down...
+2026-03-17 19:57:55,642 [INFO] [SUCCESS] ML model loaded
+2026-03-17 19:57:55,675 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-17 19:57:55,737 [INFO] [SUCCESS] Database initialized
+2026-03-17 19:57:55,739 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 01:31:34,136 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 01:31:46,392 [INFO] [SUCCESS] ML model loaded
+2026-03-18 01:31:46,430 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 01:31:46,558 [INFO] [SUCCESS] Database initialized
+2026-03-18 01:31:46,558 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 01:32:22,102 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 02:50:23,678 [INFO] [SUCCESS] ML model loaded
+2026-03-18 02:50:23,716 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 02:50:23,884 [INFO] [SUCCESS] Database initialized
+2026-03-18 02:50:23,885 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 02:51:03,078 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 02:51:08,456 [INFO] [SUCCESS] ML model loaded
+2026-03-18 02:51:08,482 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 02:51:08,548 [INFO] [SUCCESS] Database initialized
+2026-03-18 02:51:08,550 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 02:52:25,481 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 02:52:30,790 [INFO] [SUCCESS] ML model loaded
+2026-03-18 02:52:30,818 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 02:52:30,881 [INFO] [SUCCESS] Database initialized
+2026-03-18 02:52:30,883 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 02:55:57,578 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 02:56:03,925 [INFO] [SUCCESS] ML model loaded
+2026-03-18 02:56:03,964 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 02:56:04,031 [INFO] [SUCCESS] Database initialized
+2026-03-18 02:56:04,032 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 02:58:07,129 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 02:59:08,647 [INFO] [SUCCESS] ML model loaded
+2026-03-18 02:59:08,676 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 02:59:08,750 [INFO] [SUCCESS] Database initialized
+2026-03-18 02:59:08,751 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 02:59:08,788 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-18 02:59:08,923 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-18 21:15:01,408 [INFO] [SUCCESS] ML model loaded
+2026-03-18 21:30:44,574 [INFO] [SUCCESS] ML model loaded
+2026-03-18 21:30:44,613 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 21:30:45,279 [INFO] [SUCCESS] Database initialized
+2026-03-18 21:30:45,279 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 21:34:41,224 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 21:34:51,588 [INFO] [SUCCESS] ML model loaded
+2026-03-18 21:34:51,623 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 21:34:51,950 [INFO] [SUCCESS] Database initialized
+2026-03-18 21:34:51,952 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 23:36:29,491 [INFO] [SUCCESS] ML model loaded
+2026-03-18 23:36:29,528 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 23:36:29,677 [INFO] [SUCCESS] Database initialized
+2026-03-18 23:36:29,679 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 23:38:35,708 [INFO] [SHUTDOWN] Shutting down...
+2026-03-18 23:38:43,775 [INFO] [SUCCESS] ML model loaded
+2026-03-18 23:38:43,804 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 23:38:43,871 [INFO] [SUCCESS] Database initialized
+2026-03-18 23:38:43,872 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 23:38:55,294 [INFO] [SUCCESS] ML model loaded
+2026-03-18 23:38:55,331 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-18 23:38:55,392 [INFO] [SUCCESS] Database initialized
+2026-03-18 23:38:55,394 [INFO] [SUCCESS] Simulation thread started
+2026-03-18 23:38:55,688 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-18 23:52:10,453 [INFO] [LOG] /start endpoint called
+2026-03-18 23:52:10,454 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-18 23:52:10,455 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-18 23:52:10,456 [INFO] [SUCCESS] Engine created successfully
+2026-03-18 23:52:10,456 [ERROR] Error: Parent instance <User at 0x133917d7890> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-19 00:05:30,954 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:05:43,139 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:05:43,211 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:05:43,413 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:05:43,413 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:06:27,940 [INFO] [LOG] /start endpoint called
+2026-03-19 00:06:27,940 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:06:27,940 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:06:27,940 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:06:27,953 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 00:06:28,060 [INFO] [SUCCESS] Created simulation session 169 for user adrianjason
+2026-03-19 00:06:28,060 [INFO] [SUCCESS] Simulation started: Age 18, non_smoker
+2026-03-19 00:06:28,123 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 169
+2026-03-19 00:06:28,449 [ERROR] [ERROR] Engine update error during rest phase: float division by zero
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 823, in background_simulation
+    state.engine.update(dt)
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 567, in update
+    if len(self.hr_buffer) > (10 / dt_real): self.hr_buffer.pop(0)
+                              ~~~^~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-03-19 00:06:28,451 [ERROR] Engine state - HR: 63.0, SBP: 127.0, Stage: 0
+2026-03-19 00:09:31,916 [INFO] [LOG] Finalizing Metrics for Session 169: PeakHR=63.0, ExDur=0s
+2026-03-19 00:09:31,923 [INFO] [SUCCESS] Saved final simulation 169: duration=0.0s, risk_score=38.0
+2026-03-19 00:12:21,751 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:12:28,902 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:12:28,935 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:12:29,002 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:12:29,004 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:12:55,153 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 00:12:55,425 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 00:15:28,234 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:15:36,263 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:15:36,293 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:15:36,361 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:15:36,363 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:15:57,967 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:16:03,958 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:16:03,991 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:16:04,056 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:16:04,058 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:16:05,108 [INFO] [LOG] /start endpoint called
+2026-03-19 00:16:05,108 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:16:05,108 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:16:05,108 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:16:05,108 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:16:05,121 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:16:05,559 [ERROR] [ERROR] Engine update error during rest phase: float division by zero
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 823, in background_simulation
+    state.engine.update(dt)
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 567, in update
+    if len(self.hr_buffer) > (10 / dt_real): self.hr_buffer.pop(0)
+                              ~~~^~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-03-19 00:16:05,561 [ERROR] Engine state - HR: 89.0, SBP: 133.0, Stage: 0
+2026-03-19 00:16:28,202 [INFO] [LOG] /start endpoint called
+2026-03-19 00:16:28,202 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:16:28,204 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:16:28,204 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:16:28,204 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:16:28,210 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:16:28,596 [ERROR] [ERROR] Engine update error during rest phase: float division by zero
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 823, in background_simulation
+    state.engine.update(dt)
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 567, in update
+    if len(self.hr_buffer) > (10 / dt_real): self.hr_buffer.pop(0)
+                              ~~~^~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-03-19 00:16:28,602 [ERROR] Engine state - HR: 89.0, SBP: 133.0, Stage: 0
+2026-03-19 00:19:43,134 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:19:48,840 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:19:48,877 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:19:48,940 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:19:48,940 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:19:49,590 [INFO] [LOG] /start endpoint called
+2026-03-19 00:19:49,590 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:19:49,590 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:19:49,590 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:19:49,590 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:19:49,600 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:19:49,942 [ERROR] [ERROR] Engine update error during rest phase: float division by zero
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 822, in background_simulation
+    state.engine.update(dt)
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 567, in update
+    if len(self.hr_buffer) > (10 / dt_real): self.hr_buffer.pop(0)
+                              ~~~^~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-03-19 00:19:49,944 [ERROR] Engine state - HR: 89.0, SBP: 133.0, Stage: 0
+2026-03-19 00:20:33,603 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:20:39,408 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:20:39,438 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:20:39,500 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:20:39,502 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:20:39,900 [INFO] [LOG] /start endpoint called
+2026-03-19 00:20:39,908 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:20:39,908 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:20:39,908 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:20:39,908 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:20:39,916 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:20:40,003 [ERROR] [ERROR] Engine update error during rest phase: float division by zero
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 822, in background_simulation
+    state.engine.update(dt)
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 567, in update
+    if len(self.hr_buffer) > (10 / dt_real): self.hr_buffer.pop(0)
+                              ~~~^~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-03-19 00:20:40,004 [ERROR] Engine state - HR: 89.0, SBP: 133.0, Stage: 0
+2026-03-19 00:21:55,806 [INFO] [LOG] /start endpoint called
+2026-03-19 00:21:55,806 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:21:55,806 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:21:55,806 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:21:55,825 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 00:21:55,882 [INFO] [SUCCESS] Created simulation session 170 for user adrianjason
+2026-03-19 00:21:55,891 [INFO] [SUCCESS] Simulation started: Age 18, non_smoker
+2026-03-19 00:21:56,066 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 170
+2026-03-19 00:21:56,075 [ERROR] [ERROR] Engine update error during rest phase: float division by zero
+Traceback (most recent call last):
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 822, in background_simulation
+    state.engine.update(dt)
+  File "C:\Users\adria\Downloads\kardianew\KardiaTwin\backend\main.py", line 567, in update
+    if len(self.hr_buffer) > (10 / dt_real): self.hr_buffer.pop(0)
+                              ~~~^~~~~~~~~
+ZeroDivisionError: float division by zero
+2026-03-19 00:21:56,077 [ERROR] Engine state - HR: 63.0, SBP: 127.0, Stage: 0
+2026-03-19 00:22:14,952 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:22:22,803 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:22:22,843 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:22:23,012 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:22:23,014 [INFO] [THREAD] Background simulation thread starting...
+2026-03-19 00:22:23,014 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:22:23,022 [INFO] [LOG] /start endpoint called
+2026-03-19 00:22:23,023 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:22:23,023 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:22:23,024 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:22:23,024 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:22:23,031 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:24:30,360 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:24:36,771 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:24:36,808 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:24:36,873 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:24:36,874 [INFO] [THREAD] Background simulation thread starting...
+2026-03-19 00:24:36,874 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:24:37,092 [INFO] [LOG] /start endpoint called
+2026-03-19 00:24:37,092 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:24:37,093 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:24:37,093 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:24:37,093 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:24:37,100 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:24:53,434 [INFO] [LOG] Rest baseline (89.0 BPM) stabilized. Entering Exercise.
+2026-03-19 00:26:06,287 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:26:12,079 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:26:12,125 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:26:12,188 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:26:12,190 [INFO] [THREAD] Background simulation thread starting...
+2026-03-19 00:26:12,190 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:26:12,721 [INFO] [LOG] /start endpoint called
+2026-03-19 00:26:12,721 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:26:12,721 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:26:12,721 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:26:12,721 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:26:12,729 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:26:25,705 [INFO] [LOG] /start endpoint called
+2026-03-19 00:26:25,706 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:26:25,706 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:26:25,706 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:26:25,706 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:26:25,713 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:26:51,636 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:26:57,918 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:26:57,950 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:26:58,013 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:26:58,016 [INFO] [THREAD] Background simulation thread starting...
+2026-03-19 00:26:58,016 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:27:09,679 [INFO] [LOG] /start endpoint called
+2026-03-19 00:27:09,679 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:27:09,679 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:27:09,679 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:27:09,690 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 00:27:09,713 [INFO] [SUCCESS] Created simulation session 171 for user adrianjason
+2026-03-19 00:27:09,713 [INFO] [SUCCESS] Simulation started: Age 18, non_smoker
+2026-03-19 00:27:09,754 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 171
+2026-03-19 00:28:23,794 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:28:30,556 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:28:30,590 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:28:30,774 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:28:30,774 [INFO] [THREAD] Background simulation thread starting...
+2026-03-19 00:28:30,774 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:28:30,781 [INFO] [LOG] /start endpoint called
+2026-03-19 00:28:30,781 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:28:30,781 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:28:30,781 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:28:30,781 [INFO] [LOG] Digital Twin Calibrated: RR=12.3 BPM/min, Rest=89.0/133.0
+2026-03-19 00:28:30,794 [INFO] [SUCCESS] Simulation started: Age 45, smoker
+2026-03-19 00:30:02,310 [INFO] [LOG] Rest baseline (90.7 BPM) stabilized. Entering Exercise.
+2026-03-19 00:30:20,879 [INFO] [LOG] /start endpoint called
+2026-03-19 00:30:20,881 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:30:20,881 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:30:20,881 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:30:20,886 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 00:30:20,908 [INFO] [SUCCESS] Created simulation session 172 for user adrianjason
+2026-03-19 00:30:20,909 [INFO] [SUCCESS] Simulation started: Age 18, non_smoker
+2026-03-19 00:30:20,998 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 172
+2026-03-19 00:31:26,840 [INFO] [LOG] Finalizing Metrics for Session 172: PeakHR=66.2, ExDur=0s
+2026-03-19 00:31:26,848 [INFO] [SUCCESS] Saved final simulation 172: duration=131.8s, risk_score=38.0
+2026-03-19 00:31:56,055 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:32:04,500 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:32:04,551 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:32:04,634 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:32:04,635 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:32:13,518 [INFO] [LOG] /start endpoint called
+2026-03-19 00:32:13,518 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:32:13,518 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:32:13,520 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:32:13,521 [ERROR] Error: Parent instance <User at 0x1aeca83d5e0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-19 00:32:51,805 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:32:58,981 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:32:59,013 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:32:59,079 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:32:59,081 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:32:59,216 [INFO] [LOG] /start endpoint called
+2026-03-19 00:32:59,218 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:32:59,218 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:32:59,218 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:32:59,218 [ERROR] Error: Parent instance <User at 0x26e02fa5340> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-19 00:34:35,021 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:34:40,464 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:34:40,494 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:34:40,557 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:34:40,558 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:34:53,306 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:34:58,700 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:34:58,729 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:34:58,908 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:34:58,911 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:35:44,613 [INFO] [LOG] /start endpoint called
+2026-03-19 00:35:44,613 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:35:44,613 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:35:44,613 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:35:44,613 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 00:35:44,644 [INFO] [SUCCESS] Created simulation session 173 for user adrianjason
+2026-03-19 00:35:44,644 [INFO] [SUCCESS] Simulation started: Age 18, non_smoker
+2026-03-19 00:35:44,690 [INFO] [SUCCESS] Saved Heart Age (30.0) for session 173
+2026-03-19 00:35:49,678 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:35:55,316 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:35:55,361 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:35:55,531 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:35:55,536 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:36:17,114 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:36:22,623 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:36:22,653 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:36:22,827 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:36:22,827 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:39:27,650 [INFO] [LOG] /start endpoint called
+2026-03-19 00:39:27,650 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:39:27,650 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:39:27,650 [ERROR] Error: 'PhysiologySimulationEngine' object has no attribute '_initialize_vitals'
+2026-03-19 00:39:51,742 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:40:02,136 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:40:02,174 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:40:02,268 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:40:02,269 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:40:02,586 [INFO] [LOG] /start endpoint called
+2026-03-19 00:40:02,590 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:40:02,590 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:40:02,591 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:40:02,591 [ERROR] Error: Parent instance <User at 0x2ae6d844980> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-19 00:43:58,524 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:44:08,128 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:44:08,223 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:44:08,315 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:44:08,317 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:44:22,034 [INFO] [LOG] /start endpoint called
+2026-03-19 00:44:22,034 [INFO] [LOG] Request received: age=41, sex=1
+2026-03-19 00:44:22,035 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:44:22,035 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:44:22,035 [ERROR] Error: Parent instance <User at 0x1c755ea2870> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-19 00:44:42,597 [INFO] [LOG] /start endpoint called
+2026-03-19 00:44:42,597 [INFO] [LOG] Request received: age=18, sex=1
+2026-03-19 00:44:42,598 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:44:42,598 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:44:42,599 [ERROR] Error: Parent instance <User at 0x1c756ec5790> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
+2026-03-19 00:45:29,851 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:45:29,880 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:45:30,061 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:45:30,063 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:45:30,065 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 00:55:36,342 [INFO] [SUCCESS] ML model loaded
+2026-03-19 00:55:36,401 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 00:55:36,720 [INFO] [SUCCESS] Database initialized
+2026-03-19 00:55:36,725 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 00:58:14,813 [INFO] [LOG] /start endpoint called
+2026-03-19 00:58:14,813 [INFO] [LOG] Request received: age=45, sex=1
+2026-03-19 00:58:14,813 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:58:14,814 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:58:14,814 [INFO] [LOG] Digital Twin Calibrated: RR=16.2 BPM/min, Rest=71.0/120.0
+2026-03-19 00:58:14,826 [INFO] [SUCCESS] Simulation started: Age 45, non_smoker
+2026-03-19 00:58:43,958 [INFO] [LOG] /start endpoint called
+2026-03-19 00:58:43,958 [INFO] [LOG] Request received: age=27, sex=1
+2026-03-19 00:58:43,963 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 00:58:43,972 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 00:58:43,972 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x20df3653d10> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 00:58:43,973 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 00:58:44,024 [INFO] [SUCCESS] Created simulation session 174 for user adrianjason
+2026-03-19 00:58:44,024 [INFO] [SUCCESS] Simulation started: Age 27, non_smoker
+2026-03-19 00:58:44,092 [INFO] [SUCCESS] Saved Heart Age (39.0) for session 174
+2026-03-19 01:02:46,950 [INFO] [LOG] Finalizing Metrics for Session 174: PeakHR=96.8, ExDur=182s
+2026-03-19 01:02:46,950 [INFO] [SUCCESS] Saved final simulation 174: duration=242.9s, risk_score=76.0
+2026-03-19 01:17:14,460 [INFO] [LOG] /start endpoint called
+2026-03-19 01:17:14,460 [INFO] [LOG] Request received: age=30, sex=1
+2026-03-19 01:17:14,461 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 01:17:14,461 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 01:17:14,462 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x20df3a78410> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 01:17:14,463 [INFO] [LOG] Digital Twin Calibrated: RR=3.6 BPM/min, Rest=110.0/165.0
+2026-03-19 01:17:14,486 [INFO] [SUCCESS] Created simulation session 175 for user adrianjason
+2026-03-19 01:17:14,487 [INFO] [SUCCESS] Simulation started: Age 30, smoker
+2026-03-19 01:17:14,571 [INFO] [SUCCESS] Saved Heart Age (61.0) for session 175
+2026-03-19 01:17:21,935 [INFO] [LOG] Finalizing Metrics for Session 175: PeakHR=110.0, ExDur=0s
+2026-03-19 01:17:21,938 [INFO] [SUCCESS] Saved final simulation 175: duration=7.1s, risk_score=71.0
+2026-03-19 02:44:34,086 [INFO] [LOG] /start endpoint called
+2026-03-19 02:44:34,086 [INFO] [LOG] Request received: age=32, sex=1
+2026-03-19 02:44:34,089 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 02:44:34,089 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 02:44:34,091 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x20df3675340> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 02:44:34,091 [INFO] [LOG] Digital Twin Calibrated: RR=18.6 BPM/min, Rest=63.0/127.0
+2026-03-19 02:44:34,133 [INFO] [SUCCESS] Created simulation session 176 for user adrianjason
+2026-03-19 02:44:34,133 [INFO] [SUCCESS] Simulation started: Age 32, non_smoker
+2026-03-19 02:44:34,177 [INFO] [SUCCESS] Saved Heart Age (44.0) for session 176
+2026-03-19 02:45:01,516 [INFO] [LOG] Finalizing Metrics for Session 176: PeakHR=63.0, ExDur=0s
+2026-03-19 02:45:01,524 [INFO] [SUCCESS] Saved final simulation 176: duration=27.0s, risk_score=69.0
+2026-03-19 02:45:17,527 [INFO] [LOG] Digital Twin Calibrated: RR=19.0 BPM/min, Rest=71.0/115.0
+2026-03-19 02:45:53,558 [INFO] [LOG] /start endpoint called
+2026-03-19 02:45:53,559 [INFO] [LOG] Request received: age=32, sex=1
+2026-03-19 02:45:53,559 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 02:45:53,560 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 02:45:53,560 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x20df36c16d0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 02:45:53,560 [INFO] [LOG] Digital Twin Calibrated: RR=9.1 BPM/min, Rest=87.0/143.0
+2026-03-19 02:45:53,590 [INFO] [SUCCESS] Created simulation session 177 for user adrianjason
+2026-03-19 02:45:53,590 [INFO] [SUCCESS] Simulation started: Age 32, smoker
+2026-03-19 02:45:53,614 [INFO] [SUCCESS] Saved Heart Age (53.0) for session 177
+2026-03-19 02:47:41,045 [INFO] [LOG] Finalizing Metrics for Session 177: PeakHR=95.6, ExDur=46s
+2026-03-19 02:47:41,057 [INFO] [SUCCESS] Saved final simulation 177: duration=107.0s, risk_score=75.0
+2026-03-19 03:28:57,972 [INFO] [LOG] /start endpoint called
+2026-03-19 03:28:57,972 [INFO] [LOG] Request received: age=32, sex=1
+2026-03-19 03:28:57,976 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 03:28:57,977 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 03:28:57,979 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x20df37d0a10> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 03:28:57,979 [INFO] [LOG] Digital Twin Calibrated: RR=38.0 BPM/min, Rest=56.0/110.0
+2026-03-19 03:28:58,073 [INFO] [SUCCESS] Created simulation session 178 for user adrianjason
+2026-03-19 03:28:58,073 [INFO] [SUCCESS] Simulation started: Age 32, non_smoker
+2026-03-19 03:28:58,137 [INFO] [SUCCESS] Saved Heart Age (29.0) for session 178
+2026-03-19 03:31:24,448 [INFO] [LOG] Finalizing Metrics for Session 178: PeakHR=68.6, ExDur=85s
+2026-03-19 03:31:24,451 [INFO] [SUCCESS] Saved final simulation 178: duration=146.0s, risk_score=66.0
+2026-03-19 03:31:28,045 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 03:33:11,806 [INFO] [SUCCESS] ML model loaded
+2026-03-19 03:33:11,848 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 03:33:12,134 [INFO] [SUCCESS] Database initialized
+2026-03-19 03:33:12,135 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 03:33:37,091 [INFO] [LOG] /start endpoint called
+2026-03-19 03:33:37,094 [INFO] [LOG] Request received: age=32, sex=1
+2026-03-19 03:33:37,094 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 03:33:37,094 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 03:33:37,094 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x18cd09498e0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 03:33:37,094 [INFO] [LOG] Digital Twin Calibrated: RR=3.6 BPM/min, Rest=97.0/152.0
+2026-03-19 03:33:37,176 [INFO] [SUCCESS] Created simulation session 179 for user adrianjason
+2026-03-19 03:33:37,176 [INFO] [SUCCESS] Simulation started: Age 32, smoker
+2026-03-19 03:33:37,270 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 179
+2026-03-19 03:38:22,604 [INFO] [CLINICAL] Target HR Reached - Success (159.8 BPM). Entering recovery.
+2026-03-19 03:41:08,828 [INFO] [LOG] Finalizing Metrics for Session 179: PeakHR=278.1, ExDur=270s
+2026-03-19 03:41:08,831 [INFO] [SUCCESS] Saved final simulation 179: duration=451.7s, risk_score=89.0
+2026-03-19 03:41:33,718 [INFO] [LOG] /start endpoint called
+2026-03-19 03:41:33,720 [INFO] [LOG] Request received: age=32, sex=1
+2026-03-19 03:41:33,721 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 03:41:33,722 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 03:41:33,723 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x18cd0db7ad0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 03:41:33,723 [INFO] [LOG] Digital Twin Calibrated: RR=5.7 BPM/min, Rest=81.0/142.0
+2026-03-19 03:41:33,744 [INFO] [SUCCESS] Created simulation session 180 for user adrianjason
+2026-03-19 03:41:33,744 [INFO] [SUCCESS] Simulation started: Age 32, non_smoker
+2026-03-19 03:41:33,774 [INFO] [SUCCESS] Saved Heart Age (56.0) for session 180
+2026-03-19 03:47:16,615 [INFO] [CLINICAL] Target HR Reached - Success (159.8 BPM). Entering recovery.
+2026-03-19 03:47:59,643 [INFO] [LOG] Finalizing Metrics for Session 180: PeakHR=280.0, ExDur=337s
+2026-03-19 03:47:59,645 [INFO] [SUCCESS] Saved final simulation 180: duration=385.7s, risk_score=86.0
+2026-03-19 14:20:20,114 [INFO] [SUCCESS] ML model loaded
+2026-03-19 14:20:20,170 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 14:20:20,344 [INFO] [SUCCESS] Database initialized
+2026-03-19 14:20:20,345 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 14:20:20,556 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:20,717 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:20,809 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:20,817 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:20,821 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:20,826 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:20,831 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 14:20:36,677 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 14:20:44,150 [INFO] [SUCCESS] ML model loaded
+2026-03-19 14:20:44,183 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 14:20:44,247 [INFO] [SUCCESS] Database initialized
+2026-03-19 14:20:44,247 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 14:20:59,536 [INFO] Successful login for user 'adrianjason' (ID: 10)
+2026-03-19 14:23:43,722 [INFO] [LOG] /start endpoint called
+2026-03-19 14:23:43,726 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 14:23:43,726 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 14:23:43,727 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 14:23:43,727 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x1722e61a7b0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 14:23:43,727 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/130.6
+2026-03-19 14:23:43,806 [INFO] [SUCCESS] Created simulation session 181 for user adrianjason
+2026-03-19 14:23:43,806 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 14:23:43,886 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 181
+2026-03-19 14:34:56,933 [INFO] [CLINICAL] Target HR Reached - Success (130.9 BPM). Entering recovery.
+2026-03-19 14:36:47,566 [INFO] [CLINICAL] Pathophysiological Recovery Complete: 110.6s
+2026-03-19 14:36:47,721 [INFO] [LOG] Finalizing Metrics for Session 181: PeakHR=130.9, ExDur=667s
+2026-03-19 14:36:47,726 [INFO] [SUCCESS] Saved final simulation 181: duration=783.6s, risk_score=58.0
+2026-03-19 15:55:30,054 [INFO] [SUCCESS] ML model loaded
+2026-03-19 15:55:30,090 [INFO] [AGE] Imposing Age Dynamics: +15.6 SBP offset, 26% efficiency loss
+2026-03-19 15:55:30,090 [INFO] [SENIOR] Senior Stiffness Multiplier: 1.1x Applied
+2026-03-19 15:55:30,090 [INFO] [LOG] Digital Twin Calibrated: RR=20.8 BPM/min, Rest=56.0/146.2
+2026-03-19 15:55:30,127 [INFO] [AGE] Imposing Age Dynamics: +16.8 SBP offset, 28% efficiency loss
+2026-03-19 15:55:30,127 [INFO] [SENIOR] Senior Stiffness Multiplier: 1.25x Applied
+2026-03-19 15:55:30,131 [INFO] [LOG] Digital Twin Calibrated: RR=1.0 BPM/min, Rest=101.0/183.6
+2026-03-19 15:56:33,942 [INFO] [SUCCESS] ML model loaded
+2026-03-19 15:56:33,987 [INFO] [AGE] Imposing Age Dynamics: +15.6 SBP offset, +8.0 HR offset
+2026-03-19 15:56:33,987 [INFO] [SENIOR] Senior Stiffness Multiplier: 1.1x Applied
+2026-03-19 15:56:33,987 [INFO] [LOG] Digital Twin Calibrated: RR=20.8 BPM/min, Rest=64.0/146.2
+2026-03-19 15:56:33,997 [INFO] [AGE] Imposing Age Dynamics: +16.8 SBP offset, +9.0 HR offset
+2026-03-19 15:56:33,997 [INFO] [SENIOR] Senior Stiffness Multiplier: 1.25x Applied
+2026-03-19 15:56:33,997 [INFO] [LOG] Digital Twin Calibrated: RR=1.0 BPM/min, Rest=110.0/183.6
+2026-03-19 15:58:30,629 [INFO] [SUCCESS] ML model loaded
+2026-03-19 15:58:30,679 [INFO] [CLINICAL] Calibrated 66yo Male: Rest=64.0/130.6
+2026-03-19 15:58:30,679 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=64.0/130.6
+2026-03-19 15:59:12,212 [INFO] [SUCCESS] ML model loaded
+2026-03-19 15:59:12,258 [INFO] [CLINICAL] Calibrated 66yo Male: Rest=64.0/125.6
+2026-03-19 15:59:12,258 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=64.0/125.6
+2026-03-19 15:59:12,260 [INFO] [CLINICAL] Calibrated 50yo Female: Rest=80.0/111.0
+2026-03-19 15:59:12,260 [INFO] [LOG] Digital Twin Calibrated: RR=13.0 BPM/min, Rest=80.0/111.0
+2026-03-19 15:59:45,415 [INFO] [SUCCESS] ML model loaded
+2026-03-19 15:59:45,458 [INFO] [CLINICAL] Calibrated 66yo Male: Rest=64.0/125.6
+2026-03-19 15:59:45,458 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=64.0/125.6
+2026-03-19 15:59:45,460 [INFO] [CLINICAL] Calibrated 50yo Female: Rest=80.0/111.0
+2026-03-19 15:59:45,460 [INFO] [LOG] Digital Twin Calibrated: RR=13.0 BPM/min, Rest=80.0/111.0
+2026-03-19 15:59:45,460 [INFO] [CLINICAL] Calibrated 50yo Male: Rest=83.0/139.1
+2026-03-19 15:59:45,460 [INFO] [LOG] Digital Twin Calibrated: RR=10.3 BPM/min, Rest=83.0/139.1
+2026-03-19 15:59:45,461 [INFO] [CLINICAL] Calibrated 75yo Female: Rest=90.5/131.0
+2026-03-19 15:59:45,461 [INFO] [LOG] Digital Twin Calibrated: RR=9.4 BPM/min, Rest=90.5/131.0
+2026-03-19 16:04:22,222 [INFO] [LOG] /start endpoint called
+2026-03-19 16:04:22,230 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 16:04:22,237 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 16:04:22,243 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 16:04:22,252 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x1722edc5df0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 16:04:22,261 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/130.6
+2026-03-19 16:04:22,450 [INFO] [SUCCESS] Created simulation session 182 for user adrianjason
+2026-03-19 16:04:22,450 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 16:04:22,542 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 182
+2026-03-19 16:04:30,057 [INFO] [LOG] Finalizing Metrics for Session 182: PeakHR=56.3, ExDur=2s
+2026-03-19 16:04:30,067 [INFO] [SUCCESS] Saved final simulation 182: duration=7.4s, risk_score=58.0
+2026-03-19 16:05:04,422 [INFO] [LOG] /start endpoint called
+2026-03-19 16:05:04,422 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 16:05:04,422 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 16:05:04,427 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 16:05:04,427 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x1722edc6660> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 16:05:04,427 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/130.6
+2026-03-19 16:05:04,454 [INFO] [SUCCESS] Created simulation session 183 for user adrianjason
+2026-03-19 16:05:04,454 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 16:05:04,513 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 183
+2026-03-19 16:05:09,537 [INFO] [LOG] Finalizing Metrics for Session 183: PeakHR=56.0, ExDur=0s
+2026-03-19 16:05:09,544 [INFO] [SUCCESS] Saved final simulation 183: duration=4.9s, risk_score=58.0
+2026-03-19 16:05:52,894 [INFO] Refresh token endpoint called with token: eyJhbGciOiJIUzI1NiIs...
+2026-03-19 16:08:53,006 [INFO] [LOG] /start endpoint called
+2026-03-19 16:08:53,006 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 16:08:53,006 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 16:08:53,008 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 16:08:53,009 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x1722ebb6a20> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 16:08:53,009 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/130.6
+2026-03-19 16:08:53,060 [INFO] [SUCCESS] Created simulation session 184 for user testuser123
+2026-03-19 16:08:53,071 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 16:08:53,259 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 184
+2026-03-19 16:10:47,424 [INFO] [LOG] /start endpoint called
+2026-03-19 16:10:47,424 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 16:10:47,426 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 16:10:47,427 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 16:10:47,431 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x1722ebd9730> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 16:10:47,432 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/130.6
+2026-03-19 16:10:47,461 [INFO] [SUCCESS] Created simulation session 185 for user adrianjason
+2026-03-19 16:10:47,461 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 16:10:47,541 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 185
+2026-03-19 16:11:08,517 [INFO] [SUCCESS] ML model loaded
+2026-03-19 16:11:08,557 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 16:11:08,827 [INFO] [SUCCESS] Database initialized
+2026-03-19 16:11:08,827 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 16:13:53,768 [INFO] [SUCCESS] ML model loaded
+2026-03-19 16:13:53,840 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 16:13:54,058 [INFO] [SUCCESS] Database initialized
+2026-03-19 16:13:54,060 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 16:13:54,063 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 16:17:14,049 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 16:17:30,925 [INFO] [SUCCESS] ML model loaded
+2026-03-19 16:17:30,981 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 16:17:31,116 [INFO] [SUCCESS] Database initialized
+2026-03-19 16:17:31,116 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 16:17:55,117 [INFO] [LOG] /start endpoint called
+2026-03-19 16:17:55,117 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 16:17:55,118 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 16:17:55,118 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 16:17:55,120 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x1a8feea5f10> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 16:17:55,120 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/125.6
+2026-03-19 16:17:55,167 [INFO] [SUCCESS] Created simulation session 186 for user adrianjason
+2026-03-19 16:17:55,167 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 16:17:55,361 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 186
+2026-03-19 16:18:00,695 [INFO] [LOG] Finalizing Metrics for Session 186: PeakHR=56.0, ExDur=0s
+2026-03-19 16:18:00,699 [INFO] [SUCCESS] Saved final simulation 186: duration=5.4s, risk_score=58.0
+2026-03-19 16:40:39,281 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 17:11:02,428 [INFO] [SUCCESS] ML model loaded
+2026-03-19 17:11:02,522 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 17:11:02,710 [INFO] [SUCCESS] Database initialized
+2026-03-19 17:11:02,710 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 17:16:41,696 [INFO] [LOG] /start endpoint called
+2026-03-19 17:16:41,696 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 17:16:41,699 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 17:16:41,700 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 17:16:41,700 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x17b22735610> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 17:16:41,701 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/125.6
+2026-03-19 17:16:41,781 [INFO] [SUCCESS] Created simulation session 187 for user adrianjason
+2026-03-19 17:16:41,781 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 17:16:41,924 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 187
+2026-03-19 17:16:47,044 [INFO] [LOG] Finalizing Metrics for Session 187: PeakHR=56.0, ExDur=0s
+2026-03-19 17:16:47,048 [INFO] [SUCCESS] Saved final simulation 187: duration=4.8s, risk_score=58.0
+2026-03-19 17:22:05,522 [INFO] [LOG] /start endpoint called
+2026-03-19 17:22:05,522 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 17:22:05,522 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 17:22:05,527 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 17:22:05,527 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x17b2392f9b0> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 17:22:05,528 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=56.0/125.6
+2026-03-19 17:22:05,549 [INFO] [SUCCESS] Created simulation session 188 for user adrianjason
+2026-03-19 17:22:05,550 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 17:22:05,607 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 188
+2026-03-19 17:22:09,812 [INFO] [LOG] Finalizing Metrics for Session 188: PeakHR=56.0, ExDur=0s
+2026-03-19 17:22:09,815 [INFO] [SUCCESS] Saved final simulation 188: duration=3.9s, risk_score=58.0
+2026-03-19 17:22:28,607 [INFO] [SHUTDOWN] Shutting down...
+2026-03-19 17:25:34,633 [INFO] [SUCCESS] ML model loaded
+2026-03-19 17:25:34,707 [INFO] [STARTUP] Starting KardiaTwin FastAPI Server...
+2026-03-19 17:25:34,809 [INFO] [SUCCESS] Database initialized
+2026-03-19 17:25:34,811 [INFO] [SUCCESS] Simulation thread started
+2026-03-19 17:25:44,724 [INFO] [LOG] /start endpoint called
+2026-03-19 17:25:44,725 [INFO] [LOG] Request received: age=66, sex=1
+2026-03-19 17:25:44,726 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 17:25:44,726 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 17:25:44,726 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x2df1cf06450> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 17:25:44,726 [INFO] [LOG] Digital Twin Calibrated: RR=28.1 BPM/min, Rest=64.0/125.6
+2026-03-19 17:25:44,767 [INFO] [SUCCESS] Created simulation session 189 for user adrianjason
+2026-03-19 17:25:44,767 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 17:25:44,826 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 189
+2026-03-19 17:25:51,570 [INFO] [LOG] Finalizing Metrics for Session 189: PeakHR=64.0, ExDur=0s
+2026-03-19 17:25:51,575 [INFO] [SUCCESS] Saved final simulation 189: duration=6.7s, risk_score=58.0
+2026-03-19 17:26:07,410 [INFO] [LOG] /start endpoint called
+2026-03-19 17:26:07,412 [INFO] [LOG] Request received: age=66, sex=0
+2026-03-19 17:26:07,412 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 17:26:07,412 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 17:26:07,413 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x2df1e0e7590> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 17:26:07,413 [INFO] [LOG] Digital Twin Calibrated: RR=18.2 BPM/min, Rest=74.0/120.6
+2026-03-19 17:26:07,435 [INFO] [SUCCESS] Created simulation session 190 for user adrianjason
+2026-03-19 17:26:07,435 [INFO] [SUCCESS] Simulation started: Age 66, non_smoker
+2026-03-19 17:26:07,486 [INFO] [SUCCESS] Saved Heart Age (63.0) for session 190
+2026-03-19 17:26:12,171 [INFO] [LOG] Finalizing Metrics for Session 190: PeakHR=74.0, ExDur=0s
+2026-03-19 17:26:12,174 [INFO] [SUCCESS] Saved final simulation 190: duration=4.6s, risk_score=74.0
+2026-03-19 18:04:47,966 [INFO] [LOG] /start endpoint called
+2026-03-19 18:04:47,974 [INFO] [LOG] Request received: age=40, sex=0
+2026-03-19 18:04:47,983 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 18:04:47,985 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 18:04:47,992 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x2df1e124230> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 18:04:47,995 [INFO] [LOG] Digital Twin Calibrated: RR=1.6 BPM/min, Rest=128.0/166.0
+2026-03-19 18:04:48,209 [INFO] [SUCCESS] Created simulation session 191 for user adrianjason
+2026-03-19 18:04:48,209 [INFO] [SUCCESS] Simulation started: Age 40, smoker
+2026-03-19 18:04:48,299 [INFO] [SUCCESS] Saved Heart Age (71.0) for session 191
+2026-03-19 18:04:58,760 [INFO] [LOG] Finalizing Metrics for Session 191: PeakHR=128.0, ExDur=0s
+2026-03-19 18:04:58,764 [INFO] [SUCCESS] Saved final simulation 191: duration=10.3s, risk_score=84.0
+2026-03-19 18:05:06,277 [INFO] [LOG] /start endpoint called
+2026-03-19 18:05:06,277 [INFO] [LOG] Request received: age=40, sex=1
+2026-03-19 18:05:06,277 [INFO] [LOG] Creating PhysiologySimulationEngine...
+2026-03-19 18:05:06,277 [INFO] [SUCCESS] Engine created successfully
+2026-03-19 18:05:06,277 [WARNING] Warning: Could not load user profile details (Parent instance <User at 0x2df1e135190> is not bound to a Session; lazy load operation of attribute 'profile' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)). Using defaults.
+2026-03-19 18:05:06,281 [INFO] [LOG] Digital Twin Calibrated: RR=3.6 BPM/min, Rest=110.0/165.0
+2026-03-19 18:05:06,309 [INFO] [SUCCESS] Created simulation session 192 for user adrianjason
+2026-03-19 18:05:06,309 [INFO] [SUCCESS] Simulation started: Age 40, smoker
+2026-03-19 18:05:06,357 [INFO] [SUCCESS] Saved Heart Age (71.0) for session 192
+2026-03-19 18:05:10,478 [INFO] [LOG] Finalizing Metrics for Session 192: PeakHR=110.0, ExDur=0s
+2026-03-19 18:05:10,493 [INFO] [SUCCESS] Saved final simulation 192: duration=3.7s, risk_score=71.0
+2026-03-19 18:25:04,284 [INFO] [SHUTDOWN] Shutting down...

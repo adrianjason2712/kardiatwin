@@ -1,0 +1,18 @@
+2026-03-18 22:24:24,129 [ERROR] [ERROR] Failed to load ML model: [Errno 2] No such file or directory: 'heart_model.pkl'
+2026-03-18 22:24:24,168 [INFO] [LOG] Digital Twin Calibrated: RR=4.2 BPM/min, Rest=124.0/159.2
+2026-03-18 22:24:24,168 [INFO] [LOG] Rest baseline (124.0 BPM) stabilized. Entering Exercise.
+2026-03-18 22:24:24,168 [INFO] [LOG] Exercise phase complete: Target HR Met. Switching to Recovery.
+Error building patient summary: '<' not supported between instances of 'MagicMock' and 'int'
+--- [VERIFYING PHASE 10: DYNAMIC SCALING] ---
+Engine Attributes: ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_advance_stage', '_get_current_stage_config', 'activity_level', 'age', 'age_modifier', 'alcohol_consumption', 'apply_modifiers', 'baseline_dbp', 'baseline_hr', 'baseline_oldpeak', 'baseline_sbp', 'bmi', 'calculate_adaptive_thresholds', 'config', 'dbp', 'diabetes_history', 'exang', 'exercise_duration_actual', 'exercise_hr_mult', 'exercise_sbp_mult', 'female_ref', 'get_trend', 'height', 'hr', 'hr_increase_rate_per_min', 'hr_modifier', 'hr_offset', 'male_ref', 'max_hr', 'max_workload_capacity', 'oldpeak', 'pad_history', 'pause', 'pause_elapsed', 'pause_start_time', 'paused', 'peak_hr', 'peak_sbp', 'peak_sbp_cap', 'phase', 'phase_elapsed_s', 'predict_risk', 'prediction_history', 'previous_risk_level', 'protocol', 'protocol_configs', 'protocol_finished', 'recovery_duration_actual', 'recovery_efficiency', 'recovery_modifier', 'recovery_rate_per_min', 'rest_duration_actual', 'resume', 'risk_thresholds', 'sbp', 'sbp_increase_per_level', 'sbp_modifier', 'sbp_offset', 'sex', 'smoking_status', 'stage', 'stage_time', 'to_latest_data', 'total_duration_s', 'update', 'weight', 'workload_level']
+Max HR: 162.0
+Baseline HR: 124.0
+85% Target: 137.7
+Phase after 30s stable rest: exercise
+HR after hitting threshold: 137.8
+Phase after THR: recovery
+Recovery sim time after 1s real: 8.0s
+
+--- [VERIFYING PHASE 10: AI GROUNDING] ---
+Checking summary for Telemetry Map...
+FAILURE: Telemetry Map missing from AI Context.
